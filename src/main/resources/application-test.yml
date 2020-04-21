@@ -1,0 +1,43 @@
+server:
+  port: 8001
+  servlet:
+    session:
+      timeout: 4h
+
+web:
+  upload-path: D:/浪漫订货会/upload/
+
+
+spring:
+  datasource:
+    url: jdbc:mysql://10.10.10.107:3306/exhibition-test?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC&useSSL=true
+    username: ipos
+    password: hongjipos@2016
+    driver-class-name: com.mysql.jdbc.Driver
+
+
+  thymeleaf:
+    cache: false
+    mode: HTML
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+mybatis:
+  type-aliases-package: com.honji.exhibition.admin
+
+
+mybatis-plus:
+    # 支持统配符 * 或者 ; 分割
+    typeEnumsPackage: com.honji.exhibition.admin.enums
+    configuration:
+      default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+
+
+logging:
+
+  file: logs/exhibition-admin.log
+  level:
+    com.honji.exhibition.mapper: debug
+    root: INFO

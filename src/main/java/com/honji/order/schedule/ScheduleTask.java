@@ -35,11 +35,37 @@ public class ScheduleTask {
     private ICcbOrderService ccbOrderService;
     @Autowired
     private ICcbPosService ccbPosService;
+/*
 
+    @PostConstruct
+    public void backup() throws InterruptedException {
+        List<CcbPos> ccbPosList = ccbPosService.list();
+
+        LocalDate yesterday = LocalDate.of(2020, 4, 23);
+        LocalDate date = LocalDate.of(2020, 4, 1);
+        while (date.isBefore(yesterday)) {
+            List<CcbOrder> ccbOrders = new ArrayList<>();
+            for (CcbPos ccbPos : ccbPosList) {
+                save(ccbPos, date, ccbOrders);
+                Thread.sleep(5000);
+            }
+//            save(ccbPosList.get(0), date, ccbOrders);
+//            save(ccbPosList.get(1), date, ccbOrders);
+//            save(ccbPosList.get(2), date, ccbOrders);
+            boolean result = ccbOrderService.saveBatch(ccbOrders);
+            if (result) {
+                log.info("{} {} 条账单保存成功", date, ccbOrders.size());
+            } else {
+                log.error("{} 记录保存失败", date, ccbOrders.size());
+            }
+            date = date.plusDays(1);
+        }
+    }
+*/
 
     @Async
     @Scheduled(cron = "0 0 7 * * ?")  //
-    //@Scheduled(fixedDelay = 1000000)  //间隔1秒
+    //@Scheduled(fixedDelay = 1000000000)  //间隔1秒
     public void first() throws InterruptedException {
         List<CcbPos> ccbPosList = ccbPosService.list();
         List<CcbOrder> ccbOrders = new ArrayList<>();
@@ -63,6 +89,8 @@ public class ScheduleTask {
 
 
     }
+
+
 
     private void save(CcbPos ccbPos, LocalDate date, List<CcbOrder> ccbOrders) {
 
@@ -156,7 +184,7 @@ public class ScheduleTask {
         } else {
             String returnMsg = root.elementText("RETURN_MSG");
             //System.out.println("---fail===" + POSID + "  msg===" + returnMsg);
-            log.warn("posid:{} 读取日期{} 接口失败原因： {}", POSID, date, returnMsg);
+            log.warn("posid:{} 日期{} 返回失败 原因：{}", POSID, date, returnMsg);
         }
 
     }

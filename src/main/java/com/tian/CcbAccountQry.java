@@ -18,8 +18,8 @@ public class CcbAccountQry
     {
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���
-        String POSID="043783249";                    //��̨��
-        String ORDERDATE="20200419";                  //��������
+        String POSID="043783188";                    //��̨��
+        String ORDERDATE="20200407";                  //��������
         String BEGORDERTIME="00:00:00";
         String ENDORDERTIME="23:59:59";
         String BEGORDERID="";
@@ -112,7 +112,7 @@ public class CcbAccountQry
 
             Connection connection = null;
             PreparedStatement ps = null;
-            String sql = "INSERT INTO ccb_order(pos_id, date, pay_amount, refund_amount) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO ccb_order(id, khdm, date, pay_amount, refund_amount) VALUES (newid(), ?, ?, ?, ?)";
 
             ResultSet rs = null;
             try{

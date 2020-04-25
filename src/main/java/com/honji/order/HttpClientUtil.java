@@ -104,7 +104,7 @@ public class HttpClientUtil {
 
 			int statusCode = httpClient.executeMethod(method);
 			if (statusCode != 200) {
-				log.error("posid:{} 查询日期{} 网络失败");
+				log.error("posid:{} 查询日期{} 网络失败", paramMap.get("POSID"), paramMap.get("ORDERDATE"));
 			}
 			content = new String(method.getResponseBody(), code);
 			

@@ -1,6 +1,5 @@
 package com.honji.order;
 
-import com.honji.order.entity.CcbOrder;
 import com.honji.order.service.ICcbOrderService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -110,9 +109,9 @@ public class CcbAccountQry
         if ("000000".equals(returnCode)) {//返回成功
             int payAmount = (int)Float.parseFloat(root.elementText("PAYAMOUNT"));
             int refundAmount = (int)Float.parseFloat(root.elementText("REFUNDAMOUNT"));
-            CcbOrder ccbOrder = new CcbOrder(posId, date, payAmount, refundAmount);
+            //CcbOrder ccbOrder = new CcbOrder(posId, date, payAmount, refundAmount);
             //CcbOrder ccbOrder = new CcbOrder("22", posId, date, payAmount, refundAmount);
-            ccbOrderService.save(ccbOrder);
+            //ccbOrderService.save(ccbOrder);
 
         }
     }

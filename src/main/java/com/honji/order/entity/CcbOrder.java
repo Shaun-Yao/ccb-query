@@ -26,14 +26,29 @@ public class CcbOrder extends IdEntity {
 
     private LocalDate date;
 
-    private Integer payAmount;
+    private Integer amount;
 
-    private Integer refundAmount;
+    /**
+     * 手续费
+     */
+    private double fee;
 
-    public CcbOrder(String khdm, LocalDate date, Integer payAmount, Integer refundAmount) {
+    /**
+     * 订单号
+     */
+    private String num;
+
+    /**
+     * 付款类型 1是主扫 2是被扫
+     */
+    private int type;
+
+    public CcbOrder(String khdm, LocalDate date, Integer amount, double fee, String num, int type) {
         this.khdm = khdm;
         this.date = date;
-        this.payAmount = payAmount;
-        this.refundAmount = refundAmount;
+        this.amount = amount;
+        this.fee = fee;
+        this.num = num;
+        this.type = type;
     }
 }

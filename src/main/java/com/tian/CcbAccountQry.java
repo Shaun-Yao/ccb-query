@@ -6,7 +6,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,10 +16,14 @@ public class CcbAccountQry
     //@SuppressWarnings("unchecked")
 	public static void main(String[] args)throws Exception     
     {
+        LocalDate date = LocalDate.of(2020, 4, 19);
+
+        test("043783249", date, 2);
+        /*
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���
-        String POSID="043783188";                    //��̨��
-        String ORDERDATE="20200407";                  //��������
+        String POSID="043783249";                    //��̨��
+        String ORDERDATE="20200419";                  //��������
         String BEGORDERTIME="00:00:00";
         String ENDORDERTIME="23:59:59";
         String BEGORDERID="";
@@ -34,21 +38,17 @@ public class CcbAccountQry
         String KIND="1";
         String STATUS="1";
         String ORDERID = "";
-        String PAGE = "1";
+        String PAGE = "2";
         String CHANNEL = "";
         
         String bankURL="https://ibsbjstar.ccb.com.cn/app/ccbMain";
         
-        String param ="MERCHANTID="+MERCHANTID+"&BRANCHID="+BRANCHID+"&POSID="+POSID+"&ORDERDATE="+ORDERDATE+"&BEGORDERTIME="+BEGORDERTIME
-        +"&ENDORDERTIME="+ENDORDERTIME+"&BEGORDERID="+BEGORDERID+"&ENDORDERID="+ENDORDERID+"&QUPWD=&TXCODE="+TXCODE
-        +"&SEL_TYPE="+SEL_TYPE+"&OPERATOR="+OPERATOR;
-        
-        if("410408".equals(TXCODE)){
-            param ="MERCHANTID="+MERCHANTID+"&BRANCHID="+BRANCHID+"&POSID="+POSID+"&ORDERDATE="
-            +ORDERDATE+"&BEGORDERTIME="+BEGORDERTIME+"&ENDORDERTIME="+ENDORDERTIME+"&ORDERID="
-            +ORDERID+"&QUPWD=&TXCODE="+TXCODE+"&TYPE="+TYPE+"&KIND="+KIND+"&STATUS="+STATUS+
-            "&SEL_TYPE="+SEL_TYPE+"&PAGE="+PAGE+"&OPERATOR="+OPERATOR+"&CHANNEL="+CHANNEL;
-        }
+
+        String param ="MERCHANTID="+MERCHANTID+"&BRANCHID="+BRANCHID+"&POSID="+POSID+"&ORDERDATE="
+        +ORDERDATE+"&BEGORDERTIME="+BEGORDERTIME+"&ENDORDERTIME="+ENDORDERTIME+"&ORDERID="
+        +ORDERID+"&QUPWD=&TXCODE="+TXCODE+"&TYPE="+TYPE+"&KIND="+KIND+"&STATUS="+STATUS+
+        "&SEL_TYPE="+SEL_TYPE+"&PAGE="+PAGE+"&OPERATOR="+OPERATOR+"&CHANNEL="+CHANNEL;
+
        
 
         Map map = new HashMap();
@@ -71,14 +71,14 @@ public class CcbAccountQry
         
         map.put("TXCODE",TXCODE);
         
-        if("410408".equals(TXCODE)){
+        //if("410408".equals(TXCODE)){
         	 map.put("TYPE",TYPE);
              map.put("KIND",KIND);
              map.put("STATUS",STATUS);
              map.put("ORDERID",ORDERID);
              map.put("PAGE",PAGE);
              map.put("CHANNEL",CHANNEL);
-        }
+        //}
        
         
         map.put("SEL_TYPE",SEL_TYPE);
@@ -91,8 +91,80 @@ public class CcbAccountQry
         System.out.println(ret);
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         Date date = new Date(format.parse(ORDERDATE).getTime());
-        persist(POSID, date, ret);
+        //persist(POSID, date, ret);
+*/
+    }
 
+    private static void test(String posId, LocalDate date, int page) {
+        String MERCHANTID ="105000151314578";
+        String BRANCHID="441000000";                 //���д���
+        String POSID=posId;           //��̨��
+        String ORDERDATE="20200419";                  //��������
+        String BEGORDERTIME="00:00:00";
+        String ENDORDERTIME="23:59:59";
+        String BEGORDERID="";
+        String ENDORDERID="";
+        String QUPWD="Honji.123";
+        String TXCODE="410408";
+        String SEL_TYPE="3";
+        String OPERATOR="";
+
+        //txcode=410408
+        String TYPE="0";
+        String KIND="1";
+        String STATUS="1";
+        String ORDERID = "";
+        String PAGE = String.valueOf(page);
+        String CHANNEL = "";
+
+        String bankURL="https://ibsbjstar.ccb.com.cn/app/ccbMain";
+
+
+        String param ="MERCHANTID="+MERCHANTID+"&BRANCHID="+BRANCHID+"&POSID="+POSID+"&ORDERDATE="
+                +ORDERDATE+"&BEGORDERTIME="+BEGORDERTIME+"&ENDORDERTIME="+ENDORDERTIME+"&ORDERID="
+                +ORDERID+"&QUPWD=&TXCODE="+TXCODE+"&TYPE="+TYPE+"&KIND="+KIND+"&STATUS="+STATUS+
+                "&SEL_TYPE="+SEL_TYPE+"&PAGE="+PAGE+"&OPERATOR="+OPERATOR+"&CHANNEL="+CHANNEL;
+
+
+
+        Map map = new HashMap();
+        map.put("MERCHANTID",MERCHANTID);
+
+        map.put("BRANCHID",BRANCHID);
+        map.put("POSID",POSID);
+
+        map.put("ORDERDATE",ORDERDATE);
+
+        map.put("BEGORDERTIME",BEGORDERTIME);
+
+        map.put("ENDORDERTIME",ENDORDERTIME);
+
+        map.put("BEGORDERID",BEGORDERID);
+
+        map.put("ENDORDERID",ENDORDERID);
+
+        map.put("QUPWD",QUPWD);
+
+        map.put("TXCODE",TXCODE);
+
+        //if("410408".equals(TXCODE)){
+        map.put("TYPE",TYPE);
+        map.put("KIND",KIND);
+        map.put("STATUS",STATUS);
+        map.put("ORDERID",ORDERID);
+        map.put("PAGE",PAGE);
+        map.put("CHANNEL",CHANNEL);
+        //}
+
+
+        map.put("SEL_TYPE",SEL_TYPE);
+
+        map.put("OPERATOR",OPERATOR);
+
+        map.put("MAC",MD5.md5Str(param));
+
+        String ret = HttpClientUtil.httpPost(bankURL, map);
+        System.out.println(ret);
     }
 
     private static void persist(String posId, Date date, String ret) {

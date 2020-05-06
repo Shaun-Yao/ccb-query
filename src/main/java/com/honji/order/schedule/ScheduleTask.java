@@ -116,7 +116,14 @@ public class ScheduleTask {
                 ccbOrders.add(ccbOrder);
             }
 
-            boolean saveResult = ccbOrderService.saveBatch(ccbOrders);
+            boolean saveResult = false;
+            try {
+                saveResult = ccbOrderService.saveBatch(ccbOrders);
+            } catch (Exception e) {//可能出现重复订单号问题
+                log.error("{} {} 页码{} {}条记录保存出现异常", khdm, date, page, ccbOrders.size());
+                e.printStackTrace();
+            }
+
             if (!saveResult) {
                 log.error("{} {} 页码{} {}条记录保存失败", khdm, date, page, ccbOrders.size());
             }

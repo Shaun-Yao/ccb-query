@@ -8,7 +8,13 @@ spring:
     username: sa
     password: 1qazxsw2~
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
+  thymeleaf:
+      cache: false
+      mode: HTML
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 20MB
 
 mybatis:
   type-aliases-package: com.honji.order

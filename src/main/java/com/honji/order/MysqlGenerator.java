@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
+import com.baomidou.mybatisplus.generator.config.TemplateConfig;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 
@@ -86,8 +87,14 @@ public class MysqlGenerator {
         mpg.setTemplate(new TemplateConfig().setXml(null));
 */
 
+        TemplateConfig templateConfig = new TemplateConfig();
+
+        templateConfig.setXml(null);
+        mpg.setTemplate(templateConfig);
+
         // 策略配置
         StrategyConfig strategy = new StrategyConfig();
+        strategy.setEnableSqlFilter(false);//since 3.3.1
         strategy.setNaming(NamingStrategy.underline_to_camel);
         strategy.setColumnNaming(NamingStrategy.underline_to_camel);
         strategy.setSuperEntityClass("com.honji.order.IdEntity");

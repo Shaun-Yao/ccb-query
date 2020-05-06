@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!--<form class="form-horizontal" id="form" role="form" action="/import/baiShengPay" enctype="multipart/form-data" method="post">
+ -->
+<div>sdfsdfs <input type="file" name="file" id="file">
+        <!--<button type="submit">确认提交</button>-->
+        <button id="import">确认提交</button>
+    </div>
+
+
+<div>aaaa <input type="file"  ></div>
+
+</body>
+<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+<script th:inline="javascript">
+    $("#import").click(function () {
+        if ($('#file')[0].files[0] != undefined) {
+            var formData = new FormData();
+            formData.append("file", $('#file')[0].files[0]);
+            $.ajax({
+                url: "/import/baiShengPay",
+                type: "POST",
+                async: false,
+                cache: false,
+                processData: false,// 告诉jQuery不要去处理发送的数据
+                contentType: false,// 告诉jQuery不要去设置Content-Type请求头
+                data: formData,
+                success: function(result){
+                    if (result) {
+                        alert("导入成功！");
+                    } else {
+                        alert("导入失败，请重新尝试！");
+                    }
+
+                    window.location = "/import/index";
+                },
+                error:function(xhr,state,errorThrown){
+                    alert("图片上传失败，请重新尝试！");
+                    window.location = "/import/index";
+                }
+
+            });
+        }
+    })
+
+</script>
+</html>

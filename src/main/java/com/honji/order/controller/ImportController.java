@@ -75,6 +75,10 @@ public class ImportController {
                 Cell feeCell = row.getCell(8);
                 Cell merchantCell = row.getCell(12);
                 Cell orderCell = row.getCell(17);
+
+                Cell tradeTypeCell = row.getCell(4);//交易类型
+                Cell remarkCell = row.getCell(19);//备注
+
                 LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
                 String time = timeCell.getStringCellValue();
                 String terminalNum = terminalCell.getStringCellValue();
@@ -83,7 +87,15 @@ public class ImportController {
                 String merchant = merchantCell.getStringCellValue();
                 String orderId = orderCell.getStringCellValue();
 
-                BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant);
+                String tradeType = tradeTypeCell.getStringCellValue();
+                //String remark = remarkCell.getStringCellValue();
+                byte type = 1;
+
+                if (remarkCell == null && "消费".equals(tradeType)) {//扫一扫类型
+                    type = 2;
+                }
+
+                BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant, type);
                 list.add(baiShengPay);
 
                 //baiShengPayService.saveBatch(list);
@@ -112,8 +124,8 @@ public class ImportController {
             try {
                 result = baiShengPayService.saveBatch(list);
             } catch (Exception e) {
-                log.error("百胜支付 {} 导入出现异常", fileName);
-                e.printStackTrace();
+                log.error("百胜支付 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
             }
             long end = System.currentTimeMillis();
             if (result) {
@@ -123,6 +135,7 @@ public class ImportController {
             }
 
         }
+        list = null;//释放list
         return result;
     }
 

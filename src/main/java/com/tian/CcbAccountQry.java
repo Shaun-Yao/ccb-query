@@ -16,9 +16,9 @@ public class CcbAccountQry
     //@SuppressWarnings("unchecked")
 	public static void main(String[] args)throws Exception     
     {
-        LocalDate date = LocalDate.of(2020, 5, 4);
+        LocalDate date = LocalDate.of(2020, 5, 6);
 
-        test("043783188", date, 1);
+        test("043783243", date, 1);
         /*
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���

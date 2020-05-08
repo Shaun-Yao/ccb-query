@@ -8,19 +8,24 @@
 
 <!--<form class="form-horizontal" id="form" role="form" action="/import/baiShengPay" enctype="multipart/form-data" method="post">
  -->
-<div>sdfsdfs <input type="file" name="file" id="file">
+<p></p>
+<div>
+    导入百胜支付和扫一扫
+    <input type="file" name="file" id="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
         <!--<button type="submit">确认提交</button>-->
         <button id="import">确认提交</button>
-    </div>
-
-
-<div>aaaa <input type="file"  ></div>
+</div>
 
 </body>
 <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
 <script th:inline="javascript">
     $("#import").click(function () {
-        if ($('#file')[0].files[0] != undefined) {
+        var file = $('#file')[0].files[0];
+        if (file != undefined) {
+            if (file.size > 15 * 1024 * 1024) {
+                alert("文件超过15M，不允许上传");
+                return;
+            }
             var formData = new FormData();
             formData.append("file", $('#file')[0].files[0]);
             $.ajax({
@@ -41,11 +46,13 @@
                     window.location = "/import/index";
                 },
                 error:function(xhr,state,errorThrown){
-                    alert("图片上传失败，请重新尝试！");
+                    alert("导入出现错误，请重新尝试！");
                     window.location = "/import/index";
                 }
 
             });
+        } else {
+            alert("您还未选择文件！");
         }
     })
 

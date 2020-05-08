@@ -23,7 +23,8 @@ public class BaiShengPay extends IdEntity {
 
     private static final long serialVersionUID = 1L;
 
-    public BaiShengPay(LocalDate date, String time, double amount, double fee, String terminalNum, String orderId, String merchant) {
+    public BaiShengPay(LocalDate date, String time, double amount, double fee, String terminalNum,
+                       String orderId, String merchant, byte type) {
         this.date = date;
         this.time = time;
         this.amount = amount;
@@ -31,11 +32,11 @@ public class BaiShengPay extends IdEntity {
         this.terminalNum = terminalNum;
         this.orderId = orderId;
         this.merchant = merchant;
+        this.type = type;
     }
 
     /**
      * 交易日期
-
      */
     private LocalDate date;
 
@@ -68,6 +69,11 @@ public class BaiShengPay extends IdEntity {
      * 商户名称
      */
     private String merchant;
+
+    /**
+     * 类型 1.支付 2.扫一扫
+     */
+    private byte type;
 
 
 }

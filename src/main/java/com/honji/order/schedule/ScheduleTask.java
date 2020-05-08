@@ -33,6 +33,8 @@ public class ScheduleTask {
     @Autowired
     private ICcbPosService ccbPosService;
 
+    private static final int SLEEP_TIME = 15 * 1000;
+
 /*
 
     @PostConstruct
@@ -79,7 +81,7 @@ public class ScheduleTask {
 
         for (CcbPos ccbPos : ccbPosList) {
             save(ccbPos.getKhdm(), ccbPos.getPosId(), yesterday, 1);
-            Thread.sleep(10000);
+            Thread.sleep(SLEEP_TIME);
         }
     }
 
@@ -121,7 +123,7 @@ public class ScheduleTask {
                 saveResult = ccbOrderService.saveBatch(ccbOrders);
             } catch (Exception e) {//可能出现重复订单号问题
                 log.error("{} {} 页码{} {}条记录保存出现异常", khdm, date, page, ccbOrders.size());
-                e.printStackTrace();
+                //e.printStackTrace();
             }
 
             if (!saveResult) {
@@ -130,7 +132,7 @@ public class ScheduleTask {
 
             int pageCount = Integer.parseInt(root.elementText("PAGECOUNT"));
             if (pageCount != page) {//数据超过1页
-                Thread.sleep(10000);
+                Thread.sleep(SLEEP_TIME);
                 page ++;//页码加1
                 save(khdm, posId, date, page);//递归
             }

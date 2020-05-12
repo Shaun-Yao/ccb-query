@@ -4,7 +4,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:sqlserver://10.10.10.155;databaseName=finance
+    url: jdbc:sqlserver://10.10.10.155;databaseName=finance-test
     username: sa
     password: 1qazxsw2~
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

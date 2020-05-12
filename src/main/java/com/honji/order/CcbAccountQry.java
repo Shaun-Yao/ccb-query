@@ -21,8 +21,8 @@ public class CcbAccountQry
     {
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���
-        String POSID="043783291";                    //��̨��
-        String ORDERDATE="20200417";                  //��������
+        String POSID="043783062";                    //��̨��
+        String ORDERDATE="20200425";                  //��������
         String BEGORDERTIME="00:00:00";
         String ENDORDERTIME="23:59:59";
         String BEGORDERID="";

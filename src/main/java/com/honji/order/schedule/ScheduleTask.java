@@ -67,7 +67,8 @@ public class ScheduleTask {
 
         //System.out.println("==ccbOrders==" + ccbPosList.getRecords().size());
         LocalDate yesterday = LocalDate.now().minusDays(1);
-//        LocalDate date = LocalDate.of(2020, 4, 19);
+//        LocalDate date = LocalDate.of(2020, 5, 9);
+//        LocalDate date1 = LocalDate.of(2020, 5, 10);
 //        save("ss", "043783249", date, 1);
 //        save("ss", "043783249", date, 2);
         /*
@@ -83,6 +84,7 @@ public class ScheduleTask {
             save(ccbPos.getKhdm(), ccbPos.getPosId(), yesterday, 1);
             Thread.sleep(SLEEP_TIME);
         }
+
     }
 
 
@@ -107,7 +109,7 @@ public class ScheduleTask {
             Iterator<Element> orders = root.elementIterator("QUERYORDER");
             while(orders.hasNext()) {
                 Element e = orders.next();
-                int amount = (int)Float.parseFloat(e.elementText("AMOUNT"));
+                double amount = Float.parseFloat(e.elementText("AMOUNT")) ;
                 String num = e.elementText("ORDERID");
                 int type = 1;
                 if (num.startsWith("0")) {//0开头是被扫

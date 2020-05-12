@@ -26,7 +26,7 @@ public class CcbOrder extends IdEntity {
 
     private LocalDate date;
 
-    private Integer amount;
+    private double amount;
 
     /**
      * 手续费
@@ -43,7 +43,7 @@ public class CcbOrder extends IdEntity {
      */
     private int type;
 
-    public CcbOrder(String khdm, LocalDate date, Integer amount, double fee, String num, int type) {
+    public CcbOrder(String khdm, LocalDate date, double amount, double fee, String num, int type) {
         this.khdm = khdm;
         this.date = date;
         this.amount = amount;

@@ -10,10 +10,17 @@
  -->
 <p></p>
 <div>
-    导入百胜支付和扫一扫
+    导入百胜支付和扫一扫账单
     <input type="file" name="file" id="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
         <!--<button type="submit">确认提交</button>-->
         <button id="import">确认提交</button>
+</div>
+<p></p>
+<div>
+    导入百胜刷卡账单&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+    <input type="file" name="swipeFile" id="swipeFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+    <!--<button type="submit">确认提交</button>-->
+    <button id="swipe">确认提交</button>
 </div>
 
 </body>
@@ -30,6 +37,43 @@
             formData.append("file", $('#file')[0].files[0]);
             $.ajax({
                 url: "/import/baiShengPay",
+                type: "POST",
+                async: false,
+                cache: false,
+                processData: false,// 告诉jQuery不要去处理发送的数据
+                contentType: false,// 告诉jQuery不要去设置Content-Type请求头
+                data: formData,
+                success: function(result){
+                    if (result) {
+                        alert("导入成功！");
+                    } else {
+                        alert("导入失败，请重新尝试！");
+                    }
+
+                    window.location = "/import/index";
+                },
+                error:function(xhr,state,errorThrown){
+                    alert("导入出现错误，请重新尝试！");
+                    window.location = "/import/index";
+                }
+
+            });
+        } else {
+            alert("您还未选择文件！");
+        }
+    })
+
+    $("#swipe").click(function () {
+        var file = $('#swipeFile')[0].files[0];
+        if (file != undefined) {
+            if (file.size > 15 * 1024 * 1024) {
+                alert("文件超过15M，不允许上传");
+                return;
+            }
+            var formData = new FormData();
+            formData.append("swipeFile", file);
+            $.ajax({
+                url: "/bai-sheng-swipe/import",
                 type: "POST",
                 async: false,
                 cache: false,

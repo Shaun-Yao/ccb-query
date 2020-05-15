@@ -22,7 +22,7 @@ public class BaiShengSwipe extends IdEntity {
     private static final long serialVersionUID = 1L;
 
     public BaiShengSwipe(LocalDate date, String time, double amount, double fee,
-                         String terminalNum, String orderId, String merchant) {
+                         String terminalNum, String orderId, String merchant, int type) {
         this.date = date;
         this.time = time;
         this.amount = amount;
@@ -30,6 +30,7 @@ public class BaiShengSwipe extends IdEntity {
         this.terminalNum = terminalNum;
         this.orderId = orderId;
         this.merchant = merchant;
+        this.type = type;
     }
 
     /**
@@ -67,5 +68,9 @@ public class BaiShengSwipe extends IdEntity {
      */
     private String merchant;
 
+    /**
+     * 类型 1.百胜刷卡 2.浦发刷卡 3.银联刷卡
+     */
+    private int type;
 
 }

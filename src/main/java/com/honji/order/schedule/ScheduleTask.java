@@ -33,7 +33,7 @@ public class ScheduleTask {
     @Autowired
     private ICcbPosService ccbPosService;
 
-    private static final int SLEEP_TIME = 15 * 1000;
+    private static final int SLEEP_TIME = 20 * 1000;
 
 /*
 

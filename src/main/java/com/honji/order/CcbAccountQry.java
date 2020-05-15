@@ -21,8 +21,8 @@ public class CcbAccountQry
     {
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���
-        String POSID="043783062";                    //��̨��
-        String ORDERDATE="20200425";                  //��������
+        String POSID="043783293";                    //��̨��
+        String ORDERDATE="20200514";                  //��������
         String BEGORDERTIME="00:00:00";
         String ENDORDERTIME="23:59:59";
         String BEGORDERID="";
@@ -91,7 +91,7 @@ public class CcbAccountQry
         map.put("MAC",MD5.md5Str(param));
         
         String ret = HttpClientUtil.httpPost(bankURL, map);
-        //System.out.println(ret);
+        System.out.println(ret);
         LocalDate date = LocalDate.parse(ORDERDATE, DateTimeFormatter.ofPattern("yyyyMMdd"));
         persist(POSID, date, ret);
 

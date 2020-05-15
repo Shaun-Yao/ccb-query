@@ -2,9 +2,10 @@ package com.honji.order.controller;
 
 
 import com.honji.order.entity.BaiShengPay;
+import com.honji.order.entity.BaiShengSwipe;
 import com.honji.order.service.IBaiShengPayService;
+import com.honji.order.service.IBaiShengSwipeService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,12 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,6 +33,10 @@ public class ImportController {
     @Autowired
     private IBaiShengPayService baiShengPayService;
 
+    @Autowired
+    private IBaiShengSwipeService baiShengSwipeService;
+
+
     @GetMapping("/index")
     public String index() {
 
@@ -42,13 +44,13 @@ public class ImportController {
     }
 
     @ResponseBody
-    @PostMapping("/baiShengPay")
-    public boolean baiShengPay(@RequestParam("file") MultipartFile file) throws IOException {
+    @PostMapping("/bs-pay")
+    public boolean baiShengPay(@RequestParam("bs-pay") MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         //checkFile(file);
         //获得Workbook工作薄对象
-        Workbook workbook = getWorkBook(file);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
         List<BaiShengPay> list = new ArrayList<>();
         boolean result = false;
@@ -98,26 +100,6 @@ public class ImportController {
                 BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant, type);
                 list.add(baiShengPay);
 
-                //baiShengPayService.saveBatch(list);
-                //timeCell.getStringCellValue()
-                //System.out.println(cell.getLocalDateTimeCellValue().toLocalDate());
-                //System.out.println(baiShengPay);
-
-                /*
-                //获得当前行的开始列
-                int firstCellNum = row.getFirstCellNum();
-                //获得当前行的列数
-                int lastCellNum = row.getLastCellNum();
-                if (lastCellNum > 0) {
-                    ArrayList<Object> cellValues = new ArrayList<>();
-                    //循环当前行
-                    for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
-                        Cell cell = row.getCell(cellNum);
-                        cellValues.add(getCellValue(cell));
-                        //System.out.println(getCellValue(cell));
-                    }
-                    //list.add(cellValues);
-                }*/
             }
             long start = System.currentTimeMillis();
 
@@ -136,134 +118,223 @@ public class ImportController {
 
         }
         list = null;//释放list
+        System.gc();
         return result;
     }
 
-    /**
-     * 检查文件
-     *
-     * @param file
-     * @throws IOException
-     */
-    private void checkFile(MultipartFile file) throws IOException {
-        //判断文件是否存在
-        if (null == file) {
-            System.err.println("文件不存在！");
-        }
-        //获得文件名
+    @ResponseBody
+    @PostMapping("/bssk")
+    public boolean bssk(@RequestParam("bssk") MultipartFile file) throws IOException {
+
         String fileName = file.getOriginalFilename();
-        //判断文件是否是excel文件
-        if (!fileName.endsWith("xls") && !fileName.endsWith("xlsx")) {
-            System.err.println("不是excel文件");
-        }
-    }
+        //checkFile(file);
+        //获得Workbook工作薄对象
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        List<BaiShengSwipe> list = new ArrayList<>();
+        boolean result = false;
+        if (workbook != null) {
 
-    public Workbook getWorkBook(MultipartFile file) {
-        //获得文件名
-        String fileName = file.getOriginalFilename();
-        //创建Workbook工作薄对象，表示整个excel
-        Workbook workbook = null;
-        try {
-            //获取excel文件的io流
-            InputStream is = file.getInputStream();
-            workbook = WorkbookFactory.create(is);
-            //根据文件后缀名不同(xls和xlsx)获得不同的Workbook实现类对象
-            /*if (fileName.endsWith("xls")) {
-                //2003
-                workbook = new HSSFWorkbook(is);
-            } else if (fileName.endsWith("xlsx")) {
-                //2007 及2007以上
-                workbook = WorkbookFactory.create(is);
-            }*/
-        } catch (IOException e) {
-            //e.getMessage();
-            e.printStackTrace();
-        }
-        return workbook;
-    }
+            //获得当前sheet工作表
+            Sheet sheet = workbook.getSheetAt(0);
+            //获得当前sheet的开始行
+            int firstRowNum = sheet.getFirstRowNum() + 4;//刷卡账单是从第4行开始
+            //获得当前sheet的结束行
+            int lastRowNum = sheet.getLastRowNum();
+            //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
+            for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
+                //获得当前行
+                Row row = sheet.getRow(rowNum);
+                if (row == null) {
+                    continue;
+                }
 
+                Cell dateCell = row.getCell(1);
+                if (dateCell.getCellType() == CellType.BLANK) {//尾部数据直接跳出
+                    break;
+                }
+                Cell timeCell = row.getCell(2);
+                Cell terminalCell = row.getCell(4);
+                Cell amountCell = row.getCell(5);
+                Cell feeCell = row.getCell(7);
+                Cell orderCell = row.getCell(9);
+                Cell merchantCell = row.getCell(14);
 
-    public String getCellValue(Cell cell) {
-        String cellValue = "";
-        if (cell == null) {
-            return cellValue;
-        }
-        //判断数据的类型
-        //判断数据的类型
-        switch (cell.getCellType()) {
-            case NUMERIC: //数字
-                cellValue = stringDateProcess(cell);
-                break;
-            case STRING: //字符串
-                cellValue = String.valueOf(cell.getStringCellValue());
-                break;
-            case BOOLEAN: //Boolean
-                cellValue = String.valueOf(cell.getBooleanCellValue());
-                break;
-            case FORMULA: //公式
-                cellValue = String.valueOf(cell.getCellFormula());
-                break;
-            case BLANK: //空值
-                cellValue = "";
-                break;
-            case ERROR: //故障
-                cellValue = "非法字符";
-                break;
-            default:
-                cellValue = "未知类型";
-                break;
-        }
-        return cellValue;
-    }
+                LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
+                String time = timeCell.getLocalDateTimeCellValue().toString();
+                //String time = String.valueOf(timeCell.getNumericCellValue());
+                String terminalNum = terminalCell.getStringCellValue();
+                double amount = amountCell.getNumericCellValue();
+                double fee = feeCell.getNumericCellValue();
+                String merchant = merchantCell.getStringCellValue();
+                String orderId = orderCell.getStringCellValue();
 
+                BaiShengSwipe baiShengSwipe = new BaiShengSwipe(date, time, amount, fee, terminalNum, orderId, merchant,1);
+                list.add(baiShengSwipe);
 
-
-    public static String stringDateProcess(Cell cell) {
-        String result = new String();
-        if (DateUtil.isCellDateFormatted(cell)) {// 处理日期格式、时间格式
-            SimpleDateFormat sdf = null;
-            if (cell.getCellStyle().getDataFormat() == HSSFDataFormat.getBuiltinFormat("h:mm")) {
-                sdf = new SimpleDateFormat("HH:mm");
-            } else {// 日期
-                sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             }
-            Date date = cell.getDateCellValue();
-            result = sdf.format(date);
-        } else if (cell.getCellStyle().getDataFormat() == 58) {
-            // 处理自定义日期格式：m月d日(通过判断单元格的格式id解决，id的值是58)
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            double value = cell.getNumericCellValue();
-            Date date = org.apache.poi.ss.usermodel.DateUtil
-                    .getJavaDate(value);
-            result = sdf.format(date);
-        } else {
-            double value = cell.getNumericCellValue();
-            CellStyle style = cell.getCellStyle();
-            DecimalFormat format = new DecimalFormat();
-            String temp = style.getDataFormatString();
-            // 单元格设置成常规
-            if (temp.equals("General")) {
-                format.applyPattern("#");
-            }
-            result = format.format(value);
-        }
+            long start = System.currentTimeMillis();
 
+            try {
+                result = baiShengSwipeService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("百胜刷卡 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("百胜刷卡 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("百胜刷卡 {} 导入失败", fileName);
+            }
+        }
+        list = null;//释放list
+        System.gc();
         return result;
     }
-/*
-    public static InputStream convertorStream(Workbook workbook) {
-        InputStream in = null;
-        try {
-            //临时缓冲区
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            //创建临时文件
-            workbook.write(out);
-            byte[] bookByteAry = out.toByteArray();
-            in = new ByteArrayInputStream(bookByteAry);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+    @ResponseBody
+    @PostMapping("/spdb")
+    public boolean spdb(@RequestParam("spdb") MultipartFile file) throws IOException {
+
+        String fileName = file.getOriginalFilename();
+        //checkFile(file);
+        //获得Workbook工作薄对象
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        List<BaiShengSwipe> list = new ArrayList<>();
+        boolean result = false;
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+        if (workbook != null) {
+
+            //获得当前sheet工作表
+            Sheet sheet = workbook.getSheetAt(0);
+            //获得当前sheet的开始行
+            int firstRowNum = sheet.getFirstRowNum() + 2;//浦发刷卡账单是从第3行开始
+            //获得当前sheet的结束行
+            int lastRowNum = sheet.getLastRowNum();
+            //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
+            for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
+                //获得当前行
+                Row row = sheet.getRow(rowNum);
+                if (row == null) {
+                    continue;
+                }
+
+                Cell dateCell = row.getCell(6);
+                if (dateCell.getCellType() == CellType.BLANK) {//尾部数据直接跳出
+                    break;
+                }
+                Cell timeCell = row.getCell(7);
+                Cell terminalCell = row.getCell(2);
+                Cell amountCell = row.getCell(15);
+                Cell feeCell = row.getCell(16);
+                Cell orderCell = row.getCell(10);
+                Cell merchantCell = row.getCell(3);
+
+                LocalDate date = LocalDate.parse(dateCell.getStringCellValue().trim(), dtf);
+                String time = timeCell.getStringCellValue();
+                //String time = String.valueOf(timeCell.getNumericCellValue());
+                String terminalNum = terminalCell.getStringCellValue();
+                double amount = Double.valueOf(amountCell.getStringCellValue());
+                double fee = Double.valueOf(feeCell.getStringCellValue());
+                String merchant = merchantCell.getStringCellValue();
+                String orderId = orderCell.getStringCellValue();
+
+                BaiShengSwipe baiShengSwipe = new BaiShengSwipe(date, time, amount, fee, terminalNum, orderId, merchant, 2);
+                list.add(baiShengSwipe);
+
+            }
+            long start = System.currentTimeMillis();
+
+            try {
+                result = baiShengSwipeService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("浦发刷卡 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("浦发刷卡 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("浦发刷卡 {} 导入失败", fileName);
+            }
         }
-        return in;
+        list = null;//释放list
+        System.gc();
+        return result;
     }
-    */
+
+    @ResponseBody
+    @PostMapping("/union-pay")
+    public boolean unionPay(@RequestParam("union-pay") MultipartFile file) throws IOException {
+
+        String fileName = file.getOriginalFilename();
+        //checkFile(file);
+        //获得Workbook工作薄对象
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        List<BaiShengSwipe> list = new ArrayList<>();
+        boolean result = false;
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (workbook != null) {
+
+            //获得当前sheet工作表
+            Sheet sheet = workbook.getSheetAt(0);
+            //获得当前sheet的开始行
+            int firstRowNum = sheet.getFirstRowNum() + 1;//浦发刷卡账单是从第3行开始
+            //获得当前sheet的结束行
+            int lastRowNum = sheet.getLastRowNum();
+            //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
+            for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
+                //获得当前行
+                Row row = sheet.getRow(rowNum);
+                if (row == null) {
+                    continue;
+                }
+
+                Cell dateCell = row.getCell(4);
+                if (dateCell.getCellType() == CellType.BLANK) {//尾部数据直接跳出
+                    break;
+                }
+                Cell timeCell = row.getCell(5);
+                Cell terminalCell = row.getCell(7);
+                Cell amountCell = row.getCell(10);
+                Cell feeCell = row.getCell(12);
+                Cell orderCell = row.getCell(16);
+                Cell merchantCell = row.getCell(2);
+
+                LocalDate date = LocalDate.parse(String.valueOf(dateCell.getStringCellValue()).trim(), dtf);
+                String time = timeCell.getStringCellValue();
+                //String time = String.valueOf(timeCell.getNumericCellValue());
+                String terminalNum = terminalCell.getStringCellValue();
+                double amount = amountCell.getNumericCellValue();
+                double fee = feeCell.getNumericCellValue();
+                String merchant = merchantCell.getStringCellValue();
+                String orderId = orderCell.getStringCellValue();
+
+                BaiShengSwipe baiShengSwipe = new BaiShengSwipe(date, time, amount, fee, terminalNum, orderId, merchant, 3);
+                list.add(baiShengSwipe);
+
+            }
+            long start = System.currentTimeMillis();
+
+            try {
+                result = baiShengSwipeService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("银联刷卡 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("银联刷卡 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("银联刷卡 {} 导入失败", fileName);
+            }
+        }
+        list = null;//释放list
+        System.gc();
+        return result;
+    }
+
 }

@@ -22,7 +22,7 @@ import java.time.LocalDate;
 public class CcbOrder extends IdEntity {
 
 
-    private String khdm;
+    private String terminalNum;
 
     private LocalDate date;
 
@@ -34,21 +34,28 @@ public class CcbOrder extends IdEntity {
     private double fee;
 
     /**
-     * 订单号
+     * 银行流水号
      */
     private String num;
+
+    /**
+     * 银行流水号
+     */
+    private String orderId;
 
     /**
      * 付款类型 1是主扫 2是被扫
      */
     private int type;
 
-    public CcbOrder(String khdm, LocalDate date, double amount, double fee, String num, int type) {
-        this.khdm = khdm;
+    public CcbOrder(String terminalNum, LocalDate date, double amount, double fee,
+                    String num, String orderId, int type) {
+        this.terminalNum = terminalNum;
         this.date = date;
         this.amount = amount;
         this.fee = fee;
         this.num = num;
+        this.orderId = orderId;
         this.type = type;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class CcbAccountQry
@@ -21,8 +22,8 @@ public class CcbAccountQry
     {
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���
-        String POSID="043783293";                    //��̨��
-        String ORDERDATE="20200514";                  //��������
+        String POSID="043783197";                    //��̨��
+        String ORDERDATE="20200401";                  //��������
         String BEGORDERTIME="00:00:00";
         String ENDORDERTIME="23:59:59";
         String BEGORDERID="";
@@ -91,7 +92,7 @@ public class CcbAccountQry
         map.put("MAC",MD5.md5Str(param));
         
         String ret = HttpClientUtil.httpPost(bankURL, map);
-        System.out.println(ret);
+        //System.out.println(ret);
         LocalDate date = LocalDate.parse(ORDERDATE, DateTimeFormatter.ofPattern("yyyyMMdd"));
         persist(POSID, date, ret);
 
@@ -107,8 +108,18 @@ public class CcbAccountQry
         Element root = document.getRootElement();
         String returnCode = root.elementText("RETURN_CODE");
         if ("000000".equals(returnCode)) {//返回成功
-            int payAmount = (int)Float.parseFloat(root.elementText("PAYAMOUNT"));
-            int refundAmount = (int)Float.parseFloat(root.elementText("REFUNDAMOUNT"));
+            Iterator<Element> orders = root.elementIterator("QUERYORDER");
+            while(orders.hasNext()) {
+                Element e = orders.next();
+                double amount = Float.parseFloat(e.elementText("AMOUNT")) ;
+                String num = e.elementText("ORDERID");
+                int type = 1;
+                if (num.startsWith("0")) {//0开头是被扫
+                    type = 2;
+                }
+                System.out.println(amount);
+            }
+
             //CcbOrder ccbOrder = new CcbOrder(posId, date, payAmount, refundAmount);
             //CcbOrder ccbOrder = new CcbOrder("22", posId, date, payAmount, refundAmount);
             //ccbOrderService.save(ccbOrder);

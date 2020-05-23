@@ -5,7 +5,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +17,7 @@ public class CcbAccountQry
     {
         LocalDate date = LocalDate.of(2020, 5, 6);
 
-        test("043783243", date, 1);
+        test("043783197", date, 1);
         /*
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���
@@ -99,7 +98,7 @@ public class CcbAccountQry
         String MERCHANTID ="105000151314578";
         String BRANCHID="441000000";                 //���д���
         String POSID=posId;           //��̨��
-        String ORDERDATE="20200419";                  //��������
+        String ORDERDATE="20200401";                  //��������
         String BEGORDERTIME="00:00:00";
         String ENDORDERTIME="23:59:59";
         String BEGORDERID="";
@@ -164,10 +163,11 @@ public class CcbAccountQry
         map.put("MAC",MD5.md5Str(param));
 
         String ret = HttpClientUtil.httpPost(bankURL, map);
-        System.out.println(ret);
+        //System.out.println(ret.trim());
+        persist(posId);
     }
 
-    private static void persist(String posId, Date date, String ret) {
+    private static void persist(String ret) {
         Document document = null;
         try {
             document = DocumentHelper.parseText(ret.trim());
@@ -180,8 +180,8 @@ public class CcbAccountQry
             int payAmount = (int)Float.parseFloat(root.elementText("PAYAMOUNT"));
             int refundAmount = (int)Float.parseFloat(root.elementText("REFUNDAMOUNT"));
             System.out.println("ret::"+ payAmount);
-            System.out.println("ret::"+ refundAmount);
-
+            //System.out.println("ret::"+ refundAmount);
+/*
             Connection connection = null;
             PreparedStatement ps = null;
             String sql = "INSERT INTO ccb_order(id, khdm, date, pay_amount, refund_amount) VALUES (newid(), ?, ?, ?, ?)";
@@ -205,12 +205,6 @@ public class CcbAccountQry
                 if(res > 0){
                     System.out.println("数据录入成功");
                 }
-                /*rs = ps.executeQuery();
-
-                while (rs.next()){
-                    System.out.println("name:"+rs.getString(2));
-                }
-*/
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -222,7 +216,7 @@ public class CcbAccountQry
                         e.printStackTrace();
                     }
                 }
-            }
+            }*/
         }
     }
     

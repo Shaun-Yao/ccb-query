@@ -71,7 +71,7 @@ public class BaiShengPay extends IdEntity {
     private String merchant;
 
     /**
-     * 类型 1.支付 2.扫一扫
+     * 类型 1.支付 2.扫一扫 3.码上收
      */
     private byte type;
 

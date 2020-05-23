@@ -12,10 +12,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -59,8 +57,8 @@ public class ScheduleTask {
 */
 
 
-    @Async
-    @Scheduled(cron = "0 0 7 * * ?")  //
+//    @Async
+//    @Scheduled(cron = "0 0 7 * * ?")  //
     //@Scheduled(fixedDelay = 1000000000)  //间隔1秒
     public void first() throws InterruptedException {
         List<CcbPos> ccbPosList = ccbPosService.list();
@@ -116,8 +114,8 @@ public class ScheduleTask {
                     type = 2;
                 }
                 double fee = Double.parseDouble(String.format("%.2f", amount * 0.0025));//手续费固定0.0025，四舍五入保留两倍小数
-                CcbOrder ccbOrder = new CcbOrder(khdm, date, amount, fee, num, type);
-                ccbOrders.add(ccbOrder);
+//                CcbOrder ccbOrder = new CcbOrder(khdm, date, amount, fee, num, type);
+//                ccbOrders.add(ccbOrder);
             }
 
             boolean saveResult = false;

@@ -69,7 +69,7 @@ public class BaiShengSwipe extends IdEntity {
     private String merchant;
 
     /**
-     * 类型 1.百胜刷卡 2.浦发刷卡 3.银联刷卡 4.充值
+     * 类型 1.百胜刷卡 2.浦发刷卡 3.银联刷卡 4.充值 5.浦发扫码
      */
     private int type;
 

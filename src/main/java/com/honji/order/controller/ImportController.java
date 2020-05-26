@@ -259,6 +259,12 @@ public class ImportController {
                 Cell feeCell = row.getCell(16);
                 Cell orderCell = row.getCell(10);
                 Cell merchantCell = row.getCell(3);
+                Cell typeCell = row.getCell(8);
+                String tradeType =  typeCell.getStringCellValue().trim();
+                int type = 2;//2是刷卡
+                if ("扫码".equals(tradeType)) {//5是扫码
+                    type = 5;
+                }
 
                 LocalDate date = LocalDate.parse(dateCell.getStringCellValue().trim(), dtf);
                 String time = timeCell.getStringCellValue().trim();
@@ -269,7 +275,7 @@ public class ImportController {
                 String merchant = merchantCell.getStringCellValue().trim();
                 String orderId = orderCell.getStringCellValue().trim();
 
-                BaiShengSwipe baiShengSwipe = new BaiShengSwipe(date, time, amount, fee, terminalNum, orderId, merchant, 2);
+                BaiShengSwipe baiShengSwipe = new BaiShengSwipe(date, time, amount, fee, terminalNum, orderId, merchant, type);
                 list.add(baiShengSwipe);
 
             }

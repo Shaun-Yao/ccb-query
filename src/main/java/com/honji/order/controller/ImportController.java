@@ -499,11 +499,11 @@ public class ImportController {
                 Cell numCell = row.getCell(2);
                 Cell orderCell = row.getCell(4);
 
-                int dateNum = (int) dateCell.getNumericCellValue();
-                LocalDate date = LocalDate.parse(String.valueOf(dateNum), dtf);
+                //int dateNum = (int) dateCell.getNumericCellValue();
+                LocalDate date = LocalDate.parse(dateCell.getStringCellValue().trim(), dtf);
                 String terminalNum = terminalCell.getStringCellValue().trim();
-                double amount = amountCell.getNumericCellValue();
-                double fee = feeCell.getNumericCellValue();
+                double amount = Double.valueOf(amountCell.getStringCellValue());
+                double fee = Double.valueOf(feeCell.getStringCellValue());
                 String num = numCell.getStringCellValue().trim();
                 String orderId = orderCell.getStringCellValue().trim();
                 int type = 1;

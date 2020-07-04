@@ -47,12 +47,12 @@ public class ImportController {
         return "index";
     }
 
-    /**
-     * 百胜支付
-     * @param file
-     * @return
-     * @throws IOException
-     */
+        /**
+         * 百胜支付
+         * @param file
+         * @return
+         * @throws IOException
+         */
     @ResponseBody
     @PostMapping("/bs-pay")
     public boolean baiShengPay(@RequestParam("bs-pay") MultipartFile file) throws IOException {
@@ -494,7 +494,7 @@ public class ImportController {
                     break;
                 }
                 Cell terminalCell = row.getCell(12);
-                Cell amountCell = row.getCell(9);
+                Cell amountCell = row.getCell(11);
                 Cell feeCell = row.getCell(10);
                 Cell numCell = row.getCell(2);
                 Cell orderCell = row.getCell(4);

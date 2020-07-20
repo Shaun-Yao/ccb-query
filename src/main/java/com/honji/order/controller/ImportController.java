@@ -4,17 +4,24 @@ package com.honji.order.controller;
 import com.honji.order.entity.BaiShengPay;
 import com.honji.order.entity.BaiShengSwipe;
 import com.honji.order.entity.CcbOrder;
+import com.honji.order.entity.WxPay;
 import com.honji.order.service.IBaiShengPayService;
 import com.honji.order.service.IBaiShengSwipeService;
 import com.honji.order.service.ICcbOrderService;
+import com.honji.order.service.IWxPayService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -40,6 +47,9 @@ public class ImportController {
 
     @Autowired
     private ICcbOrderService ccbOrderService;
+
+    @Autowired
+    private IWxPayService wxPayService;
 
     @GetMapping("/index")
     public String index() {
@@ -532,6 +542,136 @@ public class ImportController {
         }
         list = null;//释放list
         System.gc();
+        return result;
+    }
+
+    /**
+     * 微信公户账单
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @PostMapping("/wxpay")
+    public boolean wxpay(@RequestParam("wxpay") MultipartFile file) throws IOException {
+
+        boolean result = false;
+        String fileName = file.getOriginalFilename();
+
+        //Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        InputStreamReader is = new InputStreamReader(file.getInputStream());
+        BufferedReader br = new BufferedReader(is);
+        //FileReader fileReader = new FileReader(br);
+
+        Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(br);
+        List<CSVRecord> recordList = ((CSVParser) records).getRecords();
+        int endLine = recordList.size() - 2;
+        List<WxPay> list = new ArrayList<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        for(int i = 1; i < endLine; i++) {
+            CSVRecord record = recordList.get(i);
+            LocalDate date = LocalDate.parse(record.get(0).trim().substring(1), dtf);
+            double amount = Double.valueOf(record.get(24).trim().substring(1));
+            double fee = Double.valueOf(record.get(22).trim().substring(1));
+            String orderId = record.get(5).trim().substring(1);
+            String khdm =  record.get(6).trim().substring(1).split("_")[0];
+            String type = record.get(9).trim().substring(1);
+            //System.out.println(type);
+            if ("REFUND".equals(type)) { //退款类型
+
+                amount = - Double.valueOf(record.get(16).trim().substring(1));//退款为负数
+                orderId = new String(record.get(14).trim().substring(1));
+                System.out.println(orderId);
+            }
+            //System.out.println(orderId.trim());
+            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm);
+            list.add(wxPay);
+        }
+
+        if(list.size() > 0) {
+            long start = System.currentTimeMillis();
+
+            try {
+                result = wxPayService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("微信 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("微信 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("微信 {} 导入失败", fileName);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 支付宝账单
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @PostMapping("/alipay")
+    public boolean alipay(@RequestParam("alipay") MultipartFile file) throws IOException {
+
+        boolean result = false;
+        String fileName = file.getOriginalFilename();
+
+        //Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        InputStreamReader is = new InputStreamReader(file.getInputStream());
+        BufferedReader br = new BufferedReader(is);
+        //FileReader fileReader = new FileReader(br);
+
+        Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(br);
+        List<CSVRecord> recordList = ((CSVParser) records).getRecords();
+        int endLine = recordList.size() - 2;
+        List<WxPay> list = new ArrayList<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        for(int i = 1; i < endLine; i++) {
+            CSVRecord record = recordList.get(i);
+            LocalDate date = LocalDate.parse(record.get(0).trim().substring(1), dtf);
+            double amount = Double.valueOf(record.get(13).trim().substring(1));
+            double fee = Double.valueOf(record.get(22).trim().substring(1));
+            String orderId = record.get(5).trim().substring(1);
+            String khdm =  record.get(6).trim().substring(1).split("_")[0];
+            String type = record.get(10).trim().substring(1);
+            //System.out.println(type);
+            if ("REFUND".equals(type)) { //退款类型
+
+                amount = - Double.valueOf(record.get(16).trim().substring(1));//退款为负数
+                orderId = new String(record.get(14).trim().substring(1));
+                System.out.println(orderId);
+            }
+            //System.out.println(orderId.trim());
+            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm);
+            list.add(wxPay);
+        }
+
+        if(list.size() > 0) {
+            long start = System.currentTimeMillis();
+
+            try {
+                result = wxPayService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("微信 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("微信 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("微信 {} 导入失败", fileName);
+            }
+        }
+
         return result;
     }
 

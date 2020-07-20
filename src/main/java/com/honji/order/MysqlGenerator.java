@@ -50,7 +50,7 @@ public class MysqlGenerator {
 
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setUrl("jdbc:sqlserver://10.10.10.155;databaseName=finance-test");
+        dsc.setUrl("jdbc:sqlserver://10.10.10.155;databaseName=finance");
         // dsc.setSchemaName("public");
         dsc.setDriverName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         dsc.setUsername("sa");

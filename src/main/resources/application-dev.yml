@@ -27,8 +27,15 @@ mybatis-plus:
       default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
 
 
+pagehelper:
+  helper-dialect: sqlserver
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+
 logging:
   file: logs/ccb.log
   level:
-    com.honji.exhibition.admin.mapper: debug
+    com.honji.order.mapper: debug
     root: INFO

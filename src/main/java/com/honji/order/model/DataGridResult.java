@@ -24,7 +24,7 @@ public class DataGridResult implements Serializable {
     }
 
     public DataGridResult(PageInfo<?> pageInfo) {
-        this.total = pageInfo.getSize();
+        this.total = pageInfo.getTotal();
         this.rows = pageInfo.getList();
     }
 }

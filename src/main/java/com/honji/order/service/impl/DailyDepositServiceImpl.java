@@ -1,6 +1,7 @@
 package com.honji.order.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.DailyDeposit;
@@ -27,9 +28,10 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
     private DailyDepositMapper dailyDepositMapper;
 
     @Override
-    public PageInfo<DepositVo> list(int offset, int limit) {
+    public PageInfo<DepositVo> listByCurrentUser(int offset, int limit) {
         PageHelper.startPage(offset / limit + 1, limit);
-        List<DepositVo> depositVos = dailyDepositMapper.selectList("Z75320");
+        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode("Z75320");
+        //Page<DepositVo> depositVoPage = dailyDepositMapper.selectByShopCode("Z75320");
         return new PageInfo<>(depositVos);
     }
 }

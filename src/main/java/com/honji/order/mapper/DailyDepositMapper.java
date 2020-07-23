@@ -19,8 +19,8 @@ import java.util.List;
 public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
 
     @Select("select deposit.*, bank.name as bankName from dbo.daily_deposit deposit \n" +
-            "LEFT JOIN bank on deposit.bank = bank.account where khdm = #{shopCode}")
-    List<DepositVo> selectList(@Param("shopCode") String shopCode);
+            "LEFT JOIN bank on deposit.bank = bank.account where khdm = #{shopCode} ORDER BY date desc")
+    List<DepositVo> selectByShopCode(@Param("shopCode") String shopCode);
 
 
 }

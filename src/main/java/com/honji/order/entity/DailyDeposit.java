@@ -1,8 +1,10 @@
 package com.honji.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +31,8 @@ public class DailyDeposit extends IdEntity {
     /**
      * 交易日期
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     /**
@@ -99,6 +103,8 @@ public class DailyDeposit extends IdEntity {
     /**
      * 存款日期
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate depositDate;
 
     /**
@@ -116,5 +122,9 @@ public class DailyDeposit extends IdEntity {
      */
     private BigDecimal extraCash;
 
+    /**
+     * 图片
+     */
+    private String image;
 
 }

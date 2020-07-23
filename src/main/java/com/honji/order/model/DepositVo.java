@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class DepositVo {
 
-    private Long id;
+    private String id;
 
     /**
      * 店铺代码

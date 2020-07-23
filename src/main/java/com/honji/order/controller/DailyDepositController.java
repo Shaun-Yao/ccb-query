@@ -1,23 +1,32 @@
 package com.honji.order.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.honji.order.entity.Bank;
 import com.honji.order.entity.DailyDeposit;
+import com.honji.order.entity.DirectShop;
 import com.honji.order.model.DataGridResult;
+import com.honji.order.service.IBankService;
 import com.honji.order.service.IDailyDepositService;
+import com.honji.order.service.IDirectShopService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -40,15 +49,42 @@ public class DailyDepositController {
     @Autowired
     private IDailyDepositService dailyDepositService;
 
+    @Autowired
+    private IBankService bankService;
+
+    @Autowired
+    private IDirectShopService directShopService;
+
+    @Autowired
+    private HttpSession session;
+
     @GetMapping("/index")
-    public String index(@RequestParam String shopCode) {
-        System.out.println(shopCode);
+    public String index(@RequestParam String shopCode, Model model) {
+        String user = (String) session.getAttribute("user");
+        if (StringUtils.isEmpty(user)) {
+            System.out.println(222);
+            session.setAttribute("user", shopCode);
+        }
+
+        List<Bank> banks = null;
+        QueryWrapper<DirectShop> shopQueryWrapper = new QueryWrapper<>();
+        shopQueryWrapper.eq("shop_code", shopCode);
+        DirectShop directShop = directShopService.getOne(shopQueryWrapper);
+        if (directShop.getType() == 1) {
+            banks = bankService.list();
+        } else {
+            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
+            queryWrapper.ne("type", "1");
+            banks = bankService.list(queryWrapper);
+        }
+
+        model.addAttribute("banks", banks);
         return "daily_deposit";
     }
 
     @GetMapping("/get")
     @ResponseBody
-    public DailyDeposit get(@RequestParam Long id) {
+    public DailyDeposit get(@RequestParam String id) {
 
         return dailyDepositService.getById(id);
     }
@@ -69,19 +105,25 @@ public class DailyDepositController {
 
     }
 
+    @PostMapping("/save")
+    @ResponseBody
+    public boolean save(@ModelAttribute DailyDeposit dailyDeposit) {
+        return dailyDepositService.saveOrUpdate(dailyDeposit);
+    }
+
     @PostMapping("/remove")
     @ResponseBody
-    public boolean remove(@RequestParam Long id) {
+    public boolean remove(@RequestParam String id) {
         return dailyDepositService.removeById(id);
     }
 
     @ResponseBody
     @PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file) {
-        //UserSessionVO user = (UserSessionVO) session.getAttribute("user");
+        String user = (String) session.getAttribute("user");
         //文件名由用户id-时间组成，如150-20200408095444759.png
         //TODO current user
-        StringBuffer newFileName = new StringBuffer("Z001").append("-");
+        StringBuffer newFileName = new StringBuffer(user).append("-");
         if (!file.isEmpty()) {
             try {
                 String fileName = file.getOriginalFilename();//原文件名

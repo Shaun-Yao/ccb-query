@@ -1,7 +1,6 @@
 package com.honji.order.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.DailyDeposit;
@@ -11,6 +10,7 @@ import com.honji.order.service.IDailyDepositService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -27,10 +27,14 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
     @Autowired
     private DailyDepositMapper dailyDepositMapper;
 
+    @Autowired
+    private HttpSession session;
+
     @Override
     public PageInfo<DepositVo> listByCurrentUser(int offset, int limit) {
+        String user = (String) session.getAttribute("user");
         PageHelper.startPage(offset / limit + 1, limit);
-        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode("Z75320");
+        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode(user);
         //Page<DepositVo> depositVoPage = dailyDepositMapper.selectByShopCode("Z75320");
         return new PageInfo<>(depositVos);
     }

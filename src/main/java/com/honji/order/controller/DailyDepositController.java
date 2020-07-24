@@ -60,6 +60,7 @@ public class DailyDepositController {
 
     @GetMapping("/index")
     public String index(@RequestParam String shopCode, Model model) {
+
         String user = (String) session.getAttribute("user");
         if (StringUtils.isEmpty(user)) {
             System.out.println(222);

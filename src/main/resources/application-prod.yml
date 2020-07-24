@@ -1,5 +1,5 @@
 server:
-  port: 9001
+  port: 9006
 
 
 spring:
@@ -13,7 +13,7 @@ spring:
       mode: HTML
   servlet:
     multipart:
-      max-file-size: 10MB
+      max-file-size: 5MB
       max-request-size: 20MB
 
 mybatis:

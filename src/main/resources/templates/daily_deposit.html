@@ -13,7 +13,7 @@
 
     <div class="pull-right">
         <h3>
-            <span th:text="${session.user}">信息标签</span>
+            <span th:text="${shopCode}">信息标签</span>
             <span id="balance"></span>
         </h3>
     </div>
@@ -35,7 +35,7 @@
                 <form class="form-horizontal" id="form" role="form" action="/daily-deposit/add" method="post">
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
-                        <input type="hidden" id="khdm" name="khdm" th:value="${session.user}" >
+                        <input type="hidden" id="shopCode" name="khdm" th:value="${shopCode}" >
 
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">营业日期</label>
@@ -44,72 +44,72 @@
                             </div>
                             <label for="amount" class="col-sm-2 control-label">营业额</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="amount" name="amount" required >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="amount" name="amount" required >
                             </div>
                         </div>
                        <div class="form-group">
                             <label for="pos" class="col-sm-2 control-label">POS机/刷卡/银联扫码</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="pos" name="pos" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="pos" name="pos" >
                             </div>
                             <label for="cgbCoupon" class="col-sm-2 control-label">广发兑换券</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="cgbCoupon" name="cgbCoupon" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="cgbCoupon" name="cgbCoupon" >
                             </div>
                         </div>
 
                        <div class="form-group">
                             <label for="ccbZs" class="col-sm-2 control-label">建行扫码</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="ccbZs" name="ccbZs" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="ccbZs" name="ccbZs" >
                             </div>
                             <label for="ccbBs" class="col-sm-2 control-label">建行离线</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="ccbBs" name="ccbBs" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="ccbBs" name="ccbBs" >
                             </div>
                         </div>
 
                        <div class="form-group">
                             <label for="alipay" class="col-sm-2 control-label">支付宝</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="alipay" name="alipay" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="alipay" name="alipay" >
                             </div>
                             <label for="wxpay" class="col-sm-2 control-label">微信</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="wxpay" name="wxpay" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="wxpay" name="wxpay" >
                             </div>
                         </div>
 
                        <div class="form-group">
                             <label for="sys" class="col-sm-2 control-label">扫一扫</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="sys" name="sys" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="sys" name="sys" >
                             </div>
                             <label for="mss" class="col-sm-2 control-label">码上收</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="mss" name="mss" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="mss" name="mss" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="bsPay" class="col-sm-2 control-label">百胜支付</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="bsPay" name="bsPay" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="bsPay" name="bsPay" >
                             </div>
                             <label for="cash" class="col-sm-2 control-label">现金</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="cash" name="cash" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="cash" name="cash" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="memberPoints" class="col-sm-2 control-label">会员积分/储值卡消费/礼券</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="memberPoints" name="memberPoints" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="memberPoints" name="memberPoints" >
                             </div>
                             <label for="extraCash" class="col-sm-2 control-label">多收款</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="extraCash" name="extraCash" >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="extraCash" name="extraCash" >
                             </div>
                         </div>
 
@@ -117,7 +117,7 @@
                             <label class="col-sm-2 control-label">存款银行</label>
                             <div class="col-sm-4">
                                 <select class="form-control" name="bank" id="bank" >
-                                    <option></option>
+                                    <option value=""></option>
                                     <option th:each="bank : ${banks}"
                                             th:value="${bank.account}" th:text="${bank.name}">
                                     </option>
@@ -131,14 +131,11 @@
                         </div>
 
                         <div class="form-group">
-
                             <label for="depositAmount" class="col-sm-2 control-label">存款额</label>
                             <div class="col-sm-4">
-                                <input type="number" min="0.00" max="100000.00" step="0.01" class="form-control" id="depositAmount" name="deposit"  >
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="depositAmount" name="deposit"  >
                             </div>
                         </div>
-
-
 
                         <div class="page__bd">
                             <div class="weui-gallery" id="gallery">
@@ -200,7 +197,7 @@
 
     function calculateBalance() {
         $.ajax({
-            url: "/cash-balance/calculate",
+            url: "/cash-balance/calculate?shopCode=" + $('#shopCode').val(),
             type: "GET",
             success: function(result){
                 $('#balance').text("结余：" + result + "元");
@@ -219,22 +216,24 @@
         $uploaderFiles = $("#uploaderFiles");
 
     $uploaderInput.on("change", function(e){
+        console.log("change...");
         var  files = e.target.files;
         var length = fileArr.length;
         for (var i = 0, len = files.length; i < len; ++i) {
+            console.log(length);
             var file = files[i];
-            if(length + i + 1 > 2) {
-                break;
-            }
+            // if(length + i + 1 > 2) {
+            //     break;
+            // }
             if (file.size > 5 * 1024 * 1024) {
                 alert("图片超过5M，不允许上传");
                 continue;
             }
             var formData = new FormData();
             formData.append("file", file);
-
+            console.log("ajax...");
             $.ajax({
-                url: "/daily-deposit/upload",
+                url: "/daily-deposit/upload?shopCode=" + $('#shopCode').val(),
                 type: "POST",
                 async: false,
                 cache: false,
@@ -244,6 +243,7 @@
                 success: function(result){
                     pictureSize = pictureSize + 1;
                     $uploaderFiles.append($(tmpl.replace('#url#', "/daily-deposit/showImage?fileName=" + result)).attr('file-name', result));
+                    console.log(result);
                     $('#picture1').val(result);
                     //checkPhotoSize();
                 },
@@ -279,6 +279,7 @@
 
     //删除图片
     $(".weui-gallery__del").click(function() {
+        console.log(222);
         $('#picture1').val('');
         $uploaderFiles.find("li").eq(index).remove();
         pictureSize = pictureSize - 1;
@@ -286,7 +287,7 @@
     });
 
     $('#table').bootstrapTable({
-        url: '/daily-deposit/list',
+        url: '/daily-deposit/list?shopCode=' + $('#shopCode').val(),
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
@@ -341,13 +342,16 @@
                     $('#depositDate').val(data.depositDate);
                     $('#depositAmount').val(data.deposit);
                     $('#picture1').val(data.image);
+                    if(data.bank != null && data.bank != '') {
+                        $("#bank option:contains('" + data.bank + "')")[0].selected=true;
+                    }
                     //根据自定义属性值选中
                     // $("input:radio[name=arrivedTravelMode][arrivedTravelMode=" + data.arrivedTravelMode + "]")[0].checked=true;
-                    $("#bank option:contains('" + data.bank + "')")[0].selected=true;
+
                     // $("input:radio[name=leavedTravelMode][leavedTravelMode=" + data.leavedTravelMode + "]")[0].checked=true;
                     // $("#leavedPickUpLocation option:contains('" + data.leavedPickUpLocation + "')")[0].selected=true;
                     // $("#leavedStation option:contains('" + data.leavedStation + "')")[0].selected=true;
-
+                    console.log(data.image);
                     $uploaderFiles.empty();
                     pictureSize = 0;
                     if (data.image != null && data.image != '') {
@@ -408,17 +412,21 @@
             var depositDate = $('#depositDate').val();
             var deposit = $('#depositAmount').val();
             var picture1 = $('#picture1').val();
-            console.log(bank);
+            var hasBank = bank != null && bank != '';
+            console.log(bank != '');
+            console.log(bank != null);
+
             console.log(deposit);
             console.log(depositDate);
             console.log(picture1);
 
-            if (bank.length > 0 || depositDate .length > 0 || deposit .length > 0 || picture1 .length > 0) {
-                if (bank.length == 0 || depositDate .length == 0 || deposit .length == 0 || picture1 .length == 0) {
+            if (hasBank || depositDate .length > 0 || deposit .length > 0 || picture1 .length > 0) {
+                if (!bank || depositDate .length == 0 || deposit .length == 0 || picture1 .length == 0) {
                     alert("存款银行、存款日期、存款额、存款单要么都填，要么都不填!");
                     return false;
                 }
             }
+            console.log($('#form').serialize());
 /*
             var pictures = $uploaderFiles.find("li");
             if (pictures.length == 0) { //删除了所有图片需要清空值
@@ -487,6 +495,7 @@
                             id: id
                         },
                         success: function(data){
+                            calculateBalance();
                             $('#table').bootstrapTable('refresh');
                         },
                         error:function(xhr,state,errorThrown){

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author yao
@@ -115,7 +115,7 @@ public class DailyDeposit extends IdEntity {
     /**
      * 图片
      */
-    private byte[] picture;
+//    private byte[] picture;
 
     /**
      * 多收款金额

@@ -10,7 +10,6 @@ import com.honji.order.service.IBankService;
 import com.honji.order.service.IDailyDepositService;
 import com.honji.order.service.IDirectShopService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
@@ -60,25 +59,30 @@ public class DailyDepositController {
 
     @GetMapping("/index")
     public String index(@RequestParam String shopCode, Model model) {
+/*
 
         String user = (String) session.getAttribute("user");
         if (StringUtils.isEmpty(user)) {
             System.out.println(222);
             session.setAttribute("user", shopCode);
         }
+*/
 
         List<Bank> banks = null;
         QueryWrapper<DirectShop> shopQueryWrapper = new QueryWrapper<>();
         shopQueryWrapper.eq("shop_code", shopCode);
         DirectShop directShop = directShopService.getOne(shopQueryWrapper);
         if (directShop.getType() == 1) {
-            banks = bankService.list();
+            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
+            queryWrapper.orderByAsc("type", "account");
+            banks = bankService.list(queryWrapper);
         } else {
             QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
             queryWrapper.ne("type", "1");
             banks = bankService.list(queryWrapper);
         }
 
+        model.addAttribute("shopCode", shopCode);
         model.addAttribute("banks", banks);
         return "daily_deposit";
     }
@@ -92,7 +96,7 @@ public class DailyDepositController {
 
     @GetMapping("/list")
     @ResponseBody
-    public DataGridResult list(@RequestParam(defaultValue = "0") int offset, @RequestParam int limit) {
+    public DataGridResult list(@RequestParam String shopCode, @RequestParam(defaultValue = "0") int offset, @RequestParam int limit) {
         //Admin admin = (Admin) session.getAttribute("admin");
 //        PageHelper.startPage(offset / limit + 1, limit);
 //        QueryWrapper<DailyDeposit> queryWrapper = new QueryWrapper<>();
@@ -100,7 +104,7 @@ public class DailyDepositController {
 //        List<DailyDeposit> deposits = dailyDepositService.list(queryWrapper);
 //        PageInfo<DailyDeposit> depositPageInfo = new PageInfo<>(deposits);
         //new DepositVo(1l, );
-        return new DataGridResult(dailyDepositService.listByCurrentUser(offset, limit));
+        return new DataGridResult(dailyDepositService.listByCurrentUser(shopCode, offset, limit));
 //        IPage<DailyDeposit> dailyDepositPage = new Page<>(offset / limit + 1, limit);
 //        return new DataGridResult(dailyDepositService.list(dailyDepositPage, "Z75320"));
 
@@ -110,6 +114,13 @@ public class DailyDepositController {
     @ResponseBody
     public boolean save(@ModelAttribute DailyDeposit dailyDeposit) {
         return dailyDepositService.saveOrUpdate(dailyDeposit);
+        //saveOrUpdate不会更新被清空的字段
+//        if (StringUtils.isEmpty(dailyDeposit.getId())) {
+//            return dailyDepositService.save(dailyDeposit);
+//        } else {
+//            return dailyDepositService.updateById(dailyDeposit);
+//        }
+
     }
 
     @PostMapping("/remove")
@@ -120,11 +131,11 @@ public class DailyDepositController {
 
     @ResponseBody
     @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile file) {
-        String user = (String) session.getAttribute("user");
+    public String upload(@RequestParam("file") MultipartFile file, @RequestParam String shopCode) {
+//        String user = (String) session.getAttribute("user");
         //文件名由用户id-时间组成，如150-20200408095444759.png
         //TODO current user
-        StringBuffer newFileName = new StringBuffer(user).append("-");
+        StringBuffer newFileName = new StringBuffer(shopCode).append("-");
         if (!file.isEmpty()) {
             try {
                 String fileName = file.getOriginalFilename();//原文件名

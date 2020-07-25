@@ -17,11 +17,12 @@ public class CcbQueryApplication  {
         SpringApplication.run(CcbQueryApplication.class, args);
 
     }
+
 /*
 
     @PostConstruct
     public void loadImage() {
-       DailyDeposit deposit = dailyDepositService.getById(1);
+       DailyDeposit deposit = dailyDepositService.getById(918);
 
 
             StringBuffer uri = new StringBuffer("\\\\10.10.10.188\\183财务存款票据\\");
@@ -42,6 +43,7 @@ public class CcbQueryApplication  {
             }
         }
 */
+
 
   /*  @PostConstruct
     public void loadImages() {

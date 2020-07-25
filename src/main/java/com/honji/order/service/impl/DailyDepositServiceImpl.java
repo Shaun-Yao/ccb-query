@@ -31,10 +31,10 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
     private HttpSession session;
 
     @Override
-    public PageInfo<DepositVo> listByCurrentUser(int offset, int limit) {
-        String user = (String) session.getAttribute("user");
+    public PageInfo<DepositVo> listByCurrentUser(String shopCode, int offset, int limit) {
+//        String user = (String) session.getAttribute("user");
         PageHelper.startPage(offset / limit + 1, limit);
-        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode(user);
+        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode(shopCode);
         //Page<DepositVo> depositVoPage = dailyDepositMapper.selectByShopCode("Z75320");
         return new PageInfo<>(depositVos);
     }

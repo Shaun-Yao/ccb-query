@@ -25,7 +25,9 @@ mybatis-plus:
 #    typeEnumsPackage: com.honji.exhibition.admin.enums
     configuration:
       default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
-
+    global-config:
+      db-config:
+        update-strategy: ignored
 
 pagehelper:
   helper-dialect: sqlserver

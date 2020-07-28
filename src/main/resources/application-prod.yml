@@ -1,6 +1,8 @@
 server:
   port: 9006
 
+web:
+  upload-path: \\10.10.10.188\183财务存款票据\
 
 spring:
   datasource:

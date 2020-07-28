@@ -110,4 +110,6 @@ public class DepositVo {
     private BigDecimal extraCash;
 
     private String bankName;
+
+    private String image;
 }

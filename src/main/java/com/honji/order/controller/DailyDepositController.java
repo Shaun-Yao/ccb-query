@@ -12,6 +12,7 @@ import com.honji.order.service.IDirectShopService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -40,7 +41,8 @@ import java.util.List;
 @RequestMapping("/daily-deposit")
 public class DailyDepositController {
 
-    private final String uploadPath = "\\\\10.10.10.188\\183财务存款票据\\";
+    @Value("${web.upload-path}")
+    private String uploadPath;
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -86,6 +88,20 @@ public class DailyDepositController {
         model.addAttribute("banks", banks);
         return "daily_deposit";
     }
+
+    @GetMapping("/toQuery")
+    public String query(@RequestParam(required = false) String[] shopCodes) {
+
+        return "query";
+    }
+
+    @GetMapping("/query")
+    @ResponseBody
+    public DataGridResult query(@RequestParam(defaultValue = "0") int offset, @RequestParam int limit) {
+        return new DataGridResult(dailyDepositService.listByShopCodes(offset, limit));
+
+    }
+
 
     @GetMapping("/get")
     @ResponseBody

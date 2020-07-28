@@ -1,6 +1,8 @@
 server:
   port: 9006
 
+web:
+  upload-path: D:/deposit/
 
 spring:
   datasource:

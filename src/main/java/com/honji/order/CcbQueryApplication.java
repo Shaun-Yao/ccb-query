@@ -44,13 +44,14 @@ public class CcbQueryApplication  {
         }
 */
 
+/*
 
-  /*  @PostConstruct
+   @PostConstruct
     public void loadImages() {
         QueryWrapper<DailyDeposit> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.eq("khdm", "Z75320");
-        queryWrapper.ge("date", "2020-07-16");
-        queryWrapper.le("date", "2020-07-22");
+//        queryWrapper.ge("date", "2020-07-21");
+        queryWrapper.le("date", "2020-06-30");
         queryWrapper.isNotNull("picture");
 
         List<DailyDeposit> deposits = dailyDepositService.list(queryWrapper);
@@ -59,7 +60,7 @@ public class CcbQueryApplication  {
 //            if (deposit.getDate().isBefore(LocalDate.of(2020, 7, 5))) {
 //                continue;
 //            }
-            StringBuffer uri = new StringBuffer("E:\\deposit\\");
+            StringBuffer uri = new StringBuffer("E:\\");
 
             uri.append(deposit.getKhdm()).append(".").append(deposit.getDate())
                     .append(".").append(deposit.getId()).append(".jpg");
@@ -77,17 +78,10 @@ public class CcbQueryApplication  {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                *//*try {
-                    if (outputStream != null) {
-                        outputStream.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*//*
+
             }
         }
-
-
-    }*/
+    }
+*/
 
 }

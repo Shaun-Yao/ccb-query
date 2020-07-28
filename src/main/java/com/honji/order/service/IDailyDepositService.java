@@ -16,4 +16,5 @@ import com.honji.order.model.DepositVo;
 public interface IDailyDepositService extends IService<DailyDeposit> {
 
     PageInfo<DepositVo> listByCurrentUser(String shopCode, int offset, int limit);
+    PageInfo<DepositVo> listByShopCodes(int offset, int limit);
 }

@@ -23,4 +23,11 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
     List<DepositVo> selectByShopCode(@Param("shopCode") String shopCode);
 
 
+    @Select(
+            "select deposit.*, bank.name as bankName from dbo.daily_deposit deposit " +
+                    "LEFT JOIN bank on deposit.bank = bank.account " +
+                    "where khdm in (${shopCodes}) ORDER BY date desc" )
+    List<DepositVo> selectByShopCodes(@Param("shopCodes") String shopCodes);
+
+
 }

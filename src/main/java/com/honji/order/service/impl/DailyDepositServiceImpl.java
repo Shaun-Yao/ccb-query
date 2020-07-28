@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,6 +36,18 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
 //        String user = (String) session.getAttribute("user");
         PageHelper.startPage(offset / limit + 1, limit);
         List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode(shopCode);
+        //Page<DepositVo> depositVoPage = dailyDepositMapper.selectByShopCode("Z75320");
+        return new PageInfo<>(depositVos);
+    }
+
+    @Override
+    public PageInfo<DepositVo> listByShopCodes(int offset, int limit) {
+//        String user = (String) session.getAttribute("user");
+//        String[] shopCodes = {"Z59573", "Z57113"};
+        //List<String> shopCodes = Arrays.asList("Z59573", "Z57113");
+        String shopCodes = "'Z59573','Z57113'";
+        PageHelper.startPage(offset / limit + 1, limit);
+        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes);
         //Page<DepositVo> depositVoPage = dailyDepositMapper.selectByShopCode("Z75320");
         return new PageInfo<>(depositVos);
     }

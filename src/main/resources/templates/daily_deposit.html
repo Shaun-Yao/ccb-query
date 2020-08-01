@@ -216,11 +216,9 @@
         $uploaderFiles = $("#uploaderFiles");
 
     $uploaderInput.on("change", function(e){
-        console.log("change...");
         var  files = e.target.files;
         var length = fileArr.length;
         for (var i = 0, len = files.length; i < len; ++i) {
-            console.log(length);
             var file = files[i];
             // if(length + i + 1 > 2) {
             //     break;
@@ -231,7 +229,6 @@
             }
             var formData = new FormData();
             formData.append("file", file);
-            console.log("ajax...");
             $.ajax({
                 url: "/daily-deposit/upload?shopCode=" + $('#shopCode').val(),
                 type: "POST",
@@ -243,7 +240,6 @@
                 success: function(result){
                     pictureSize = pictureSize + 1;
                     $uploaderFiles.append($(tmpl.replace('#url#', "/daily-deposit/showImage?fileName=" + result)).attr('file-name', result));
-                    console.log(result);
                     $('#picture1').val(result);
                     //checkPhotoSize();
                 },
@@ -279,7 +275,6 @@
 
     //删除图片
     $(".weui-gallery__del").click(function() {
-        console.log(222);
         $('#picture1').val('');
         $uploaderFiles.find("li").eq(index).remove();
         pictureSize = pictureSize - 1;
@@ -322,7 +317,6 @@
                 success: function(data){
 
                     $gallery.fadeOut(100);//关闭图片预览
-                    //console.log($("#arrivedPickUpStation option:contains('" + data.arrivedPickUpStation + "')").val());
                     $('#form').clearForm();
                     $('#id').val(data.id);
                     $('#amount').val(data.amount);
@@ -351,7 +345,6 @@
                     // $("input:radio[name=leavedTravelMode][leavedTravelMode=" + data.leavedTravelMode + "]")[0].checked=true;
                     // $("#leavedPickUpLocation option:contains('" + data.leavedPickUpLocation + "')")[0].selected=true;
                     // $("#leavedStation option:contains('" + data.leavedStation + "')")[0].selected=true;
-                    console.log(data.image);
                     $uploaderFiles.empty();
                     pictureSize = 0;
                     if (data.image != null && data.image != '') {
@@ -397,12 +390,13 @@
 
     $('#save').click(function() {
         if($('#form')[0].reportValidity()) {
-            var amount = $('#amount').val();
-            var sum = Number($('#pos').val()) + Number($('#cgbCoupon').val()) + Number($('#ccbZs').val())
+            var amount = Number($('#amount').val()).toFixed(2);
+            var sum = (Number($('#pos').val()) + Number($('#cgbCoupon').val()) + Number($('#ccbZs').val())
                         + Number($('#ccbBs').val()) + Number($('#alipay').val()) + Number($('#wxpay').val())
                         + Number($('#sys').val()) + Number($('#mss').val()) + Number($('#bsPay').val())
-                        + Number($('#cash').val()) + Number($('#memberPoints').val()) ;
-
+                        + Number($('#cash').val()) + Number($('#memberPoints').val())).toFixed(2) ;
+            console.log(amount);
+            console.log(sum);
             if (amount != sum) {
                 alert("营业额与其它各项结算方式的总和不相等，请修改！");
                 return false;
@@ -426,7 +420,6 @@
                     return false;
                 }
             }
-            console.log($('#form').serialize());
 /*
             var pictures = $uploaderFiles.find("li");
             if (pictures.length == 0) { //删除了所有图片需要清空值

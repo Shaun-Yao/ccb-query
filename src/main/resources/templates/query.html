@@ -8,13 +8,31 @@
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
     <link rel="stylesheet" href="/webjars/weui/1.1.2/dist/style/weui.min.css" />
+    <link rel="stylesheet" href="/webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css" />
 </head>
 <body>
+    <input type="hidden" id="jobNum" th:value="${jobNum}">
+    <div class="col-md-12 pull-left" id="tb1">
+        <form class="form-inline" id="resource-form">
+            <div class="form-group form-inner">
+                <label  class="form-lable">店铺代码：</label>
+                <select class="form-control" name="shopCodes" id="shopCodes" multiple
+                        data-live-search="true" data-actions-box="true"
+                        data-selected-text-format="count">
+                    <option value=""></option>
+                    <option th:each="authority : ${authorities}"
+                            th:value="${authority.khdm}" th:text="${authority.khmc}">
+                    </option>
+                </select>
+            </div>
 
-    <div class="pull-right">
-
+            <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
+        </form>
     </div>
-    <table id="table" class="modal-body"></table>
+
+    <table id="table" class="modal-body">
+
+    </table>
     <div id="deposit" >
 
     </div>
@@ -32,29 +50,34 @@
 <script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
 <script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
 </body>
 <script th:inline="javascript">
 
     $(function () {
+        $('#shopCodes').selectpicker();
         $("#gallery").on("click", function(){
             //console.log(2323);
             $("#gallery").fadeOut(100);
         });
+
+        $('#searchBtn').click(function () {
+            console.log($('#shopCodes').val());
+            $('#table').bootstrapTable('refresh');
+        });
     });
 
-
-
     $('#table').bootstrapTable({
-        url: '/daily-deposit/query',
+        url: '/daily-deposit/query?jobNum=' + $('#jobNum').val(),
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
-        search: true,
-        showButtonText: true,
-        searchOnEnterKey: true,
-        showSearchButton: true,
-        showSearchClearButton: true,
-        showColumnsSearch: true,
+        // search: true,
+        // showButtonText: true,
+        // searchOnEnterKey: true,
+        // showSearchButton: true,
+        // showSearchClearButton: true,
+        // showColumnsSearch: true,
         showColumns: true,
         showRefresh: true,
         toolbar: "#deposit",
@@ -64,22 +87,8 @@
         smartDisplay: false,
         pageNumber: 1,     //初始化加载第一页，默认第一页
         pageSize: 10,      //每页的记录行数（*）
-        customSearch:function customSearch(text) { //搜索--以第一列为导向 text为搜索框内输入的值
-            console.log(3333);
-            if(text == undefined){
-                return false;
-            }
-            this.data = body;  //以防前一次的搜索对后边的搜索有影响
-            var arr = [];  //用来暂存符合搜索条件的数据
-            $.each(this.data, function (index,item){  //逐个比较
-                if( item[0].indexOf(text) >= 0 ){
-                    arr.push(item)
-                }
-            });
-            this.data = arr;  //将获得数据给this.data
-            $('#table').bootstrapTable('refresh'); //重新渲染表格
-        },
         queryParams: function (params) {
+            params.shopCodes = $('#shopCodes').val();
             //导出全部数据没有传limit给后台, 把limit设置为全部数据
             if (typeof(params.limit) == "undefined") {
                 params.limit = this.totalRows;
@@ -97,11 +106,47 @@
             title: 'ID',
             visible: false
         },*/ {
+            field: 'khdm',
+            title: '店铺代码'
+        }, {
             field: 'date',
             title: '营业日期'
         }, {
             field: 'amount',
             title: '营业额'
+        }, {
+            field: 'pos',
+            title: 'POS机/刷卡/银联扫码'
+        }, {
+            field: 'cgbCoupon',
+            title: '广发兑换券'
+        }, {
+            field: 'ccbZs',
+            title: '建行扫码'
+        }, {
+            field: 'ccbBs',
+            title: '建行离线'
+        }, {
+            field: 'alipay',
+            title: '支付宝'
+        }, {
+            field: 'wxpay',
+            title: '微信'
+        }, {
+            field: 'sys',
+            title: '扫一扫'
+        }, {
+            field: 'mss',
+            title: '码上收'
+        }, {
+            field: 'bsPay',
+            title: '百胜支付'
+        }, {
+            field: 'cash',
+            title: '现金'
+        }, {
+            field: 'memberPoints',
+            title: '会员积分/储值卡消费/礼券'
         }, {
             field: 'bankName',
             title: '存款银行'

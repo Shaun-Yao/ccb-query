@@ -2,10 +2,12 @@ package com.honji.order.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.honji.order.entity.Authority;
 import com.honji.order.entity.Bank;
 import com.honji.order.entity.DailyDeposit;
 import com.honji.order.entity.DirectShop;
 import com.honji.order.model.DataGridResult;
+import com.honji.order.service.IAuthorityService;
 import com.honji.order.service.IBankService;
 import com.honji.order.service.IDailyDepositService;
 import com.honji.order.service.IDirectShopService;
@@ -57,6 +59,9 @@ public class DailyDepositController {
     private IDirectShopService directShopService;
 
     @Autowired
+    private IAuthorityService authorityService;
+
+    @Autowired
     private HttpSession session;
 
     @GetMapping("/index")
@@ -90,16 +95,22 @@ public class DailyDepositController {
     }
 
     @GetMapping("/toQuery")
-    public String query(@RequestParam(required = false) String[] shopCodes) {
-
+    public String query(@RequestParam String jobNum, Model model) {
+        QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("job_num", jobNum);
+//        StringBuffer shopCodes = new StringBuffer();
+        List<Authority> authorities = authorityService.list(queryWrapper);
+        model.addAttribute("authorities", authorities);
+        model.addAttribute("jobNum", jobNum);
         return "query";
     }
 
     @GetMapping("/query")
     @ResponseBody
-    public DataGridResult query(@RequestParam(defaultValue = "0") int offset, @RequestParam int limit) {
-        return new DataGridResult(dailyDepositService.listByShopCodes(offset, limit));
-
+    public DataGridResult query(@RequestParam String jobNum, @RequestParam(value = "shopCodes[]", required = false) List<String> shopCodes,
+                                @RequestParam(defaultValue = "0") int offset,
+                                @RequestParam int limit ) {
+        return new DataGridResult(dailyDepositService.listByShopCodes(jobNum, shopCodes, offset, limit));
     }
 
 

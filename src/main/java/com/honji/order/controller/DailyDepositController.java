@@ -141,13 +141,6 @@ public class DailyDepositController {
     @ResponseBody
     public boolean save(@ModelAttribute DailyDeposit dailyDeposit) {
         return dailyDepositService.saveOrUpdate(dailyDeposit);
-        //saveOrUpdate不会更新被清空的字段
-//        if (StringUtils.isEmpty(dailyDeposit.getId())) {
-//            return dailyDepositService.save(dailyDeposit);
-//        } else {
-//            return dailyDepositService.updateById(dailyDeposit);
-//        }
-
     }
 
     @PostMapping("/remove")

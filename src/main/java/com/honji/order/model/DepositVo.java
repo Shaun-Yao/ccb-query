@@ -112,4 +112,9 @@ public class DepositVo {
     private String bankName;
 
     private String image;
+
+    /**
+     * 结余
+     */
+    private double balance;
 }

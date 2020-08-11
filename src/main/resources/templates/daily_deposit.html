@@ -456,13 +456,18 @@
 
     $('#add').click(function () {
         $gallery.fadeOut(100);//关闭图片预览
-        if($('#id').val().length > 0) {
+        /*if($('#id').val().length > 0) {//有id表示上一步查看了旧记录，需要清空数据
             $uploaderFiles.empty();//清空图片
+            $('#picture1').val('');
+            pictureSize = 0;
             $('#form').resetForm();//无法重置hidden项
-        }
+        }*/
+
+        $uploaderFiles.empty();//清空图片
         $('#picture1').val('');
         pictureSize = 0;
         checkPhotoSize();
+        $('#form').resetForm();
         $('#id').val('');
         // $("input:radio[name=arrivedTravelMode]").get(0).checked=true;
         // $("#arrivedPickUpStation option").get(1).selected=true;

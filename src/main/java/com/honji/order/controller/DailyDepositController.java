@@ -4,13 +4,13 @@ package com.honji.order.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.honji.order.entity.Authority;
 import com.honji.order.entity.Bank;
+import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.DailyDeposit;
-import com.honji.order.entity.DirectShop;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.service.IAuthorityService;
 import com.honji.order.service.IBankService;
+import com.honji.order.service.ICashBalanceService;
 import com.honji.order.service.IDailyDepositService;
-import com.honji.order.service.IDirectShopService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,13 +55,10 @@ public class DailyDepositController {
     private IBankService bankService;
 
     @Autowired
-    private IDirectShopService directShopService;
-
-    @Autowired
     private IAuthorityService authorityService;
 
     @Autowired
-    private HttpSession session;
+    private ICashBalanceService cashBalanceService;
 
     @GetMapping("/index")
     public String index(@RequestParam String shopCode, Model model) {
@@ -76,10 +72,10 @@ public class DailyDepositController {
 */
 
         List<Bank> banks = null;
-        QueryWrapper<DirectShop> shopQueryWrapper = new QueryWrapper<>();
-        shopQueryWrapper.eq("shop_code", shopCode);
-        DirectShop directShop = directShopService.getOne(shopQueryWrapper);
-        if (directShop.getType() == 1) {
+        QueryWrapper<CashBalance> shopQueryWrapper = new QueryWrapper<>();
+        shopQueryWrapper.eq("khdm", shopCode);
+        CashBalance cashBalance = cashBalanceService.getOne(shopQueryWrapper);
+        if (cashBalance.getType() == 1) {
             QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
             queryWrapper.orderByAsc("type", "account");
             banks = bankService.list(queryWrapper);

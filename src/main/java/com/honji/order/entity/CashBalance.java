@@ -19,13 +19,20 @@ import java.time.LocalDate;
 @Accessors(chain = true)
 public class CashBalance extends IdEntity {
 
-    private static final long serialVersionUID = 1L;
-
     private String khdm;
 
     private Double balance;
 
     private LocalDate date;
 
+    /**
+     * 部门编码
+     */
+    private String deptCode;
+
+    /**
+     * 1.公户 2.私户
+     */
+    private Integer type;
 
 }

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
     <link rel="stylesheet" href="/webjars/weui/1.1.2/dist/style/weui.min.css" />
     <link rel="stylesheet" href="/webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="/webjars/viewerjs/dist/viewer.min.css" />
 </head>
 <body>
     <input type="hidden" id="jobNum" th:value="${jobNum}">
@@ -51,6 +52,7 @@
 <script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
 <script src="/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
+<script src="/webjars/viewerjs/dist/viewer.min.js"></script>
 </body>
 <script th:inline="javascript">
 
@@ -164,7 +166,7 @@
             title: '票据',
             formatter: function (value, row, index) {
                 //console.log(value);
-                return "<a href='#' class='image' onclick=showImage('" + value + "')>查看票据</a>";
+                return "<a href='#' class='image' onclick=showImage2('" + value + "')>查看票据</a>";
             }
         }]
     });
@@ -174,6 +176,32 @@
         var url = "/daily-deposit/showImage?fileName=" + fileName;
         $('#galleryImg').css("background-image","url(" + url + ")");
         $("#gallery").fadeIn(100);
+    }
+
+    function showImage2(fileName) {
+        console.log(23423);
+        var image = new Image();
+        image.src = "/daily-deposit/showImage?fileName=" + fileName;
+        var viewer = new Viewer(image, {
+            toolbar: {
+                // zoomIn: true,
+                // zoomOut: true,
+                // oneToOne: true,
+                reset: true,
+
+                rotateLeft: true,
+                rotateRight: true,
+                flipHorizontal: true,
+                flipVertical: true,
+            },
+            navbar: false,
+
+            hidden: function () {
+                viewer.destroy();
+            },
+        });
+        // image.click();
+        viewer.show();
     }
 
     /*$('.image').click(function () {

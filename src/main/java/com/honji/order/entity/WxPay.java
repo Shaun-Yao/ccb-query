@@ -38,12 +38,19 @@ public class WxPay extends IdEntity {
      */
     private String khdm;
 
+    /**
+     * 账单类型 1.公户 2.私户
+     */
+    private int type;
 
-    public WxPay(LocalDate date, double amount, double fee, String orderId, String khdm) {
+
+    public WxPay(LocalDate date, double amount, double fee,
+                 String orderId, String khdm, int type) {
         this.date = date;
         this.amount = amount;
         this.fee = fee;
         this.orderId = orderId;
         this.khdm = khdm;
+        this.type = type;
     }
 }

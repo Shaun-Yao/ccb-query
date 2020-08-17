@@ -552,9 +552,24 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/wxpay")
-    public boolean wxpay(@RequestParam("wxpay") MultipartFile file) throws IOException {
+    @PostMapping("/public-wxpay")
+    public boolean publicWxpay(@RequestParam("public-wxpay") MultipartFile file) throws IOException {
+        return wxpay(file, 1);
+    }
 
+     /**
+     * 微信私户账单
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @PostMapping("/private-wxpay")
+    public boolean privateWxpay(@RequestParam("private-wxpay") MultipartFile file) throws IOException {
+        return wxpay(file, 2);
+    }
+
+    private boolean wxpay(MultipartFile file, int orderType) throws IOException {
         boolean result = false;
         String fileName = file.getOriginalFilename();
 
@@ -580,13 +595,12 @@ public class ImportController {
             String type = record.get(9).trim().substring(1);
             //System.out.println(type);
             if ("REFUND".equals(type)) { //退款类型
-
                 amount = - Double.valueOf(record.get(16).trim().substring(1));//退款为负数
                 orderId = new String(record.get(14).trim().substring(1));
                 System.out.println(orderId);
             }
             //System.out.println(orderId.trim());
-            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm);
+            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm, orderType);
             list.add(wxPay);
         }
 
@@ -645,14 +659,13 @@ public class ImportController {
             String type = record.get(10).trim().substring(1);
             //System.out.println(type);
             if ("REFUND".equals(type)) { //退款类型
-
                 amount = - Double.valueOf(record.get(16).trim().substring(1));//退款为负数
                 orderId = new String(record.get(14).trim().substring(1));
                 System.out.println(orderId);
             }
             //System.out.println(orderId.trim());
-            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm);
-            list.add(wxPay);
+//            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm);
+//            list.add(wxPay);
         }
 
         if(list.size() > 0) {

@@ -1,9 +1,11 @@
 package com.honji.order.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.ibatis.type.JdbcType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -86,6 +88,16 @@ public class DailyDeposit extends IdEntity {
     private BigDecimal bsPay;
 
     /**
+     * 商场代收款
+     */
+    private BigDecimal mallCollection;
+
+    /**
+     * 合胜收款
+     */
+    private BigDecimal heSheng;
+
+    /**
      * 现金
      */
     private BigDecimal cash;
@@ -103,6 +115,9 @@ public class DailyDeposit extends IdEntity {
     /**
      * 存款日期
      */
+
+    /*更新值为null会报错，加上dbcType.DATE解决*/
+    @TableField(jdbcType = JdbcType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate depositDate;

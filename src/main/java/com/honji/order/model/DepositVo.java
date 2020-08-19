@@ -75,6 +75,16 @@ public class DepositVo {
     private BigDecimal bsPay;
 
     /**
+     * 商场代收款
+     */
+    private BigDecimal mallCollection;
+
+    /**
+     * 合胜收款
+     */
+    private BigDecimal heSheng;
+
+    /**
      * 现金
      */
     private BigDecimal cash;

@@ -104,6 +104,17 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="mallCollection" class="col-sm-2 control-label">商场代收款</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="mallCollection" name="mallCollection" >
+                            </div>
+                            <label for="heSheng" class="col-sm-2 control-label">合胜收款</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="heSheng" name="heSheng" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label for="memberPoints" class="col-sm-2 control-label">会员积分/储值卡消费/礼券</label>
                             <div class="col-sm-4">
                                 <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="memberPoints" name="memberPoints" >
@@ -195,6 +206,14 @@
 
     $(function () {
         calculateBalance();
+        $('form').on('focus', 'input[type=number]', function (e) {
+            $(this).on('wheel.disableScroll', function (e) {
+                e.preventDefault()
+            })
+        })
+        $('form').on('blur', 'input[type=number]', function (e) {
+            $(this).off('wheel.disableScroll')
+        })
     });
 
     function calculateBalance() {
@@ -332,14 +351,19 @@
                     $('#sys').val(data.sys);
                     $('#mss').val(data.mss);
                     $('#bsPay').val(data.bsPay);
+                    $('#mallCollection').val(data.mallCollection);
+                    $('#heSheng').val(data.heSheng);
                     $('#cash').val(data.cash);
                     $('#memberPoints').val(data.memberPoints);
                     $('#extraCash').val(data.extraCash);
                     $('#depositDate').val(data.depositDate);
                     $('#depositAmount').val(data.deposit);
                     $('#picture1').val(data.image);
+                    //console.log(data.bank);
+                    //console.log($("#bank option:contains('" + 0000 + "')")[0]);
                     if(data.bank != null && data.bank != '') {
-                        $("#bank option:contains('" + data.bank + "')")[0].selected=true;
+                        $("#bank").val(data.bank);
+                        //$("#bank option:contains('" + data.bank + "')")[0].selected=true;
                     }
                     //根据自定义属性值选中
                     // $("input:radio[name=arrivedTravelMode][arrivedTravelMode=" + data.arrivedTravelMode + "]")[0].checked=true;
@@ -396,6 +420,7 @@
             var sum = (Number($('#pos').val()) + Number($('#cgbCoupon').val()) + Number($('#ccbZs').val())
                         + Number($('#ccbBs').val()) + Number($('#alipay').val()) + Number($('#wxpay').val())
                         + Number($('#sys').val()) + Number($('#mss').val()) + Number($('#bsPay').val())
+                        + Number($('#mallCollection').val()) + Number($('#heSheng').val())
                         + Number($('#cash').val()) + Number($('#memberPoints').val())).toFixed(2) ;
             console.log(amount);
             console.log(sum);
@@ -409,12 +434,12 @@
             var deposit = $('#depositAmount').val();
             var picture1 = $('#picture1').val();
             var hasBank = bank != null && bank != '';
-            console.log(bank != '');
-            console.log(bank != null);
-
-            console.log(deposit);
-            console.log(depositDate);
-            console.log(picture1);
+            // console.log(bank != '');
+            // console.log(bank != null);
+            //
+            // console.log(deposit);
+            // console.log(depositDate);
+            // console.log(picture1);
 
             if (hasBank || depositDate .length > 0 || deposit .length > 0 || picture1 .length > 0) {
                 if (!bank || depositDate .length == 0 || deposit .length == 0 || picture1 .length == 0) {

@@ -206,12 +206,12 @@
 
     $(function () {
         calculateBalance();
-        $('form').on('focus', 'input[type=number]', function (e) {
+        $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
             $(this).on('wheel.disableScroll', function (e) {
                 e.preventDefault()
             })
         })
-        $('form').on('blur', 'input[type=number]', function (e) {
+        $('form').on('blur', 'input[type=number], input[type=date]', function (e) {
             $(this).off('wheel.disableScroll')
         })
     });

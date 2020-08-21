@@ -77,7 +77,7 @@
 
         var file = $('#' + name)[0].files[0];
         if (file != undefined) {
-            if (file.size > 15 * 1024 * 1024) {
+            if (file.size > 20 * 1024 * 1024) {
                 alert("文件超过15M，不允许上传");
                 return;
             }

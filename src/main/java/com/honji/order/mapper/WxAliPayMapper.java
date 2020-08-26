@@ -1,6 +1,6 @@
 package com.honji.order.mapper;
 
-import com.honji.order.entity.WxPay;
+import com.honji.order.entity.WxAliPay;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author yao
  * @since 2020-07-17
  */
-public interface WxPayMapper extends BaseMapper<WxPay> {
+public interface WxAliPayMapper extends BaseMapper<WxAliPay> {
 
 }

@@ -1,8 +1,8 @@
 package com.honji.order.service.impl;
 
-import com.honji.order.entity.WxPay;
-import com.honji.order.mapper.WxPayMapper;
-import com.honji.order.service.IWxPayService;
+import com.honji.order.entity.WxAliPay;
+import com.honji.order.mapper.WxAliPayMapper;
+import com.honji.order.service.IWxAliPayService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2020-07-17
  */
 @Service
-public class WxPayServiceImpl extends ServiceImpl<WxPayMapper, WxPay> implements IWxPayService {
+public class WxAliPayServiceImpl extends ServiceImpl<WxAliPayMapper, WxAliPay> implements IWxAliPayService {
 
 }

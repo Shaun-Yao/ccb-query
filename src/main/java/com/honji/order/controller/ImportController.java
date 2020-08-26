@@ -4,11 +4,11 @@ package com.honji.order.controller;
 import com.honji.order.entity.BaiShengPay;
 import com.honji.order.entity.BaiShengSwipe;
 import com.honji.order.entity.CcbOrder;
-import com.honji.order.entity.WxPay;
+import com.honji.order.entity.WxAliPay;
 import com.honji.order.service.IBaiShengPayService;
 import com.honji.order.service.IBaiShengSwipeService;
 import com.honji.order.service.ICcbOrderService;
-import com.honji.order.service.IWxPayService;
+import com.honji.order.service.IWxAliPayService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -50,7 +50,7 @@ public class ImportController {
     private ICcbOrderService ccbOrderService;
 
     @Autowired
-    private IWxPayService wxPayService;
+    private IWxAliPayService wxPayService;
 
     @GetMapping("/index")
     public String index() {
@@ -583,7 +583,7 @@ public class ImportController {
         Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(br);
         List<CSVRecord> recordList = ((CSVParser) records).getRecords();
         int endLine = recordList.size() - 2;
-        List<WxPay> list = new ArrayList<>();
+        List<WxAliPay> list = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for(int i = 1; i < endLine; i++) {
@@ -602,7 +602,7 @@ public class ImportController {
                 System.out.println(orderId);
             }
             //System.out.println(orderId.trim());
-            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm, orderType);
+            WxAliPay wxPay = new WxAliPay(date, amount, fee, orderId, khdm, orderType);
             list.add(wxPay);
         }
 
@@ -664,7 +664,7 @@ public class ImportController {
         List<CSVRecord> recordList = ((CSVParser) records).getRecords();
         List<CSVRecord> qualifiedRecords = new ArrayList<>();
         int endLine = recordList.size() - 4;
-        List<WxPay> list = new ArrayList<>();
+        List<WxAliPay> list = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for(int i = 5; i < endLine; i++) {
@@ -702,7 +702,7 @@ public class ImportController {
                 orderId = new String(record.get(0).trim());
                 System.out.println("===" + orderId);
             }
-            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm, orderType);
+            WxAliPay wxPay = new WxAliPay(date, amount, fee, orderId, khdm, orderType);
             list.add(wxPay);
         }
 

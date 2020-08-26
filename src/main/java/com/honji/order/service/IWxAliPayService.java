@@ -1,6 +1,6 @@
 package com.honji.order.service;
 
-import com.honji.order.entity.WxPay;
+import com.honji.order.entity.WxAliPay;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author yao
  * @since 2020-07-17
  */
-public interface IWxPayService extends IService<WxPay> {
+public interface IWxAliPayService extends IService<WxAliPay> {
 
 }

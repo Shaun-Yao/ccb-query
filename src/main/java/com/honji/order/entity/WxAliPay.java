@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 /**
  * <p>
- * 
+ * 微信支付宝账单
  * </p>
  *
  * @author yao
@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class WxPay extends IdEntity {
+public class WxAliPay extends IdEntity {
 
     private LocalDate date;
 
@@ -44,8 +44,8 @@ public class WxPay extends IdEntity {
     private int type;
 
 
-    public WxPay(LocalDate date, double amount, double fee,
-                 String orderId, String khdm, int type) {
+    public WxAliPay(LocalDate date, double amount, double fee,
+                    String orderId, String khdm, int type) {
         this.date = date;
         this.amount = amount;
         this.fee = fee;

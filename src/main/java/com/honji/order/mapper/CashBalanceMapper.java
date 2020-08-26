@@ -29,7 +29,7 @@ public interface CashBalanceMapper extends BaseMapper<CashBalance> {
             "SELECT sum(ISNULL(cash, 0) - ISNULL(deposit, 0) + ISNULL(extra_cash, 0)) as amount FROM daily_deposit deposit \n" +
             "LEFT JOIN cash_balance balance \n" +
             "ON deposit.khdm = balance.khdm \n" +
-            "WHERE deposit.khdm = #{shopCode} AND deposit.date > balance.date\n" +
+            "WHERE deposit.khdm = #{shopCode} AND deposit.date >= balance.date\n" +
             "GROUP BY deposit.khdm\n" +
             ") deposit\n" +
             "ON 1 = 1")

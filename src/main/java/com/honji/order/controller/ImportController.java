@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -594,6 +595,7 @@ public class ImportController {
             String khdm =  record.get(6).trim().substring(1).split("_")[0];
             String type = record.get(9).trim().substring(1);
             //System.out.println(type);
+            //退款业务订单号与消费订单号重复，用微信退款单号替换，为保证orderId唯一性
             if ("REFUND".equals(type)) { //退款类型
                 amount = - Double.valueOf(record.get(16).trim().substring(1));//退款为负数
                 orderId = new String(record.get(14).trim().substring(1));
@@ -625,47 +627,83 @@ public class ImportController {
     }
 
     /**
-     * 支付宝账单
+     * 支付宝公户账单
      * @param file
      * @return
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/alipay")
-    public boolean alipay(@RequestParam("alipay") MultipartFile file) throws IOException {
+    @PostMapping("/public-alipay")
+    public boolean publicAlipay(@RequestParam("public-alipay") MultipartFile file) throws IOException {
+        return alipay(file, 3);
+    }
+
+    /**
+     * 支付宝私户账单
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @PostMapping("/private-alipay")
+    public boolean privateAlipay(@RequestParam("private-alipay") MultipartFile file) throws IOException {
+        return alipay(file, 4);
+    }
+
+
+    private boolean alipay(MultipartFile file, int orderType) throws IOException {
 
         boolean result = false;
         String fileName = file.getOriginalFilename();
 
-        //Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-        InputStreamReader is = new InputStreamReader(file.getInputStream());
+        InputStreamReader is = new InputStreamReader(file.getInputStream(), "GBK");
         BufferedReader br = new BufferedReader(is);
-        //FileReader fileReader = new FileReader(br);
 
         Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(br);
         List<CSVRecord> recordList = ((CSVParser) records).getRecords();
-        int endLine = recordList.size() - 2;
+        List<CSVRecord> qualifiedRecords = new ArrayList<>();
+        int endLine = recordList.size() - 4;
         List<WxPay> list = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        for(int i = 1; i < endLine; i++) {
+        for(int i = 5; i < endLine; i++) {
             CSVRecord record = recordList.get(i);
-            LocalDate date = LocalDate.parse(record.get(0).trim().substring(1), dtf);
-            double amount = Double.valueOf(record.get(13).trim().substring(1));
-            double fee = Double.valueOf(record.get(22).trim().substring(1));
-            String orderId = record.get(5).trim().substring(1);
-            String khdm =  record.get(6).trim().substring(1).split("_")[0];
-            String type = record.get(10).trim().substring(1);
-            //System.out.println(type);
-            if ("REFUND".equals(type)) { //退款类型
-                amount = - Double.valueOf(record.get(16).trim().substring(1));//退款为负数
-                orderId = new String(record.get(14).trim().substring(1));
-                System.out.println(orderId);
+            String name = record.get(3).trim();//商品名称
+            String type = record.get(10).trim();
+            List<String> types = Arrays.asList("提现", "收费", "退费");
+            //去除魔体的数据和类型为“提现”的数据
+            if (!name.startsWith("当面付条码支付") ||
+                    types.contains(type)) {
+                continue;
             }
-            //System.out.println(orderId.trim());
-//            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm);
-//            list.add(wxPay);
+            qualifiedRecords.add(record);
+        }
+
+        /**支付宝账单一笔消费有2条流水记录，第1条是消费金额，第2条是手续费
+         * 正常支付“收入金额”为消费金额，“支出金额”为手续费
+         * 交易退款“支出金额”为消费金额，“收入金额”为手续费
+         * 退款业务流水号与消费重复，用财务流水号替换，为保证orderId唯一性
+         */
+        for(int i = 0; i < qualifiedRecords.size(); i++) {
+            CSVRecord record = qualifiedRecords.get(i);
+
+            LocalDate date = LocalDate.parse(record.get(4).trim(), dtf);
+            double amount = Double.valueOf(record.get(6).trim());
+//            double fee = - Double.valueOf(feeRecord.get(7).trim());//账单为负数加负号改为正数
+            double fee = Double.parseDouble(String.format("%.2f", amount * 0.006));//手续费固定0.006，四舍五入保留两位小数
+            String orderId = record.get(1).trim();
+            String khdm =  record.get(2).trim().split("_")[0];
+            String type = record.get(10).trim();
+            //System.out.println(type);
+            if ("交易退款".equals(type)) { //退款类型
+                amount = Double.valueOf(record.get(7).trim());
+                fee = Double.parseDouble(String.format("%.2f", amount * 0.006));//退款手续费为负数
+                orderId = new String(record.get(0).trim());
+                System.out.println("===" + orderId);
+            }
+            WxPay wxPay = new WxPay(date, amount, fee, orderId, khdm, orderType);
+            list.add(wxPay);
         }
 
         if(list.size() > 0) {
@@ -674,14 +712,14 @@ public class ImportController {
             try {
                 result = wxPayService.saveBatch(list);
             } catch (Exception e) {
-                log.error("微信 {} 导入出现异常 {}", fileName, e.getMessage());
+                log.error("支付宝 {} 导入出现异常 {}", fileName, e.getMessage());
                 //e.printStackTrace();
             }
             long end = System.currentTimeMillis();
             if (result) {
-                log.info("微信 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+                log.info("支付宝 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
             } else {
-                log.error("微信 {} 导入失败", fileName);
+                log.error("支付宝 {} 导入失败", fileName);
             }
         }
 

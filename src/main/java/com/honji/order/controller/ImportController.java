@@ -621,8 +621,12 @@ public class ImportController {
             } else {
                 log.error("微信 {} 导入失败", fileName);
             }
+        } else {
+            log.warn("账单没有数据！");
         }
 
+        list = null;//释放list
+        System.gc();
         return result;
     }
 
@@ -696,7 +700,7 @@ public class ImportController {
             String khdm =  record.get(2).trim().split("_")[0];
             String type = record.get(10).trim();
             //System.out.println(type);
-            if ("交易退款".equals(type)) { //退款类型
+            if ("交易退款".equals(type) || "退款（交易退款）".equals(type)) { //退款类型
                 amount = Double.valueOf(record.get(7).trim());
                 fee = Double.parseDouble(String.format("%.2f", amount * 0.006));//退款手续费为负数
                 orderId = new String(record.get(0).trim());
@@ -721,8 +725,12 @@ public class ImportController {
             } else {
                 log.error("支付宝 {} 导入失败", fileName);
             }
+        } else {
+            log.warn("账单没有数据！");
         }
 
+        list = null;//释放list
+        System.gc();
         return result;
     }
 

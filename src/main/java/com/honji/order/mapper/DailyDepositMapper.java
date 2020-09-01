@@ -48,7 +48,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
             "\tSELECT deposit.khdm, sum(ISNULL(cash, 0) - ISNULL(deposit, 0) + ISNULL(extra_cash, 0)) as amount FROM daily_deposit deposit \n" +
             "\tLEFT JOIN cash_balance balance \n" +
             "\tON deposit.khdm = balance.khdm \n" +
-            "\tWHERE deposit.date > balance.date\n" +
+            "\tWHERE deposit.date >= balance.date\n" +
             "\tGROUP BY deposit.khdm\n" +
             "\t) deposit\n" +
             "\tON balance.khdm = deposit.khdm\n" +

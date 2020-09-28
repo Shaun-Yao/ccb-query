@@ -7,6 +7,7 @@ import com.honji.order.entity.Bank;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.DailyDeposit;
 import com.honji.order.model.DataGridResult;
+import com.honji.order.model.DepositDTO;
 import com.honji.order.service.IAuthorityService;
 import com.honji.order.service.IBankService;
 import com.honji.order.service.ICashBalanceService;
@@ -103,10 +104,10 @@ public class DailyDepositController {
 
     @GetMapping("/query")
     @ResponseBody
-    public DataGridResult query(@RequestParam String jobNum, @RequestParam(value = "shopCodes[]", required = false) List<String> shopCodes,
-                                @RequestParam(defaultValue = "0") int offset,
-                                @RequestParam int limit ) {
-        return new DataGridResult(dailyDepositService.listByShopCodes(jobNum, shopCodes, offset, limit));
+    public DataGridResult query(DepositDTO depositDTO,
+                                @RequestParam(value = "shopCodes[]", required = false) List<String> shopCodes) {
+        System.out.println(depositDTO.getLimit() + "===" + depositDTO.getOffset());
+        return new DataGridResult(dailyDepositService.listByShopCodes(depositDTO, shopCodes));
     }
 
 
@@ -119,7 +120,8 @@ public class DailyDepositController {
 
     @GetMapping("/list")
     @ResponseBody
-    public DataGridResult list(@RequestParam String shopCode, @RequestParam(defaultValue = "0") int offset, @RequestParam int limit) {
+    public DataGridResult list(@RequestParam String shopCode,
+                               @RequestParam(defaultValue = "0") int offset, @RequestParam int limit) {
         //Admin admin = (Admin) session.getAttribute("admin");
 //        PageHelper.startPage(offset / limit + 1, limit);
 //        QueryWrapper<DailyDeposit> queryWrapper = new QueryWrapper<>();

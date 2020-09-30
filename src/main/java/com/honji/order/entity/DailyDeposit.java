@@ -127,15 +127,16 @@ public class DailyDeposit extends IdEntity {
      */
     private BigDecimal deposit;
 
-    /**
-     * 图片
-     */
-//    private byte[] picture;
 
     /**
      * 多收款金额
      */
     private BigDecimal extraCash;
+
+    /**
+     * 现金调整金额，默认0
+     */
+    private BigDecimal cashAdjustment =  BigDecimal.ZERO;
 
     /**
      * 图片

@@ -9,7 +9,7 @@ import com.honji.order.entity.DailyDeposit;
 import com.honji.order.mapper.AuthorityMapper;
 import com.honji.order.mapper.DailyDepositMapper;
 import com.honji.order.model.DepositDTO;
-import com.honji.order.model.DepositVo;
+import com.honji.order.model.DepositVO;
 import com.honji.order.service.IDailyDepositService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,16 +39,16 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
     private HttpSession session;
 
     @Override
-    public PageInfo<DepositVo> listByCurrentUser(String shopCode, int offset, int limit) {
+    public PageInfo<DepositVO> listByCurrentUser(String shopCode, int offset, int limit) {
 //        String user = (String) session.getAttribute("user");
         PageHelper.startPage(offset / limit + 1, limit);
-        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode(shopCode);
-        //Page<DepositVo> depositVoPage = dailyDepositMapper.selectByShopCode("Z75320");
+        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCode(shopCode);
+        //Page<DepositVO> depositVoPage = dailyDepositMapper.selectByShopCode("Z75320");
         return new PageInfo<>(depositVos);
     }
 
     @Override
-    public PageInfo<DepositVo> listByShopCodes(DepositDTO depositDTO, List<String> shopCodeList) {
+    public PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO, List<String> shopCodeList) {
 //        String user = (String) session.getAttribute("user");
 //        String[] shopCodes = {"Z59573", "Z57113"};
         //List<String> shopCodes = Arrays.asList("Z59573", "Z57113");
@@ -59,7 +59,7 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
             QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("job_num", depositDTO.getJobNum());
 //        StringBuffer shopCodes = new StringBuffer();
-            //根据工号查询负责的门店，再转为
+            //根据工号查询负责的门店，再拼接成字符串
             List<Authority> authorities = authorityMapper.selectList(queryWrapper);
             List<String> shopCodeList2 = authorities.stream().map(e -> e.getKhdm()).collect(Collectors.toList());
             shopCodes = shopCodeList2.stream().map(s -> "\'" + s + "\'")
@@ -70,14 +70,14 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
         }
 
         PageHelper.startPage(depositDTO.getOffset() / depositDTO.getLimit() + 1, depositDTO.getLimit());
-        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes, depositDTO);
+        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes, depositDTO);
 //        QueryWrapper<DailyDeposit> qw = new QueryWrapper<DailyDeposit>();
 //        qw.eq("date", "2020-08-01");
 //        List<DailyDeposit> dailyDeposits = dailyDepositMapper.selectList(qw);
 //        System.out.println("=====" + dailyDeposits.size());
 
-//        List<DepositVo> depositVos = dailyDepositMapper.selectByShopCode("2020-09-25");
-        //Page<DepositVo> depositVoPage = dailyDepositMapper.selectByShopCode("Z59568");
+//        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCode("2020-09-25");
+        //Page<DepositVO> depositVoPage = dailyDepositMapper.selectByShopCode("Z59568");
 //        return null;
         return new PageInfo<>(depositVos);
     }

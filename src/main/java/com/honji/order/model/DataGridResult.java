@@ -24,6 +24,8 @@ public class DataGridResult implements Serializable {
     }
 
     public DataGridResult(PageInfo<?> pageInfo) {
+//        DepositVO deposit = (DepositVO) pageInfo.getList().get(0);
+//        System.out.println(deposit.getKhdm() + deposit.getAmount() + "====" + deposit.getCash_adjustment());
         this.total = pageInfo.getTotal();
         this.rows = pageInfo.getList();
     }

@@ -10,9 +10,11 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DepositVo {
+public class DepositVO {
 
     private String id;
+
+
 
     /**
      * 店铺代码
@@ -109,10 +111,6 @@ public class DepositVo {
      */
     private BigDecimal deposit;
 
-    /**
-     * 图片
-     */
-//    private byte[] picture;
 
     /**
      * 多收款金额
@@ -127,4 +125,10 @@ public class DepositVo {
      * 结余
      */
     private double balance;
+
+    /**
+     * 现金调整金额
+     */
+    private BigDecimal cashAdjustment;
+
 }

@@ -2,6 +2,7 @@ package com.honji.order.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.honji.order.entity.Authority;
 import com.honji.order.entity.Bank;
 import com.honji.order.entity.CashBalance;
@@ -106,7 +107,7 @@ public class DailyDepositController {
     @ResponseBody
     public DataGridResult query(DepositDTO depositDTO,
                                 @RequestParam(value = "shopCodes[]", required = false) List<String> shopCodes) {
-        System.out.println(depositDTO.getLimit() + "===" + depositDTO.getOffset());
+//        System.out.println(depositDTO.getLimit() + "===" + depositDTO.getOffset());
         return new DataGridResult(dailyDepositService.listByShopCodes(depositDTO, shopCodes));
     }
 
@@ -128,7 +129,7 @@ public class DailyDepositController {
 //        queryWrapper.eq("khdm", "Z75320");
 //        List<DailyDeposit> deposits = dailyDepositService.list(queryWrapper);
 //        PageInfo<DailyDeposit> depositPageInfo = new PageInfo<>(deposits);
-        //new DepositVo(1l, );
+        //new DepositVO(1l, );
         return new DataGridResult(dailyDepositService.listByCurrentUser(shopCode, offset, limit));
 //        IPage<DailyDeposit> dailyDepositPage = new Page<>(offset / limit + 1, limit);
 //        return new DataGridResult(dailyDepositService.list(dailyDepositPage, "Z75320"));
@@ -139,6 +140,15 @@ public class DailyDepositController {
     @ResponseBody
     public boolean save(@ModelAttribute DailyDeposit dailyDeposit) {
         return dailyDepositService.saveOrUpdate(dailyDeposit);
+    }
+
+    @PostMapping("/updateCashAdjustment")
+    @ResponseBody
+    public boolean updateCashAdjustment(@ModelAttribute DailyDeposit dailyDeposit) {
+        UpdateWrapper<DailyDeposit> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", dailyDeposit.getId()).set("cash_adjustment", dailyDeposit.getCashAdjustment());
+//        updateWrapper.eq("cash_adjustment", dailyDeposit.getCashAdjustment());
+        return dailyDepositService.update(updateWrapper);
     }
 
     @PostMapping("/remove")

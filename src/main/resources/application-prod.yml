@@ -29,7 +29,7 @@ mybatis-plus:
       default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
     global-config:
           db-config:
-            update-strategy: ignored
+            update-strategy: ignored #更新所有字段
 
 pagehelper:
   helper-dialect: sqlserver

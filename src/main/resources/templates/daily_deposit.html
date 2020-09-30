@@ -37,6 +37,7 @@
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
                         <input type="hidden" id="shopCode" name="khdm" th:value="${shopCode}" >
+                        <input type="hidden" id="cashAdjustment" name="cashAdjustment"><!--隐藏不给修改，更新时才能按原值更新-->
 
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">营业日期</label>
@@ -206,6 +207,7 @@
 
     $(function () {
         calculateBalance();
+        //禁止数字框，日期框滚轮修改数据
         $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
             $(this).on('wheel.disableScroll', function (e) {
                 e.preventDefault()
@@ -355,6 +357,7 @@
                     $('#heSheng').val(data.heSheng);
                     $('#cash').val(data.cash);
                     $('#memberPoints').val(data.memberPoints);
+                    $('#cashAdjustment').val(data.cashAdjustment);
                     $('#extraCash').val(data.extraCash);
                     $('#depositDate').val(data.depositDate);
                     $('#depositAmount').val(data.deposit);

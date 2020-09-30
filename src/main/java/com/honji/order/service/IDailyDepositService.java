@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.DailyDeposit;
 import com.honji.order.model.DepositDTO;
-import com.honji.order.model.DepositVo;
+import com.honji.order.model.DepositVO;
 
 import java.util.List;
 
@@ -18,6 +18,6 @@ import java.util.List;
  */
 public interface IDailyDepositService extends IService<DailyDeposit> {
 
-    PageInfo<DepositVo> listByCurrentUser(String shopCode,int offset, int limit);
-    PageInfo<DepositVo> listByShopCodes(DepositDTO depositDTO, List<String> shopCodeList);
+    PageInfo<DepositVO> listByCurrentUser(String shopCode, int offset, int limit);
+    PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO, List<String> shopCodeList);
 }

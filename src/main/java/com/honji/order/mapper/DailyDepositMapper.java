@@ -3,7 +3,7 @@ package com.honji.order.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.honji.order.entity.DailyDeposit;
 import com.honji.order.model.DepositDTO;
-import com.honji.order.model.DepositVo;
+import com.honji.order.model.DepositVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -20,8 +20,8 @@ import java.util.List;
 public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
 
     @Select("select deposit.*, bank.name as bankName from dbo.daily_deposit deposit " +
-            "LEFT JOIN bank on deposit.bank = bank.account where date = #{shopCode} ORDER BY date desc")
-    List<DepositVo> selectByShopCode(@Param("shopCode") String shopCode);
+            "LEFT JOIN bank on deposit.bank = bank.account where khdm = #{shopCode} ORDER BY date desc")
+    List<DepositVO> selectByShopCode(@Param("shopCode") String shopCode);
 
 /*
 
@@ -29,7 +29,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
             "select deposit.*, bank.name as bankName from dbo.daily_deposit deposit " +
                     "LEFT JOIN bank on deposit.bank = bank.account " +
                     "where khdm in (${shopCodes}) ORDER BY date desc" )
-    List<DepositVo> selectByShopCodes(@Param("shopCodes") String shopCodes);
+    List<DepositVO> selectByShopCodes(@Param("shopCodes") String shopCodes);
 */
 /*
 
@@ -58,7 +58,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
             "on result.khdm = balance.khdm\n" +
             "\t ORDER BY date desc " )
     //date BETWEEN '${begin}' AND '${end}' and
-    List<DepositVo> selectByShopCodes(@Param("shopCodes") String shopCodes,
+    List<DepositVO> selectByShopCodes(@Param("shopCodes") String shopCodes,
                                       @Param("begin")String begin, @Param("end")String end);
 
 */
@@ -79,7 +79,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
             "\t) balance\n" +
             "\tLEFT JOIN\n" +
             "\t(\n" +
-            "\tSELECT deposit.khdm, sum(ISNULL(cash, 0) - ISNULL(deposit, 0) + ISNULL(extra_cash, 0)) as amount FROM daily_deposit deposit \n" +
+            "\tSELECT deposit.khdm, sum(ISNULL(cash, 0) - ISNULL(deposit, 0) + ISNULL(extra_cash, 0) + cash_adjustment) as amount FROM daily_deposit deposit \n" +
             "\tLEFT JOIN cash_balance balance \n" +
             "\tON deposit.khdm = balance.khdm \n" +
             "\tWHERE deposit.date >= balance.date\n" +
@@ -103,7 +103,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
             "</if>",
             " ORDER BY date desc ",
             "</script>"})
-    List<DepositVo> selectByShopCodes(@Param("shopCodes") String shopCodes, @Param("depositDTO")DepositDTO depositDTO);
+    List<DepositVO> selectByShopCodes(@Param("shopCodes") String shopCodes, @Param("depositDTO")DepositDTO depositDTO);
 
 
 }

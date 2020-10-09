@@ -78,7 +78,7 @@
     </div>
 
 
-    <table id="table" class="modal-body" > </table>
+    <table id="table" class="modal-body" style="table-layout: fixed" > </table>
     <div id="deposit" >
 
     </div>
@@ -123,8 +123,9 @@
 <script src="/webjars/jquery-form/4.2.2/jquery.form.min.js"></script>
     <script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
     <script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
-    <script src="/webjars/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js"></script>
     <script src="/webjars/bootstrap-table/dist/extensions/sticky-header/bootstrap-table-sticky-header.min.js"></script>
+    <script src="/webjars/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js"></script>
+
 
     <script src="/tableExport/libs/FileSaver/FileSaver.min.js"></script>
     <script src="/tableExport/libs/js-xlsx/xlsx.core.min.js"></script>
@@ -146,10 +147,15 @@
             $(this).on('wheel.disableScroll', function (e) {
                 e.preventDefault()
             })
-        })
+        });
         $('form').on('blur', 'input[type=number], input[type=date]', function (e) {
             $(this).off('wheel.disableScroll')
-        })
+        });
+
+        $(window).resize(function () {
+            console.log(2222);
+            $('#table').bootstrapTable('resetView');
+        });
 
         $('#begin-date, #end-date, #deposit-begin-date, #deposit-end-date').datetimepicker({
             // timeZone: "zh",
@@ -191,6 +197,7 @@
 
     $('#table').bootstrapTable({
         height: 1000,
+        // width: 800,
         url: '/daily-deposit/query?jobNum=' + $('#jobNum').val(),
         pagination: true,
         sidePagination: "server",
@@ -255,74 +262,95 @@
             visible: false
         },*/ {
             field: 'khdm',
-            title: '店铺代码'
+            title: '店铺代码',
+            width: '100'
         }, {
             field: 'date',
             title: '营业日期',
             width: '100'
         }, {
             field: 'amount',
-            title: '营业额'
+            title: '营业额',
+            width: '80'
         }, {
             field: 'balance',
-            title: '结余'
+            title: '结余',
+            width: '80'
         }, {
             field: 'cashAdjustment',
-            title: '现金调整'
+            title: '现金调整',
+            width: '80'
         }, {
             field: 'pos',
-            title: 'POS机/刷卡/银联扫码'
+            title: 'POS机/刷卡/银联扫码',
+            width: '160'
         }, {
             field: 'cgbCoupon',
-            title: '广发兑换券'
+            title: '广发兑换券',
+            width: '90'
         }, {
             field: 'ccbZs',
-            title: '建行扫码'
+            title: '建行扫码',
+            width: '80'
         }, {
             field: 'ccbBs',
-            title: '建行离线'
+            title: '建行离线',
+            width: '80'
         }, {
             field: 'alipay',
-            title: '支付宝'
+            title: '支付宝',
+            width: '80'
         }, {
             field: 'wxpay',
-            title: '微信'
+            title: '微信',
+            width: '80'
         }, {
             field: 'sys',
-            title: '扫一扫'
+            title: '扫一扫',
+            width: '80'
         }, {
             field: 'mss',
-            title: '码上收'
+            title: '码上收',
+            width: '80'
         }, {
             field: 'bsPay',
-            title: '百胜支付'
+            title: '百胜支付',
+            width: '80'
         }, {
             field: 'mallCollection',
-            title: '商场代收款'
+            title: '商场代收款',
+            width: '90'
         }, {
             field: 'heSheng',
-            title: '合胜收款'
+            title: '合胜收款',
+            width: '80'
         }, {
             field: 'cash',
-            title: '现金'
+            title: '现金',
+            width: '80'
         }, {
             field: 'memberPoints',
-            title: '会员积分/储值卡消费/礼券'
+            title: '会员积分/储值卡消费/礼券',
+            width: '200'
         }, {
             field: 'bankName',
-            title: '存款银行'
+            title: '存款银行',
+            width: '120'
         }, {
             field: 'depositDate',
-            title: '存款日期'
+            title: '存款日期',
+            width: '100'
         }, {
             field: 'deposit',
-            title: '存款额'
+            title: '存款额',
+            width: '80'
         }, {
             field: 'image',
             title: '票据',
+            width: '80',
             formatter: function (value, row, index) {
                 //console.log(value);
-                return "<a href='#' class='image' onclick=showImage2('" + value + "')>查看票据</a>";
+                return "<a href='#' class='image' onclick=showImage2('" + value + "')>查看</a>";
             }
         }]
     });

@@ -547,6 +547,163 @@ public class ImportController {
     }
 
     /**
+     * 合胜收款 Z754143专用
+     * @param file
+     * @return
+     * @throws IOException
+     */
+//    @ResponseBody
+//    @PostMapping("/heSheng")
+//    public boolean heSheng(@RequestParam("heSheng") MultipartFile file) throws IOException {
+//
+//        String fileName = file.getOriginalFilename();
+//        //checkFile(file);
+//        //获得Workbook工作薄对象
+//        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+//        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+//        List<BaiShengPay> list = new ArrayList<>();
+//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+//        boolean result = false;
+//        if (workbook != null) {
+//
+//            //获得当前sheet工作表
+//            Sheet sheet = workbook.getSheetAt(0);
+//            //获得当前sheet的开始行
+//            int firstRowNum = sheet.getFirstRowNum() + 2;//码上收账单是从第2行开始
+//            //获得当前sheet的结束行
+//            int lastRowNum = sheet.getLastRowNum();
+//            //循环除了所有行,如果要循环除第一行以外的就firstRowNum
+//            for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
+//                //获得当前行
+//                Row row = sheet.getRow(rowNum);
+//                if (row == null) {
+//                    continue;
+//                }
+//
+//                Cell dateCell = row.getCell(6);
+//                if (dateCell.getCellType() == CellType.BLANK) {//尾部数据直接跳出
+//                    break;
+//                }
+//                Cell timeCell = row.getCell(7);
+////                Cell terminalCell = row.getCell(4);
+//                Cell amountCell = row.getCell(15);
+//                Cell feeCell = row.getCell(16);
+//                Cell orderCell = row.getCell(10);
+//                //Cell merchantCell = row.getCell(14);
+//
+//                LocalDate date = LocalDate.parse(dateCell.getStringCellValue().trim(), dtf);
+//                String time = null;
+//                if (timeCell.getCellType().equals(CellType.STRING)) {
+//                    time = timeCell.getStringCellValue().trim();
+//                }
+//
+//                if (timeCell.getCellType().equals(CellType.NUMERIC)) {
+//                    time = String.valueOf(timeCell.getNumericCellValue()).trim();
+//                }
+//
+//                String terminalNum = "Z754143";//没有终端号固定为百胜店代码
+//                double amount = Double.valueOf(amountCell.getStringCellValue().trim());
+//                double fee = Double.valueOf(feeCell.getStringCellValue().trim());
+//                String merchant = "汕头合胜百货店";
+//                String orderId = orderCell.getStringCellValue().trim();
+//                byte type = 4;
+//                BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant,type);
+//                list.add(baiShengPay);
+//
+//            }
+//            long start = System.currentTimeMillis();
+//
+//            try {
+//                result = baiShengPayService.saveBatch(list);
+//            } catch (Exception e) {
+//                log.error("合胜收款账单 {} 导入出现异常 {}", fileName, e.getMessage());
+//                //e.printStackTrace();
+//            }
+//            long end = System.currentTimeMillis();
+//            if (result) {
+//                log.info("合胜收款账单 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+//            } else {
+//                log.error("合胜收款账单 {} 导入失败", fileName);
+//            }
+//        }
+//        list = null;//释放list
+//        System.gc();
+//        return result;
+//    }
+
+/**
+     * 合胜收款 Z754143专用
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @PostMapping("/heSheng")
+    public boolean heSheng(@RequestParam("heSheng") MultipartFile file) throws IOException {
+
+        boolean result = false;
+        String fileName = file.getOriginalFilename();
+
+        //Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        InputStreamReader is = new InputStreamReader(file.getInputStream(), "GBK");
+        BufferedReader br = new BufferedReader(is);
+
+        Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(br);
+        List<CSVRecord> recordList = ((CSVParser) records).getRecords();
+        int endLine = recordList.size() - 1;
+        List<WxAliPay> list = new ArrayList<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        for(int i = 3; i < endLine; i++) {//从第4行开始
+            CSVRecord record = recordList.get(i);
+            String dateStr =  record.get(2).trim();
+            LocalDate date = LocalDate.parse(dateStr.substring(2, dateStr.length() - 1), dtf);
+            String amountStr =  record.get(15).trim();
+            double amount = Double.valueOf(amountStr.substring(2, amountStr.length() - 1));
+            String feeStr =  record.get(17).trim();
+            double fee = Double.valueOf(feeStr.substring(2, feeStr.length() - 1));
+            String orderIdStr =  record.get(4).trim();
+            String orderId = orderIdStr.substring(2, orderIdStr.length() - 1);
+            final String khdm = "Z754143";
+            //System.out.println(type);
+            //退款业务订单号与消费订单号重复，用微信退款单号替换，为保证orderId唯一性
+//            if ("REFUND".equals(type)) { //退款类型
+//                amount = - Double.valueOf(record.get(16).trim().substring(1));//退款为负数
+//                orderId = new String(record.get(14).trim().substring(1));
+//                System.out.println(orderId);
+//            }
+
+            WxAliPay wxPay = new WxAliPay(date, amount, fee, orderId, khdm, 5);
+            list.add(wxPay);
+        }
+
+        if(list.size() > 0) {
+            long start = System.currentTimeMillis();
+
+            try {
+                result = wxPayService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("合胜收款 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("合胜收款 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("合胜收款 {} 导入失败", fileName);
+            }
+        } else {
+            log.warn("合胜收款账单没有数据！");
+        }
+
+        list = null;//释放list
+        System.gc();
+        return result;
+    }
+
+
+    /**
      * 微信公户账单
      * @param file
      * @return
@@ -726,7 +883,7 @@ public class ImportController {
                 log.error("支付宝 {} 导入失败", fileName);
             }
         } else {
-            log.warn("账单没有数据！");
+            log.warn("支付宝 {} 账单没有数据！", fileName);
         }
 
         list = null;//释放list

@@ -39,7 +39,7 @@ public class WxAliPay extends IdEntity {
     private String khdm;
 
     /**
-     * 账单类型 1.微信公户 2.微信私户 3.支付宝公户 4.支付宝私户
+     * 账单类型 1.微信公户 2.微信私户 3.支付宝公户 4.支付宝私户 5.合胜收款
      */
     private int type;
 

@@ -27,7 +27,7 @@ mybatis-plus:
 #    typeEnumsPackage: com.honji.exhibition.admin.enums
     configuration:
       default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
-      auto-mapping-unknown-column-behavior: warning
+#      auto-mapping-unknown-column-behavior: warning
     global-config:
       db-config:
         update-strategy: ignored #更新所有字段

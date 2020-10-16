@@ -65,43 +65,46 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
 
 
     @Select({"<script>",
-            "SELECT result.*, balance.balance FROM \n" +
-            "(\n" +
-            "\tselect deposit.*, bank.name as bankName from dbo.daily_deposit deposit \n" +
-            "\tLEFT JOIN bank on deposit.bank = bank.account\n" +
-
-            ") result\n" +
-            "LEFT JOIN\n" +
-            "(\n" +
-            "\tSELECT balance.khdm, balance.amount + ISNULL(deposit.amount, 0) as \t    balance FROM\n" +
-            "  (\n" +
-            "\tSELECT khdm, balance as amount FROM cash_balance balance\n" +
-            "\t) balance\n" +
-            "\tLEFT JOIN\n" +
-            "\t(\n" +
-            "\tSELECT deposit.khdm, sum(ISNULL(cash, 0) - ISNULL(deposit, 0) + ISNULL(extra_cash, 0) + cash_adjustment) as amount FROM daily_deposit deposit \n" +
-            "\tLEFT JOIN cash_balance balance \n" +
-            "\tON deposit.khdm = balance.khdm \n" +
-            "\tWHERE deposit.date >= balance.date\n" +
-            "\tGROUP BY deposit.khdm\n" +
-            "\t) deposit\n" +
-            "\tON balance.khdm = deposit.khdm\n" +
-            ") balance\n" +
-            "on result.khdm = balance.khdm\n" +
+            "SELECT balance.balance,result.* FROM\n" +
+                    "\t (\n" +
+                    "\t\t SELECT\n" +
+                    "\t\tdeposit.*,\n" +
+                    "\t\tbank.name AS bankName \n" +
+                    "\tFROM\n" +
+                    "\t\tdbo.daily_deposit deposit \n" +
+                    "\t\tLEFT JOIN bank ON deposit.bank = bank.account  \n" +
+                    "\t) result \n" +
+                    "\tLEFT JOIN  (\n" +
+                    "\t\t SELECT out.khdm, out.date,\n" +
+                    "cash_balance.balance + \n" +
+                    "(\n" +
+                    "\tSELECT SUM(ISNULL( cash, 0 ) - ISNULL( deposit, 0 ) + ISNULL( extra_cash, 0 ) + cash_adjustment) as amount FROM\n" +
+                    "\t(\n" +
+                    "\tSELECT  cash.khdm, cash.date, cash.cash, deposit.deposit, cash.extra_cash, cash.cash_adjustment\n" +
+                    "\tFROM daily_deposit cash\n" +
+                    "\tLEFT JOIN daily_deposit deposit \n" +
+                    "\tON cash.khdm = deposit.khdm and cash.date = deposit.deposit_date\n" +
+                    "\t) inn\n" +
+                    "\tWHERE out.khdm = inn.khdm\n" +
+                    "\tand out.date >= inn.date\n" +
+                    ") as balance\n" +
+                    "from daily_deposit out\n" +
+                    "LEFT JOIN cash_balance ON out.khdm = cash_balance.khdm  \n" +
+                    "\t) balance  ON result.khdm = balance.khdm AND result.date = balance.date" +
             "\twhere 1 = 1 and result.khdm in (${shopCodes}) ",
             "<if test='depositDTO.begin !=null and depositDTO.begin!=\"\"'>",
-            "AND date &gt;= '${depositDTO.begin}'",
+            "AND result.date &gt;= '${depositDTO.begin}'",
             "</if>",
             "<if test='depositDTO.end !=null and depositDTO.end!=\"\"'>",
-            "AND date &lt;= '${depositDTO.end}'",
+            "AND result.date &lt;= '${depositDTO.end}'",
             "</if>",
             "<if test='depositDTO.depositBegin !=null and depositDTO.depositBegin!=\"\"'>",
-            "AND deposit_date &gt;= '${depositDTO.depositBegin}'",
+            "AND result.deposit_date &gt;= '${depositDTO.depositBegin}'",
             "</if>",
             "<if test='depositDTO.depositEnd !=null and depositDTO.depositEnd!=\"\"'>",
-            "AND deposit_date &lt;= '${depositDTO.depositEnd}'",
+            "AND result.deposit_date &lt;= '${depositDTO.depositEnd}'",
             "</if>",
-            " ORDER BY date desc ",
+            " ORDER BY result.date desc ",
             "</script>"})
     List<DepositVO> selectByShopCodes(@Param("shopCodes") String shopCodes, @Param("depositDTO")DepositDTO depositDTO);
 

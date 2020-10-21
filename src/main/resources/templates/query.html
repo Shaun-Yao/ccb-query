@@ -152,11 +152,6 @@
             $(this).off('wheel.disableScroll')
         });
 
-        $(window).resize(function () {
-            console.log(2222);
-            $('#table').bootstrapTable('resetView');
-        });
-
         $('#begin-date, #end-date, #deposit-begin-date, #deposit-end-date').datetimepicker({
             // timeZone: "zh",
             format: 'YYYY-MM-DD',
@@ -202,6 +197,7 @@
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
+        showButtonText: true,
         stickyHeader: true,
         fixedColumns: true,
         fixedNumber: 2,
@@ -231,17 +227,23 @@
         },
         pageNumber: 1,     //初始化加载第一页，默认第一页
         pageSize: 10,      //每页的记录行数（*）
-        ajaxOption:{traditional:true}, //好像无效，数组参数还是加上了[]
+        // ajaxOption:{traditional:true}, //好像无效，数组参数还是加上了[]
         queryParams: function (params) {
             params.shopCodes = $('#shopCodes').val();
-            console.log($('#shopCodes').val());
+            // console.log($('#shopCodes').val());
             params.begin = $('#begin').val();
             params.end = $('#end').val();
             params.depositBegin = $('#deposit-begin').val();
             params.depositEnd = $('#deposit-end').val();
             //导出全部数据没有传limit给后台, 把limit设置为全部数据
             if (typeof(params.limit) == "undefined") {
-                // if(params.shopCodes) {
+
+                // if(params.shopCodes.length == 0) {
+                //     if ( params.end == ""
+                //         && params.depositBegin == "" && params.depositEnd == "") {
+                //         alert("请添加查询条件后再导出");
+                //         return false;
+                //     }
                 //
                 // }
                 params.limit = this.totalRows;

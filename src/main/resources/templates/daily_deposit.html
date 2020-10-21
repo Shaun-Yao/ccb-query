@@ -42,7 +42,7 @@
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">营业日期</label>
                             <div class="col-sm-4">
-                                <input type="date" class="form-control" id="date" name="date" required>
+                                <input type="date" min="2020-06-30" class="form-control" id="date" name="date" required>
                             </div>
                             <label for="amount" class="col-sm-2 control-label">营业额</label>
                             <div class="col-sm-4">
@@ -138,7 +138,7 @@
                             </div>
                             <label for="depositDate" class="col-sm-2 control-label">存款日期</label>
                             <div class="col-sm-4">
-                                <input type="date" class="form-control" id="depositDate" name="depositDate" >
+                                <input type="date" min="2020-06-30" class="form-control" id="depositDate" name="depositDate" >
                             </div>
 
                         </div>
@@ -206,15 +206,30 @@
 <script th:inline="javascript">
 
     $(function () {
-        calculateBalance();
+        var tomorrow = new Date();
+        tomorrow.setDate(new Date().getDate()+1);
+        var dd = tomorrow.getDate();
+        var mm = tomorrow.getMonth()+1; //January is 0!
+        var yyyy = tomorrow.getFullYear();
+        if(dd<10){
+            dd='0'+dd
+        }
+        if(mm<10){
+            mm='0'+mm
+        }
+        tomorrow = yyyy+'-'+mm+'-'+dd;
+        // document.getElementById("depositDate").setAttribute("max", tomorrow);
+        $('input[type=date]').attr("max", tomorrow);
+
+        calculateBalance();//初始化计算结余
         //禁止数字框，日期框滚轮修改数据
         $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
             $(this).on('wheel.disableScroll', function (e) {
-                e.preventDefault()
+                e.preventDefault();
             })
         })
         $('form').on('blur', 'input[type=number], input[type=date]', function (e) {
-            $(this).off('wheel.disableScroll')
+            $(this).off('wheel.disableScroll');
         })
     });
 

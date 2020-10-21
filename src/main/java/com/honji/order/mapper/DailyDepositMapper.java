@@ -63,9 +63,9 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
 
 */
 
-
+/*
     @Select({"<script>",
-            "SELECT balance.balance,result.* FROM\n" +
+            " SELECT balance.balance,result.* FROM\n" +
                     "\t (\n" +
                     "\t\t SELECT\n" +
                     "\t\tdeposit.*,\n" +
@@ -105,7 +105,36 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
             "AND result.deposit_date &lt;= '${depositDTO.depositEnd}'",
             "</if>",
             " ORDER BY result.date desc ",
-            "</script>"})
+            "</script>"})*/
+@Select({"<script>",
+        " SELECT balance_result.TotalAmount AS balance, daily_deposit.* FROM daily_deposit\n" +
+                "\tLEFT JOIN (\n" +
+                "\tSELECT outt.*,\n" +
+                "\t\t(\n" +
+                "\t\tSELECT SUM(ISNULL(cash, 0) - ISNULL(deposit, 0) + ISNULL(extra_cash, 0) + ISNULL(cash_adjustment, 0)) AS amount \n" +
+                "\t\tFROM balance_history inn \n" +
+                "\t\tWHERE inn.khdm= outt.khdm \n" +
+                "\t\t\tAND (inn.date &lt; outt.date \n" +
+                "\t\t\tOR ( inn.date = outt.date AND inn.RowNo &lt;= outt.RowNo )) \n" +
+                "\t\t) + ba.balance TotalAmount \n" +
+                "\tFROM balance_history outt\n" +
+                "\t\tJOIN cash_balance ba ON outt.khdm= ba.khdm \n" +
+                "\t) balance_result ON daily_deposit.id = balance_result.id " +
+                "\twhere 1 = 1 and daily_deposit.khdm in (${shopCodes}) ",
+        "<if test='depositDTO.begin !=null and depositDTO.begin!=\"\"'>",
+        "AND daily_deposit.date &gt;= '${depositDTO.begin}'",
+        "</if>",
+        "<if test='depositDTO.end !=null and depositDTO.end!=\"\"'>",
+        "AND daily_deposit.date &lt;= '${depositDTO.end}'",
+        "</if>",
+        "<if test='depositDTO.depositBegin !=null and depositDTO.depositBegin!=\"\"'>",
+        "AND daily_deposit.deposit_date &gt;= '${depositDTO.depositBegin}'",
+        "</if>",
+        "<if test='depositDTO.depositEnd !=null and depositDTO.depositEnd!=\"\"'>",
+        "AND daily_deposit.deposit_date &lt;= '${depositDTO.depositEnd}'",
+        "</if>",
+        " ORDER BY daily_deposit.date desc ",
+        "</script>"})
     List<DepositVO> selectByShopCodes(@Param("shopCodes") String shopCodes, @Param("depositDTO")DepositDTO depositDTO);
 
 

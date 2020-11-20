@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -120,7 +121,9 @@ public class ImportController {
                 //String remark = remarkCell.getStringCellValue();
                 byte type = 1;
 
-                if (remarkCell == null && "消费".equals(tradeType)) {//扫一扫类型
+                //如果备注字段为空并且交易类型为“消费” 则是扫一扫类型
+                if ((remarkCell == null || StringUtils.isBlank(remarkCell.getStringCellValue()))
+                        && "消费".equals(tradeType)) {
                     type = 2;
                 }
 
@@ -165,7 +168,9 @@ public class ImportController {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
         List<BaiShengSwipe> list = new ArrayList<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean result = false;
+
         if (workbook != null) {
 
             //获得当前sheet工作表
@@ -182,7 +187,7 @@ public class ImportController {
                     continue;
                 }
 
-                Cell dateCell = row.getCell(1);
+                Cell dateCell = row.getCell(0);//百胜刷卡刷卡认“清算日期”
                 if (dateCell.getCellType() == CellType.BLANK) {//尾部数据直接跳出
                     break;
                 }
@@ -193,7 +198,8 @@ public class ImportController {
                 Cell orderCell = row.getCell(9);
                 Cell merchantCell = row.getCell(14);
 
-                LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
+                LocalDate date = LocalDate.parse(dateCell.getStringCellValue().trim(), dtf);
+//                LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
                 String time = timeCell.getLocalDateTimeCellValue().toString();
                 //String time = String.valueOf(timeCell.getNumericCellValue());
                 String terminalNum = terminalCell.getStringCellValue().trim();

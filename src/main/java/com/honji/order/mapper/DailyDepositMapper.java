@@ -107,7 +107,8 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
             " ORDER BY result.date desc ",
             "</script>"})*/
 @Select({"<script>",
-        " SELECT balance_result.TotalAmount AS balance, daily_deposit.* FROM daily_deposit\n" +
+        " SELECT balance_result.TotalAmount AS balance, balance_result.khmc, daily_deposit.* FROM " +
+                "( SELECT deposit.*, bank.name AS bankName FROM dbo.daily_deposit deposit LEFT JOIN bank ON deposit.bank = bank.account ) daily_deposit\n" +
                 "\tLEFT JOIN (\n" +
                 "\tSELECT outt.*,\n" +
                 "\t\t(\n" +
@@ -116,7 +117,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
                 "\t\tWHERE inn.khdm= outt.khdm \n" +
                 "\t\t\tAND (inn.date &lt; outt.date \n" +
                 "\t\t\tOR ( inn.date = outt.date AND inn.RowNo &lt;= outt.RowNo )) \n" +
-                "\t\t) + ba.balance TotalAmount \n" +
+                "\t\t) + ba.balance TotalAmount, ba.khmc  \n" +
                 "\tFROM balance_history outt\n" +
                 "\t\tJOIN cash_balance ba ON outt.khdm= ba.khdm \n" +
                 "\t) balance_result ON daily_deposit.id = balance_result.id " +

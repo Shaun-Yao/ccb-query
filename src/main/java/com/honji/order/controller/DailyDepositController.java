@@ -9,12 +9,19 @@ import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.DailyDeposit;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DepositDTO;
+import com.honji.order.model.DepositVO;
 import com.honji.order.service.IAuthorityService;
 import com.honji.order.service.IBankService;
 import com.honji.order.service.ICashBalanceService;
 import com.honji.order.service.IDailyDepositService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
@@ -24,7 +31,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,6 +119,70 @@ public class DailyDepositController {
                                 @RequestParam(value = "shopCodes[]", required = false) List<String> shopCodes) {
 //        System.out.println(depositDTO.getLimit() + "===" + depositDTO.getOffset());
         return new DataGridResult(dailyDepositService.listByShopCodes(depositDTO, shopCodes));
+    }
+
+    @GetMapping("/export")
+    @ResponseBody
+    public void export(DepositDTO depositDTO, HttpServletResponse response,
+                                @RequestParam(value = "shopCodes", required = false) List<String> shopCodes) {
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("sheet1");
+        String columnNames[] = { "店铺代码", "店铺名称", "营业日期", "营业额", "结余", "现金调整",
+                "POS机/刷卡/银联扫码", "广发兑换券", "建行扫码", "建行离线", "支付宝", "微信", "扫一扫", "码上收",
+                "百胜支付", "商场代收款", "合胜收款", "现金", "会员积分/储值卡消费/礼券", "存款银行", "存款日期", "存款额"};// 列名
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+
+        Row headRow = sheet.createRow(0);
+        for (int i = 0; i < columnNames.length; i++) {
+            headRow.createCell(i).setCellValue(columnNames[i]);
+        }
+        List<DepositVO> deposits = dailyDepositService.listAll(depositDTO, shopCodes);
+        for (int i = 0; i < deposits.size(); i++) {
+            DepositVO deposit = deposits.get(i);
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(deposit.getKhdm());
+            row.createCell(1).setCellValue(deposit.getKhmc());
+            Cell dateCell = row.createCell(2);
+            dateCell.setCellValue(deposit.getDate());
+            dateCell.setCellStyle(cellStyle);
+            row.createCell(3).setCellValue(deposit.getAmount());
+            row.createCell(4).setCellValue(deposit.getBalance());
+            row.createCell(5).setCellValue(deposit.getCashAdjustment());
+            row.createCell(6).setCellValue(deposit.getPos());
+            row.createCell(7).setCellValue(deposit.getCgbCoupon());
+            row.createCell(8).setCellValue(deposit.getCcbZs());
+            row.createCell(9).setCellValue(deposit.getCcbBs());
+            row.createCell(10).setCellValue(deposit.getAlipay());
+            row.createCell(11).setCellValue(deposit.getWxpay());
+            row.createCell(12).setCellValue(deposit.getSys());
+            row.createCell(13).setCellValue(deposit.getMss());
+            row.createCell(14).setCellValue(deposit.getBsPay());
+            row.createCell(15).setCellValue(deposit.getMallCollection());
+            row.createCell(16).setCellValue(deposit.getHeSheng());
+            row.createCell(17).setCellValue(deposit.getCash());
+            row.createCell(18).setCellValue(deposit.getMemberPoints());
+            row.createCell(19).setCellValue(deposit.getBankName());
+            Cell depositDateCell = row.createCell(20);
+            depositDateCell.setCellValue(deposit.getDepositDate());
+            depositDateCell.setCellStyle(cellStyle);
+            row.createCell(21).setCellValue(deposit.getDeposit());
+        }
+
+        try {
+            response.reset();
+//            response.setContentType("application/vnd.ms-excel");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("存款数据.xlsx", "utf-8"));
+            OutputStream out = response.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

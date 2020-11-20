@@ -74,6 +74,7 @@
             </div>
 
             <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
+            <a class="btn btn-primary " id="exportBtn" >导出exel</a>
         </form>
     </div>
 
@@ -171,6 +172,36 @@
             $('#table').bootstrapTable('refresh');
         });
 
+        $('#exportBtn').click(function () {
+            bootbox.confirm("确认导出？",
+            function(result){
+                if(result) {
+                    var jobNum = $('#jobNum').val();
+                    var shopCodes = $('#shopCodes').val();
+                    // console.log($('#shopCodes').val());
+                    var begin = $('#begin').val();
+                    var end = $('#end').val();
+                    var depositBegin = $('#deposit-begin').val();
+                    var depositEnd = $('#deposit-end').val();
+                    window.location.href = "/daily-deposit/export?jobNum=" + jobNum + "&shopCodes=" + shopCodes
+                        +"&begin=" + begin + "&end=" + end + "&depositBegin=" + depositBegin
+                        + "&depositEnd=" + depositEnd;
+                }
+            });
+
+            /*$.ajax({
+                type: "get",
+                url: "/daily-deposit/export",
+                data: $('#form').serialize(),
+                success: function(data){
+
+                },
+                error:function(xhr,state,errorThrown){
+                    alert("操作失败，请确认数据是否正确后重新尝试！");
+                }
+            });*/
+        });
+
         $('#save').click(function() {
             if($('#form')[0].reportValidity()) {
                 //$('#form').submit();
@@ -200,7 +231,7 @@
         showButtonText: true,
         stickyHeader: true,
         fixedColumns: true,
-        fixedNumber: 2,
+        fixedNumber: 3,
         // showFooter: true,
         // search: true,
         // showButtonText: true,
@@ -215,12 +246,12 @@
         singleSelect: true,
         sortable: true,
         smartDisplay: false,
-        showExport: true,
+        // showExport: true,
         exportDataType: "all",
         exportTypes: ['xlsx'],
         exportOptions: {
             // 导出数据去除第一列出现"on"
-            ignoreColumn: [0],
+            //ignoreColumn: [0],
             fileName: function () {
                 return '存款数据'
             }
@@ -266,6 +297,10 @@
             field: 'khdm',
             title: '店铺代码',
             width: '100'
+        }, {
+            field: 'khmc',
+            title: '店铺名称',
+            width: '150'
         }, {
             field: 'date',
             title: '营业日期',
@@ -378,13 +413,13 @@
                 rotateLeft: true,
                 rotateRight: true,
                 flipHorizontal: true,
-                flipVertical: true,
+                flipVertical: true
             },
             navbar: false,
 
             hidden: function () {
                 viewer.destroy();
-            },
+            }
         });
         // image.click();
         viewer.show();

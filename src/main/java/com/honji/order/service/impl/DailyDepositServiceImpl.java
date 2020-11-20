@@ -49,15 +49,30 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
 
     @Override
     public PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO, List<String> shopCodeList) {
-//        String user = (String) session.getAttribute("user");
-//        String[] shopCodes = {"Z59573", "Z57113"};
-        //List<String> shopCodes = Arrays.asList("Z59573", "Z57113");
 
+        String shopCodes = parseShopCodes(depositDTO.getJobNum(), shopCodeList);
+
+        PageHelper.startPage(depositDTO.getOffset() / depositDTO.getLimit() + 1, depositDTO.getLimit());
+        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes, depositDTO);
+
+        return new PageInfo<>(depositVos);
+    }
+
+    @Override
+    public List<DepositVO> listAll(DepositDTO depositDTO, List<String> shopCodeList) {
+
+        String shopCodes = parseShopCodes(depositDTO.getJobNum(), shopCodeList);
+        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes, depositDTO);
+
+        return depositVos;
+    }
+
+    private String parseShopCodes(String jobNum, List<String> shopCodeList) {
         String shopCodes = null;
         //没有查询条件显示当前用户负责的所有门店的存款信息
         if (shopCodeList == null || shopCodeList.isEmpty()) {
             QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("job_num", depositDTO.getJobNum());
+            queryWrapper.eq("job_num", jobNum);
 //        StringBuffer shopCodes = new StringBuffer();
             //根据工号查询负责的门店，再拼接成字符串
             List<Authority> authorities = authorityMapper.selectList(queryWrapper);
@@ -68,17 +83,6 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
             shopCodes = shopCodeList.stream().map(s -> "\'" + s + "\'")
                     .collect(Collectors.joining(", "));
         }
-
-        PageHelper.startPage(depositDTO.getOffset() / depositDTO.getLimit() + 1, depositDTO.getLimit());
-        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes, depositDTO);
-//        QueryWrapper<DailyDeposit> qw = new QueryWrapper<DailyDeposit>();
-//        qw.eq("date", "2020-08-01");
-//        List<DailyDeposit> dailyDeposits = dailyDepositMapper.selectList(qw);
-//        System.out.println("=====" + dailyDeposits.size());
-
-//        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCode("2020-09-25");
-        //Page<DepositVO> depositVoPage = dailyDepositMapper.selectByShopCode("Z59568");
-//        return null;
-        return new PageInfo<>(depositVos);
+        return shopCodes;
     }
 }

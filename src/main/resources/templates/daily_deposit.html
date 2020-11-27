@@ -205,21 +205,29 @@
 </body>
 <script th:inline="javascript">
 
-    $(function () {
-        var tomorrow = new Date();
-        tomorrow.setDate(new Date().getDate()+1);
-        var dd = tomorrow.getDate();
-        var mm = tomorrow.getMonth()+1; //January is 0!
-        var yyyy = tomorrow.getFullYear();
+    function parseDate(date) {
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+        var yyyy = date.getFullYear();
         if(dd<10){
-            dd='0'+dd
+            dd='0'+dd;
         }
         if(mm<10){
-            mm='0'+mm
+            mm='0'+mm;
         }
-        tomorrow = yyyy+'-'+mm+'-'+dd;
+        return yyyy+'-' + mm+'-' + dd;
+    }
+
+    $(function () {
+        var tomorrow = new Date();
+        var before31days = new Date();
+        tomorrow.setDate(new Date().getDate()+1);
+        before31days.setDate(new Date().getDate() - 31);
+
         // document.getElementById("depositDate").setAttribute("max", tomorrow);
-        $('input[type=date]').attr("max", tomorrow);
+        $('input[type=date]').attr("min", "2020-06-30");
+        // $('input[type=date]').attr("min", parseDate(before31days));
+        $('input[type=date]').attr("max", parseDate(tomorrow));
 
         calculateBalance();//初始化计算结余
         //禁止数字框，日期框滚轮修改数据

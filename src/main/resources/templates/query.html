@@ -146,11 +146,11 @@
         //禁止数字框，日期框滚轮修改数据
         $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
             $(this).on('wheel.disableScroll', function (e) {
-                e.preventDefault()
+                e.preventDefault();
             })
         });
         $('form').on('blur', 'input[type=number], input[type=date]', function (e) {
-            $(this).off('wheel.disableScroll')
+            $(this).off('wheel.disableScroll');
         });
 
         $('#begin-date, #end-date, #deposit-begin-date, #deposit-end-date').datetimepicker({
@@ -160,7 +160,7 @@
             showClear: true,
             showClose: true,
             minDate : '2020-06-30',
-            maxDate : moment().add('d', 1).toDate() //tomorrow
+            maxDate : moment().add('d', 1).toDate() //最大日期为1天后，即明天
         });
         $('#shopCodes').selectpicker();
         $("#gallery").on("click", function(){

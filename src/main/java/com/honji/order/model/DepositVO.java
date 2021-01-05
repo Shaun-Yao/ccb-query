@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 import java.time.LocalDate;
 
 @Data
@@ -116,6 +115,10 @@ public class DepositVO {
      */
     private double deposit;
 
+    /**
+     * 悦支付
+     */
+    private double yuePay;
 
     /**
      * 多收款金额

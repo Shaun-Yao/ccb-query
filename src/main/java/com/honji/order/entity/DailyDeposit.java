@@ -134,6 +134,11 @@ public class DailyDeposit extends IdEntity {
     private BigDecimal extraCash;
 
     /**
+     * 悦支付
+     */
+    private BigDecimal yuePay;
+
+    /**
      * 现金调整金额，默认0
      */
     private BigDecimal cashAdjustment =  BigDecimal.ZERO;

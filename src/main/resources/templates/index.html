@@ -86,6 +86,12 @@
     <input type="file" name="heSheng" id="heSheng" accept=".csv">
     <button  onclick="upload('heSheng')">确认提交</button>
 </div>
+<p></p>
+<div>
+    悦支付账单&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+    <input type="file" name="yue-pay" id="yue-pay" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+    <button  onclick="upload('yue-pay')">确认提交</button>
+</div>
 
 </body>
 <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
@@ -95,7 +101,7 @@
 
         var file = $('#' + name)[0].files[0];
         if (file != undefined) {
-            if (file.size > 20 * 1024 * 1024) {
+            if (file.size > 80 * 1024 * 1024) {
                 alert("文件超过15M，不允许上传");
                 return;
             }

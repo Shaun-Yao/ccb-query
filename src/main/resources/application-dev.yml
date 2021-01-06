@@ -15,8 +15,8 @@ spring:
       mode: HTML
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
+      max-file-size: 80MB
+      max-request-size: 80MB
 
 mybatis:
   type-aliases-package: com.honji.order

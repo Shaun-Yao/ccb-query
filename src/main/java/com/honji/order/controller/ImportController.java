@@ -1,14 +1,9 @@
 package com.honji.order.controller;
 
 
-import com.honji.order.entity.BaiShengPay;
-import com.honji.order.entity.BaiShengSwipe;
-import com.honji.order.entity.CcbOrder;
-import com.honji.order.entity.WxAliPay;
-import com.honji.order.service.IBaiShengPayService;
-import com.honji.order.service.IBaiShengSwipeService;
-import com.honji.order.service.ICcbOrderService;
-import com.honji.order.service.IWxAliPayService;
+import com.honji.order.entity.*;
+import com.honji.order.enums.BillTypeEnum;
+import com.honji.order.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -53,28 +48,30 @@ public class ImportController {
     @Autowired
     private IWxAliPayService wxPayService;
 
+    @Autowired
+    private IBillService billService;
+
     @GetMapping("/index")
     public String index() {
 
         return "index";
     }
 
-        /**
-         * 百胜支付
-         * @param file
-         * @return
-         * @throws IOException
-         */
+
+    /**
+     * 百胜支付
+     * @param file
+     * @return
+     * @throws IOException
+     */
     @ResponseBody
     @PostMapping("/bs-pay")
     public boolean baiShengPay(@RequestParam("bs-pay") MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
-        //checkFile(file);
-        //获得Workbook工作薄对象
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-        List<BaiShengPay> list = new ArrayList<>();
+        List<Bill> list = new ArrayList<>();
         boolean result = false;
         if (workbook != null) {
 
@@ -119,22 +116,22 @@ public class ImportController {
 
                 String tradeType = tradeTypeCell.getStringCellValue().trim();
                 //String remark = remarkCell.getStringCellValue();
-                byte type = 1;
+                BillTypeEnum type = BillTypeEnum.BS_PAY;
 
                 //如果备注字段为空并且交易类型为“消费” 则是扫一扫类型
                 if ((remarkCell == null || StringUtils.isBlank(remarkCell.getStringCellValue()))
                         && "消费".equals(tradeType)) {
-                    type = 2;
+                    type = BillTypeEnum.BS_SYS;
                 }
 
-                BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant, type);
-                list.add(baiShengPay);
+                Bill bill = new Bill(date, time, amount, fee, terminalNum,orderId, merchant, type.getCode());
+                list.add(bill);
 
             }
             long start = System.currentTimeMillis();
 
             try {
-                result = baiShengPayService.saveBatch(list);
+                result = billService.saveBatch(list);
             } catch (Exception e) {
                 log.error("百胜支付 {} 导入出现异常 {}", fileName, e.getMessage());
                 //e.printStackTrace();
@@ -144,6 +141,87 @@ public class ImportController {
                 log.info("百胜支付 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
             } else {
                 log.error("百胜支付 {} 导入失败", fileName);
+            }
+
+        }
+        list = null;//释放list
+        System.gc();
+        return result;
+    }
+
+    /**
+     * 悦支付
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @PostMapping("/yue-pay")
+    public boolean yuePay(@RequestParam("yue-pay") MultipartFile file) throws IOException {
+
+        String fileName = file.getOriginalFilename();
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        List<Bill> list = new ArrayList<>();
+        boolean result = false;
+        if (workbook != null) {
+
+            //获得当前sheet工作表
+            Sheet sheet = workbook.getSheetAt(0);
+            //获得当前sheet的开始行
+            int firstRowNum = sheet.getFirstRowNum();
+            //获得当前sheet的结束行
+            int lastRowNum = sheet.getLastRowNum();
+            //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++) {
+                //获得当前行
+                Row row = sheet.getRow(rowNum);
+                if (row == null) {
+                    continue;
+                }
+
+                Cell dateCell = row.getCell(4);
+                Cell timeCell = row.getCell(5);
+                Cell terminalCell = row.getCell(7);
+                Cell amountCell = row.getCell(10);
+                Cell feeCell = row.getCell(12);
+                //Cell merchantCell = row.getCell(12);
+                Cell orderCell = row.getCell(6);
+
+                //LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
+                LocalDate date = LocalDate.parse(String.valueOf(dateCell.getStringCellValue()).trim(), dtf);
+                String time = timeCell.getStringCellValue();
+                String terminalNum;
+                if (terminalCell.getCellType() == CellType.STRING) {
+                    terminalNum = terminalCell.getStringCellValue().trim();
+                } else { //不是string 就是Numeric
+                    int num = (int) terminalCell.getNumericCellValue();
+                    terminalNum = String.valueOf(num);
+                }
+                double amount = amountCell.getNumericCellValue();
+                double fee = feeCell.getNumericCellValue();
+                //String merchant = merchantCell.getStringCellValue().trim();
+                String orderId = orderCell.getStringCellValue().trim();
+
+                Bill bill = new Bill(date, time, amount, fee, terminalNum,
+                        orderId, null, BillTypeEnum.YUE_PAY.getCode());
+                list.add(bill);
+
+            }
+            long start = System.currentTimeMillis();
+
+            try {
+                result = billService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("悦支付 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("悦支付 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("悦支付 {} 导入失败", fileName);
             }
 
         }
@@ -867,7 +945,6 @@ public class ImportController {
                 amount = Double.valueOf(record.get(7).trim());
                 fee = Double.parseDouble(String.format("%.2f", amount * 0.006));//退款手续费为负数
                 orderId = new String(record.get(0).trim());
-                System.out.println("===" + orderId);
             }
             WxAliPay wxPay = new WxAliPay(date, amount, fee, orderId, khdm, orderType);
             list.add(wxPay);

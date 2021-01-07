@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -23,13 +23,14 @@ public class Bill extends IdEntity {
 
     private static final long serialVersionUID = 1L;
 
-    public Bill(LocalDate date, String time, double amount, double fee, String terminalNum,
-                       String orderId, String merchant, String type) {
+    public Bill(LocalDateTime date, double amount, double fee, String terminalNum,
+                       String orderId, String merchant, String shopCode, String type) {
         this.date = date;
-        this.time = time;
+//        this.time = time;
         this.amount = amount;
         this.fee = fee;
         this.terminalNum = terminalNum;
+        this.shopCode = shopCode;
         this.orderId = orderId;
         this.merchant = merchant;
         this.type = type;
@@ -38,12 +39,12 @@ public class Bill extends IdEntity {
     /**
      * 交易日期
      */
-    private LocalDate date;
+    private LocalDateTime date;
 
     /**
      * 交易时间
      */
-    private String time;
+//    private String time;
 
     /**
      * 交易金额
@@ -66,9 +67,14 @@ public class Bill extends IdEntity {
     private String orderId;
 
     /**
-     * 商户名称
+     * 商户名称（选填）
      */
     private String merchant;
+
+    /**
+     * 店铺代码（选填）
+     */
+    private String shopCode;
 
     /**
      * 类型编码

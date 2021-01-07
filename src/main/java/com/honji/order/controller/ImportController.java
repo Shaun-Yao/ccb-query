@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +82,8 @@ public class ImportController {
             int firstRowNum = sheet.getFirstRowNum();
             //获得当前sheet的结束行
             int lastRowNum = sheet.getLastRowNum();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
             //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
             for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++) {
                 //获得当前行
@@ -100,8 +103,9 @@ public class ImportController {
                 Cell tradeTypeCell = row.getCell(4);//交易类型
                 Cell remarkCell = row.getCell(19);//备注
 
-                LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
-                String time = timeCell.getStringCellValue();
+                String time = String.valueOf(dateCell.getLocalDateTimeCellValue().toLocalDate())
+                        .trim().concat(" ").concat(timeCell.getStringCellValue().trim());
+                LocalDateTime date = LocalDateTime.parse(time, dtf);
                 String terminalNum;
                 if (terminalCell.getCellType() == CellType.STRING) {
                     terminalNum = terminalCell.getStringCellValue().trim();
@@ -124,7 +128,8 @@ public class ImportController {
                     type = BillTypeEnum.BS_SYS;
                 }
 
-                Bill bill = new Bill(date, time, amount, fee, terminalNum,orderId, merchant, type.getCode());
+                Bill bill = new Bill(date, amount, fee, terminalNum,orderId,
+                        merchant, null, type.getCode());
                 list.add(bill);
 
             }
@@ -172,8 +177,9 @@ public class ImportController {
             int firstRowNum = sheet.getFirstRowNum();
             //获得当前sheet的结束行
             int lastRowNum = sheet.getLastRowNum();
+
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++) {
                 //获得当前行
                 Row row = sheet.getRow(rowNum);
@@ -189,9 +195,12 @@ public class ImportController {
                 //Cell merchantCell = row.getCell(12);
                 Cell orderCell = row.getCell(6);
 
+                String time = String.valueOf(dateCell.getStringCellValue()).trim().concat(" ")
+                    .concat(timeCell.getStringCellValue().trim());
                 //LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
-                LocalDate date = LocalDate.parse(String.valueOf(dateCell.getStringCellValue()).trim(), dtf);
-                String time = timeCell.getStringCellValue();
+
+                LocalDateTime date = LocalDateTime.parse(time, dtf);
+
                 String terminalNum;
                 if (terminalCell.getCellType() == CellType.STRING) {
                     terminalNum = terminalCell.getStringCellValue().trim();
@@ -204,8 +213,8 @@ public class ImportController {
                 //String merchant = merchantCell.getStringCellValue().trim();
                 String orderId = orderCell.getStringCellValue().trim();
 
-                Bill bill = new Bill(date, time, amount, fee, terminalNum,
-                        orderId, null, BillTypeEnum.YUE_PAY.getCode());
+                Bill bill = new Bill(date, amount, fee, terminalNum,
+                        orderId, null, null, BillTypeEnum.YUE_PAY.getCode());
                 list.add(bill);
 
             }
@@ -245,8 +254,7 @@ public class ImportController {
         //获得Workbook工作薄对象
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-        List<BaiShengSwipe> list = new ArrayList<>();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+        List<Bill> list = new ArrayList<>();
         boolean result = false;
 
         if (workbook != null) {
@@ -257,7 +265,10 @@ public class ImportController {
             int firstRowNum = sheet.getFirstRowNum() + 4;//刷卡账单是从第4行开始
             //获得当前sheet的结束行
             int lastRowNum = sheet.getLastRowNum();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
+            //前3行如果是手动制造空白行会被解析为无效行，而前3条有效记录会成为空行导致没有导入成功，所以需要原始账单，不能手动修改账单
             for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
                 //获得当前行
                 Row row = sheet.getRow(rowNum);
@@ -276,24 +287,29 @@ public class ImportController {
                 Cell orderCell = row.getCell(9);
                 Cell merchantCell = row.getCell(14);
 
-                LocalDate date = LocalDate.parse(dateCell.getStringCellValue().trim(), dtf);
-//                LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
-                String time = timeCell.getLocalDateTimeCellValue().toString();
-                //String time = String.valueOf(timeCell.getNumericCellValue());
+//                System.out.println(timeCell.getLocalDateTimeCellValue());
+
+                //百胜刷卡刷卡认“清算日期”,而清算日期没有时间，需要在交易时间列获取时间，但交易时间又包含了日期，所以需要拆分
+                String timeVal = timeCell.getLocalDateTimeCellValue().toLocalTime().format(timeFormatter);
+                String time = dateCell.getStringCellValue().trim().concat(" ").concat(timeVal);
+                LocalDateTime date = LocalDateTime.parse(time, dtf);
+
                 String terminalNum = terminalCell.getStringCellValue().trim();
                 double amount = amountCell.getNumericCellValue();
                 double fee = feeCell.getNumericCellValue();
                 String merchant = merchantCell.getStringCellValue().trim();
                 String orderId = orderCell.getStringCellValue().trim();
 
-                BaiShengSwipe baiShengSwipe = new BaiShengSwipe(date, time, amount, fee, terminalNum, orderId, merchant,1);
-                list.add(baiShengSwipe);
+                Bill bill = new Bill(date, amount, fee, terminalNum,
+                        orderId, merchant, null, BillTypeEnum.BS_SK.getCode());
+//                Bill bill = new Bill(date, amount, fee, terminalNum, orderId, merchant, 1);
+                list.add(bill);
 
             }
             long start = System.currentTimeMillis();
 
             try {
-                result = baiShengSwipeService.saveBatch(list);
+                result = billService.saveBatch(list);
             } catch (Exception e) {
                 log.error("百胜刷卡 {} 导入出现异常 {}", fileName, e.getMessage());
                 //e.printStackTrace();
@@ -630,90 +646,6 @@ public class ImportController {
         return result;
     }
 
-    /**
-     * 合胜收款 Z754143专用
-     * @param file
-     * @return
-     * @throws IOException
-     */
-//    @ResponseBody
-//    @PostMapping("/heSheng")
-//    public boolean heSheng(@RequestParam("heSheng") MultipartFile file) throws IOException {
-//
-//        String fileName = file.getOriginalFilename();
-//        //checkFile(file);
-//        //获得Workbook工作薄对象
-//        Workbook workbook = WorkbookFactory.create(file.getInputStream());
-//        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-//        List<BaiShengPay> list = new ArrayList<>();
-//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
-//        boolean result = false;
-//        if (workbook != null) {
-//
-//            //获得当前sheet工作表
-//            Sheet sheet = workbook.getSheetAt(0);
-//            //获得当前sheet的开始行
-//            int firstRowNum = sheet.getFirstRowNum() + 2;//码上收账单是从第2行开始
-//            //获得当前sheet的结束行
-//            int lastRowNum = sheet.getLastRowNum();
-//            //循环除了所有行,如果要循环除第一行以外的就firstRowNum
-//            for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
-//                //获得当前行
-//                Row row = sheet.getRow(rowNum);
-//                if (row == null) {
-//                    continue;
-//                }
-//
-//                Cell dateCell = row.getCell(6);
-//                if (dateCell.getCellType() == CellType.BLANK) {//尾部数据直接跳出
-//                    break;
-//                }
-//                Cell timeCell = row.getCell(7);
-////                Cell terminalCell = row.getCell(4);
-//                Cell amountCell = row.getCell(15);
-//                Cell feeCell = row.getCell(16);
-//                Cell orderCell = row.getCell(10);
-//                //Cell merchantCell = row.getCell(14);
-//
-//                LocalDate date = LocalDate.parse(dateCell.getStringCellValue().trim(), dtf);
-//                String time = null;
-//                if (timeCell.getCellType().equals(CellType.STRING)) {
-//                    time = timeCell.getStringCellValue().trim();
-//                }
-//
-//                if (timeCell.getCellType().equals(CellType.NUMERIC)) {
-//                    time = String.valueOf(timeCell.getNumericCellValue()).trim();
-//                }
-//
-//                String terminalNum = "Z754143";//没有终端号固定为百胜店代码
-//                double amount = Double.valueOf(amountCell.getStringCellValue().trim());
-//                double fee = Double.valueOf(feeCell.getStringCellValue().trim());
-//                String merchant = "汕头合胜百货店";
-//                String orderId = orderCell.getStringCellValue().trim();
-//                byte type = 4;
-//                BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant,type);
-//                list.add(baiShengPay);
-//
-//            }
-//            long start = System.currentTimeMillis();
-//
-//            try {
-//                result = baiShengPayService.saveBatch(list);
-//            } catch (Exception e) {
-//                log.error("合胜收款账单 {} 导入出现异常 {}", fileName, e.getMessage());
-//                //e.printStackTrace();
-//            }
-//            long end = System.currentTimeMillis();
-//            if (result) {
-//                log.info("合胜收款账单 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
-//            } else {
-//                log.error("合胜收款账单 {} 导入失败", fileName);
-//            }
-//        }
-//        list = null;//释放list
-//        System.gc();
-//        return result;
-//    }
 
 /**
      * 合胜收款 Z754143专用
@@ -880,7 +812,7 @@ public class ImportController {
     @ResponseBody
     @PostMapping("/public-alipay")
     public boolean publicAlipay(@RequestParam("public-alipay") MultipartFile file) throws IOException {
-        return alipay(file, 3);
+        return alipay(file, BillTypeEnum.ALI_PAY_PUBLIC.getCode());
     }
 
     /**
@@ -892,11 +824,11 @@ public class ImportController {
     @ResponseBody
     @PostMapping("/private-alipay")
     public boolean privateAlipay(@RequestParam("private-alipay") MultipartFile file) throws IOException {
-        return alipay(file, 4);
+        return alipay(file, BillTypeEnum.ALI_PAY_PRIVATE.getCode());
     }
 
 
-    private boolean alipay(MultipartFile file, int orderType) throws IOException {
+    private boolean alipay(MultipartFile file, String orderType) throws IOException {
 
         boolean result = false;
         String fileName = file.getOriginalFilename();
@@ -909,7 +841,7 @@ public class ImportController {
         List<CSVRecord> recordList = ((CSVParser) records).getRecords();
         List<CSVRecord> qualifiedRecords = new ArrayList<>();
         int endLine = recordList.size() - 4;
-        List<WxAliPay> list = new ArrayList<>();
+        List<Bill> list = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         for(int i = 5; i < endLine; i++) {
@@ -933,28 +865,30 @@ public class ImportController {
         for(int i = 0; i < qualifiedRecords.size(); i++) {
             CSVRecord record = qualifiedRecords.get(i);
 
-            LocalDate date = LocalDate.parse(record.get(4).trim(), dtf);
+            LocalDateTime date = LocalDateTime.parse(record.get(4).trim(), dtf);
             double amount = Double.valueOf(record.get(6).trim());
 //            double fee = - Double.valueOf(feeRecord.get(7).trim());//账单为负数加负号改为正数
             double fee = Double.parseDouble(String.format("%.2f", amount * 0.006));//手续费固定0.006，四舍五入保留两位小数
             String orderId = record.get(1).trim();
-            String khdm =  record.get(2).trim().split("_")[0];
+            String shopCode =  record.get(2).trim().split("_")[0];
             String type = record.get(10).trim();
-            //System.out.println(type);
+
             if ("交易退款".equals(type) || "退款（交易退款）".equals(type)) { //退款类型
                 amount = Double.valueOf(record.get(7).trim());
                 fee = Double.parseDouble(String.format("%.2f", amount * 0.006));//退款手续费为负数
                 orderId = new String(record.get(0).trim());
             }
-            WxAliPay wxPay = new WxAliPay(date, amount, fee, orderId, khdm, orderType);
-            list.add(wxPay);
+
+            Bill bill = new Bill(date, amount, fee, null,
+                    orderId, null, shopCode, orderType);
+            list.add(bill);
         }
 
         if(list.size() > 0) {
             long start = System.currentTimeMillis();
 
             try {
-                result = wxPayService.saveBatch(list);
+                result = billService.saveBatch(list);
             } catch (Exception e) {
                 log.error("支付宝 {} 导入出现异常 {}", fileName, e.getMessage());
                 //e.printStackTrace();

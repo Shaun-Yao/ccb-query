@@ -24,13 +24,13 @@ public class Bill extends IdEntity {
     private static final long serialVersionUID = 1L;
 
     public Bill(LocalDateTime date, double amount, double fee, String terminalNum,
-                       String orderId, String merchant, String shopCode, String type) {
+                       String orderId, String merchant, String khdm, String type) {
         this.date = date;
 //        this.time = time;
         this.amount = amount;
         this.fee = fee;
         this.terminalNum = terminalNum;
-        this.shopCode = shopCode;
+        this.khdm = khdm;
         this.orderId = orderId;
         this.merchant = merchant;
         this.type = type;
@@ -74,7 +74,7 @@ public class Bill extends IdEntity {
     /**
      * 店铺代码（选填）
      */
-    private String shopCode;
+    private String khdm;
 
     /**
      * 类型编码

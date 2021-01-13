@@ -1,9 +1,9 @@
 package com.honji.order.controller;
 
 
-import com.honji.order.entity.*;
+import com.honji.order.entity.Bill;
 import com.honji.order.enums.BillTypeEnum;
-import com.honji.order.service.*;
+import com.honji.order.service.IBillService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -37,17 +36,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/import")
 public class ImportController {
-    @Autowired
-    private IBaiShengPayService baiShengPayService;
 
-    @Autowired
-    private IBaiShengSwipeService baiShengSwipeService;
-
-    @Autowired
-    private ICcbOrderService ccbOrderService;
-
-    @Autowired
-    private IWxAliPayService wxPayService;
 
     @Autowired
     private IBillService billService;
@@ -503,7 +492,7 @@ public class ImportController {
         //获得Workbook工作薄对象
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-        List<BaiShengPay> list = new ArrayList<>();
+        List<Bill> list = new ArrayList<>();
         boolean result = false;
         if (workbook != null) {
 
@@ -530,25 +519,25 @@ public class ImportController {
                 Cell amountCell = row.getCell(3);
                 Cell feeCell = row.getCell(6);
                 Cell orderCell = row.getCell(15);
-                //Cell merchantCell = row.getCell(14);
 
-                LocalDate date = dateCell.getLocalDateTimeCellValue().toLocalDate();
-                String time = timeCell.getLocalDateTimeCellValue().toString();
+                LocalDateTime date = timeCell.getLocalDateTimeCellValue();
+//                String time = timeCell.getLocalDateTimeCellValue().toString();
                 //String time = String.valueOf(timeCell.getNumericCellValue());
                 String terminalNum = terminalCell.getStringCellValue().trim();
                 double amount = amountCell.getNumericCellValue();
                 double fee = feeCell.getNumericCellValue();
-                String merchant = "汕头市金平区科尚服装店";
+//                String merchant = "汕头市金平区科尚服装店";
                 String orderId = orderCell.getStringCellValue().trim();
-                byte type = 3;
-                BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant,type);
-                list.add(baiShengPay);
+                Bill bill = new Bill(date, amount, fee, terminalNum,
+                        orderId, null, null, BillTypeEnum.BS_MSS.getCode());
+//                BaiShengPay baiShengPay = new BaiShengPay(date, time, amount, fee, terminalNum, orderId, merchant,type);
+                list.add(bill);
 
             }
             long start = System.currentTimeMillis();
 
             try {
-                result = baiShengPayService.saveBatch(list);
+                result = billService.saveBatch(list);
             } catch (Exception e) {
                 log.error("码上收 {} 导入出现异常 {}", fileName, e.getMessage());
                 //e.printStackTrace();

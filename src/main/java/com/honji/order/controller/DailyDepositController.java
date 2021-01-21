@@ -130,7 +130,8 @@ public class DailyDepositController {
         XSSFSheet sheet = workbook.createSheet("sheet1");
         String columnNames[] = { "店铺代码", "店铺名称", "营业日期", "营业额", "结余", "现金调整",
                 "POS机/刷卡/银联扫码", "广发兑换券", "建行扫码", "建行离线", "支付宝", "微信", "扫一扫", "码上收",
-                "百胜支付", "商场代收款", "合胜收款", "现金", "会员积分/储值卡消费/礼券", "存款银行", "存款日期", "存款额"};// 列名
+                "百胜支付", "商场代收款", "合胜收款", "现金", "会员积分/储值卡消费/礼券",
+                "多收款", "悦支付","存款银行", "存款日期", "存款额"};// 列名
         CreationHelper creationHelper = workbook.getCreationHelper();
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
@@ -164,11 +165,13 @@ public class DailyDepositController {
             row.createCell(16).setCellValue(deposit.getHeSheng());
             row.createCell(17).setCellValue(deposit.getCash());
             row.createCell(18).setCellValue(deposit.getMemberPoints());
-            row.createCell(19).setCellValue(deposit.getBankName());
-            Cell depositDateCell = row.createCell(20);
+            row.createCell(19).setCellValue(deposit.getExtraCash());
+            row.createCell(20).setCellValue(deposit.getYuePay());
+            row.createCell(21).setCellValue(deposit.getBankName());
+            Cell depositDateCell = row.createCell(22);
             depositDateCell.setCellValue(deposit.getDepositDate());
             depositDateCell.setCellStyle(cellStyle);
-            row.createCell(21).setCellValue(deposit.getDeposit());
+            row.createCell(23).setCellValue(deposit.getDeposit());
         }
 
         try {

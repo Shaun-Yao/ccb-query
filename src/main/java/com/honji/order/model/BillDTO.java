@@ -1,9 +1,11 @@
 package com.honji.order.model;
 
-import com.honji.order.enums.BillTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -29,7 +31,10 @@ public class BillDTO {
     /**
      * 账单类型
      */
-    private BillTypeEnum billType;
+//    private BillTypeEnum billType;
+//    @JsonProperty(value = "billTypes[]")
+//    private String[] billTypes = new String[]{};
+    private List<String> billTypes = new ArrayList<>();
 
 
     private int offset;

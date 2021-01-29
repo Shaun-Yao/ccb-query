@@ -19,7 +19,11 @@ import java.util.List;
 public interface BillMapper extends BaseMapper<Bill> {
 
     @Select({"<script>",
-            "SELECT * FROM bill WHERE type = '${billDTO.billType.code}'",
+            "SELECT * FROM bill WHERE 1 = 1",
+            "<if test='billDTO.billTypes !=null and billDTO.billTypes.size() > 0'>",
+            " AND type in",
+            "<foreach item='item' index='index' collection='billDTO.billTypes' open='(' separator=',' close=')'> #{item} </foreach>",
+            "</if>",
             "<if test='billDTO.month !=null and billDTO.month!=\"\"'>",
             "AND CONVERT(char(7), date, 23) = '${billDTO.month}'",
             "</if>",
@@ -29,8 +33,8 @@ public interface BillMapper extends BaseMapper<Bill> {
 
     @Select({"<script>",
             "DELETE FROM bill WHERE type in ",
-            "<foreach item='item' index='index' collection='types' open='(' separator=',' close=')'> #{item} </foreach>",
-            " and CONVERT(char(7), date, 23) = '${month}'",
+            "<foreach item='item' index='index' collection='billDTO.billTypes' open='(' separator=',' close=')'> #{item} </foreach>",
+            " and CONVERT(char(7), date, 23) = '${billDTO.month}'",
             "</script>"})
-    void deleteByMonth(@Param("types") List<String> types, @Param("month") String month);
+    void deleteByMonth(@Param("billDTO")BillDTO billDTO);
 }

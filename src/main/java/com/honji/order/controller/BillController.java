@@ -7,9 +7,10 @@ import com.honji.order.service.IBillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * <p>
@@ -35,14 +36,14 @@ public class BillController {
     @ResponseBody
     @GetMapping("/list")
     public DataGridResult list(BillDTO billDTO) {
-        System.out.println(billDTO.getMonth());
+        System.out.println("=======" + billDTO.getBillTypes());
         return new DataGridResult(billService.listForIndex(billDTO));
     }
 
     @PostMapping("/remove")
     @ResponseBody
-    public boolean remove(@RequestParam List<String> types, @RequestParam String month) {
-
+    public boolean remove(BillDTO billDTO) {
+        System.out.println("=======" + billDTO.getBillTypes());
 //        String[] yearMonth = month.split("-");
 //        LocalDateTime begin = LocalDateTime.of(Integer.valueOf(yearMonth[0]),
 //                Integer.valueOf(yearMonth[1]), 1, 0,0, 0);
@@ -51,7 +52,7 @@ public class BillController {
 //        QueryWrapper<Bill> billQueryWrapper = new QueryWrapper<>();
 //        billQueryWrapper.in("type", types);
 //        billService.remove(billQueryWrapper);
-        billService.removeByMonth(types, month);
+        billService.removeByMonth(billDTO);
         return true;
     }
 

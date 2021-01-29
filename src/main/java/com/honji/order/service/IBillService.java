@@ -1,11 +1,9 @@
 package com.honji.order.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.Bill;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.honji.order.model.BillDTO;
-
-import java.util.List;
 
 /**
  * <p>
@@ -19,5 +17,5 @@ public interface IBillService extends IService<Bill> {
 
     PageInfo<Bill> listForIndex(BillDTO billDTO);
 
-    void removeByMonth(List<String> types, String month);
+    void removeByMonth(BillDTO billDTO);
 }

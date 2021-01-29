@@ -19,9 +19,11 @@
     <form class="form-inline" id="resource-form">
         <div class="form-group form-inner">
             <label  class="form-lable">账单类型：</label>
-            <select class="form-control" name="billType" id="billType" required>
+            <select class="form-control" name="billTypes" id="billType" multiple required
+                    data-live-search="true" data-actions-box="true"
+                    data-selected-text-format="count">
                 <option th:each="elem : ${T(com.honji.order.enums.BillTypeEnum).values()}"
-                        th:value="${elem}" th:text="${elem.desc}">
+                        th:value="${elem.code}" th:text="${elem.desc}">
                 </option>
             </select>
         </div>
@@ -29,16 +31,15 @@
         <div class="form-group">
             <label class="form-lable">年月</label>
             <div class='input-group date' id='month-date'>
-                <input type='text' class="form-control" name="month" id='month' />
+                <input type='text' class="form-control" name="month" id='month' required />
                 <span class="input-group-addon">
                         <span class="glyphicon glyphicon-time"></span>
                     </span>
             </div>
         </div>
 
-
         <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
-
+        <a class="btn btn-danger" id="remove" >删除</a>
     </form>
 </div>
 
@@ -46,7 +47,7 @@
 
     <div id="deposit" >
         <!--<button type="button" class="btn btn-success" id="add">新增</button>-->
-        <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <!--<button type="button" class="btn btn-danger" id="remove">删除</button>-->
     </div>
 
 <!-- 模态框（Modal） -->
@@ -69,7 +70,7 @@
                     </select>
                     <label class="form-lable">年月</label>
                     <div class='input-group date' id='month-date-del'>
-                        <input type='text' class="form-control" name="monthDel" id='monthDel' />
+                        <input type='text' class="form-control" name="month" id='monthDel' />
                         <span class="input-group-addon">
                         <span class="glyphicon glyphicon-time"></span>
                     </span>
@@ -102,18 +103,17 @@
 <script th:inline="javascript">
 
     $(function () {
-        $('#billTypeDel').selectpicker({
+        $('#billType, #billTypeDel').selectpicker({
             showContent: true
         });
         $('#searchBtn').click(function () {
+            console.log($('#resource-form').serialize());
+            // $('#table').bootstrapTable('refresh');
             $('#table').bootstrapTable('refresh',
-                {url: '/bill/list?billType=' + $('#billType').val()
-                    + '&month=' + $('#month').val()
+                {ajaxOption:{
+                        data: $('#resource-form').serialize()
+                    }
                 });
-        });
-
-        $('#remove').click(function () {
-            $('#myModal').modal('show');
         });
 
 
@@ -128,65 +128,31 @@
             // maxDate : moment().add('d', 1).toDate() //最大日期为1天后，即明天
         });
 
-        $('#save').click(function() {
-            if($('#form')[0].reportValidity()) {
-                //$('#form').submit();
-                $.ajax({
-                    type: "post",
-                    url: "/bill/remove",
-                    data: $('#form').serialize(),
-                    success: function(data){
-                        $('#myModal').modal('hide');
-                        $('#table').bootstrapTable('refresh');
-                    },
-                    error:function(xhr,state,errorThrown){
-                        alert("操作失败，请确认数据是否正确后重新尝试！");
-                    }
-                });
+        $('#remove').click(function() {
+            if($('#resource-form')[0].reportValidity()) {
+                bootbox.confirm("确认删除？",
+                    function(result){
+                        if(result) {
+                            $.ajax({
+                                type: "post",
+                                url: "/bill/remove",
+                                data: $('#resource-form').serialize(),
+                                success: function(data){
+                                    $('#table').bootstrapTable('refresh');
+                                },
+                                error:function(xhr,state,errorThrown){
+                                    alert("操作失败，请重新尝试！");
+                                }
+                            });
+                    }});
             }
         });
 
     });
 
 
-    function parseDate(date) {
-        var dd = date.getDate();
-        var mm = date.getMonth()+1; //January is 0!
-        var yyyy = date.getFullYear();
-        if(dd<10){
-            dd='0'+dd;
-        }
-        if(mm<10){
-            mm='0'+mm;
-        }
-        return yyyy+'-' + mm+'-' + dd;
-    }
-
-    $(function () {
-        var tomorrow = new Date();
-        var before31days = new Date();
-        tomorrow.setDate(new Date().getDate()+1);
-        before31days.setDate(new Date().getDate() - 31);
-
-        // document.getElementById("depositDate").setAttribute("max", tomorrow);
-        $('input[type=date]').attr("min", "2020-06-30");
-        // $('input[type=date]').attr("min", parseDate(before31days));
-        $('input[type=date]').attr("max", parseDate(tomorrow));
-
-        //禁止数字框，日期框滚轮修改数据
-        $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
-            $(this).on('wheel.disableScroll', function (e) {
-                e.preventDefault();
-            })
-        });
-        $('form').on('blur', 'input[type=number], input[type=date]', function (e) {
-            $(this).off('wheel.disableScroll');
-        });
-    });
-
-
     $('#table').bootstrapTable({
-        url: '/bill/list?billType=' + $('#billType').val(),
+        url: '/bill/list',
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
@@ -196,6 +162,11 @@
         // showSearchButton: true,
         // showSearchClearButton: true,
         // showRefresh: true,
+        // dataType: 'json',
+        ajaxOptions:{
+            // data: $('#resource-form').serialize() //无效
+            traditional:true
+        },
         toolbar: "#deposit",
         clickToSelect: true,
         singleSelect: true,
@@ -208,6 +179,8 @@
             if (typeof(params.limit) == "undefined") {
                 params.limit = this.totalRows;
             }
+            params.month = $('#month').val();
+            params.billTypes = $('#billType').val();
             return params;
         },
 
@@ -244,42 +217,5 @@
     });
 
 
-    $('#add').click(function () {
-        checkPhotoSize();
-        $('#form').resetForm();
-        $('#id').val('');
-        // $("input:radio[name=arrivedTravelMode]").get(0).checked=true;
-        // $("#arrivedPickUpStation option").get(1).selected=true;
-        // $("input:radio[name=leavedTravelMode]").get(0).checked=true;
-        // $("#leavedStation option").get(1).selected=true;
-        $('#myModal').modal('show');
-    });
-
-    $('#remove').click(function () {
-        if($('#table').bootstrapTable('getSelections').length == 0) {
-            return;
-        }
-
-        var id = $('#table').bootstrapTable('getSelections')[0].id;
-        bootbox.confirm("确认删除？",
-            function(result){
-                if(result) {
-                    $.ajax({
-                        type: "POST",
-                        url: "/daily-deposit/remove",
-                        traditional: true,
-                        data: {
-                            id: id
-                        },
-                        success: function(data){
-                            $('#table').bootstrapTable('refresh');
-                        },
-                        error:function(xhr,state,errorThrown){
-                            alert("删除失败，请关闭网页重新尝试！");
-                        }
-                    });
-                }
-            })
-    });
 </script>
 </html>

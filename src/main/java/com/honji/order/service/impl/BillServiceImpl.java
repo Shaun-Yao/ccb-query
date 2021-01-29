@@ -31,12 +31,11 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
     public PageInfo<Bill> listForIndex(BillDTO billDTO) {
         PageHelper.startPage(billDTO.getOffset() / billDTO.getLimit() + 1, billDTO.getLimit());
         List<Bill> bills = billMapper.selectForIndex(billDTO);
-
         return new PageInfo<>(bills);
     }
 
     @Override
-    public void removeByMonth(List<String> types, String month) {
-        billMapper.deleteByMonth(types, month);
+    public void removeByMonth(BillDTO billDTO) {
+        billMapper.deleteByMonth(billDTO);
     }
 }

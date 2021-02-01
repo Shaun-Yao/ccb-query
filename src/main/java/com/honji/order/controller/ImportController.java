@@ -58,10 +58,11 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/bs-pay")
-    public boolean baiShengPay(@RequestParam("bs-pay") MultipartFile file) throws IOException {
+    @PostMapping("bs-pay")
+    public boolean baiShengPay(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
+        System.out.println(fileName);
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
         List<Bill> list = new ArrayList<>();
@@ -153,7 +154,7 @@ public class ImportController {
      */
     @ResponseBody
     @PostMapping("/yue-pay")
-    public boolean yuePay(@RequestParam("yue-pay") MultipartFile file) throws IOException {
+    public boolean yuePay(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -236,8 +237,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/bssk")
-    public boolean bssk(@RequestParam("bssk") MultipartFile file) throws IOException {
+    @PostMapping("/bs-sk")
+    public boolean bssk(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         //checkFile(file);
@@ -322,8 +323,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/spdb")
-    public boolean spdb(@RequestParam("spdb") MultipartFile file) throws IOException {
+    @PostMapping("/pf-sk")
+    public boolean spdb(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         //checkFile(file);
@@ -407,7 +408,7 @@ public class ImportController {
      */
     @ResponseBody
     @PostMapping("/union-pay")
-    public boolean unionPay(@RequestParam("union-pay") MultipartFile file) throws IOException {
+    public boolean unionPay(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -484,8 +485,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/mss")
-    public boolean mss(@RequestParam("mss") MultipartFile file) throws IOException {
+    @PostMapping("/bs-mss")
+    public boolean mss(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         //checkFile(file);
@@ -562,8 +563,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/ccb")
-    public boolean ccb(@RequestParam("ccb") MultipartFile file) throws IOException {
+    @PostMapping("/ccb-sm")
+    public boolean ccb(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -645,8 +646,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/heSheng")
-    public boolean heSheng(@RequestParam("heSheng") MultipartFile file) throws IOException {
+    @PostMapping("/he-sheng")
+    public boolean heSheng(@RequestParam MultipartFile file) throws IOException {
 
         boolean result = false;
         String fileName = file.getOriginalFilename();
@@ -718,8 +719,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/public-wxpay")
-    public boolean publicWxpay(@RequestParam("public-wxpay") MultipartFile file) throws IOException {
+    @PostMapping("/wx-pay-public")
+    public boolean publicWxpay(@RequestParam MultipartFile file) throws IOException {
         return wxpay(file, BillTypeEnum.WX_PAY_PUBLIC.getCode());
     }
 
@@ -730,8 +731,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/private-wxpay")
-    public boolean privateWxpay(@RequestParam("private-wxpay") MultipartFile file) throws IOException {
+    @PostMapping("/wx-pay-private")
+    public boolean privateWxpay(@RequestParam MultipartFile file) throws IOException {
         return wxpay(file, BillTypeEnum.ALI_PAY_PRIVATE.getCode());
     }
 
@@ -801,8 +802,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/public-alipay")
-    public boolean publicAlipay(@RequestParam("public-alipay") MultipartFile file) throws IOException {
+    @PostMapping("/ali-pay-public")
+    public boolean publicAlipay(@RequestParam MultipartFile file) throws IOException {
         return alipay(file, BillTypeEnum.ALI_PAY_PUBLIC.getCode());
     }
 
@@ -813,8 +814,8 @@ public class ImportController {
      * @throws IOException
      */
     @ResponseBody
-    @PostMapping("/private-alipay")
-    public boolean privateAlipay(@RequestParam("private-alipay") MultipartFile file) throws IOException {
+    @PostMapping("/ali-pay-private")
+    public boolean privateAlipay(@RequestParam MultipartFile file) throws IOException {
         return alipay(file, BillTypeEnum.ALI_PAY_PRIVATE.getCode());
     }
 
@@ -907,7 +908,7 @@ public class ImportController {
      */
     @ResponseBody
     @PostMapping("/top-up")
-    public boolean topUp(@RequestParam("top-up") MultipartFile file) throws IOException {
+    public boolean topUp(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());

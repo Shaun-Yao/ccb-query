@@ -91,6 +91,7 @@
 <script th:inline="javascript">
 
     $(function () {
+
         //建行离线和扫码是同一份账单一起导入，所以隐藏百胜离线选项
         $("#billTypeImport option[value='ccb-lx']").each(function() {
             $(this).remove();
@@ -109,7 +110,7 @@
 
             if($('#import-form')[0].reportValidity()) {
                 var file = $('#file')[0].files[0];
-                console.log(file.name);
+
                 if (file != undefined) {
                     if (file.size > 80 * 1024 * 1024) {
                         alert("文件超过15M，不允许上传");
@@ -127,7 +128,7 @@
                         data: formData,
                         success: function(result){
                             if (result) {
-                                var tips = "<p><b>" + file.name + "导入成功！" + "</b></p>";
+                                var tips = "<p style=\"font-size:20px;color:red\"><b>" + file.name + "导入成功！" + "</b></p>";
                                 $('#importTips').append(tips);
                             } else {
                                 alert("导入失败或者账单没有数据，请确认后重新尝试！");
@@ -251,8 +252,21 @@
             field: 'terminalNum',
             title: '终端号'
         }, {
-            field: 'khdm',
-            title: '店铺代码'
+            field: 'type',
+            title: '账单类型',
+            formatter: function (value, row, index) {
+                /*<![CDATA[*/
+
+                /*[# th:each="n : ${T(com.honji.order.enums.BillTypeEnum).values()}"]*/
+                //console.log("[(${n.desc})]");
+                if (value == "[(${n.code})]") {
+                    return "[(${n.desc})]";
+                }
+                /*[/]*/
+
+                /*]]>*/
+
+            }
         }]
     });
 

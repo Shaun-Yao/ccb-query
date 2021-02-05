@@ -115,16 +115,13 @@ public class DailyDepositController {
 
     @GetMapping("/query")
     @ResponseBody
-    public DataGridResult query(DepositDTO depositDTO,
-                                @RequestParam(value = "shopCodes[]", required = false) List<String> shopCodes) {
-//        System.out.println(depositDTO.getLimit() + "===" + depositDTO.getOffset());
-        return new DataGridResult(dailyDepositService.listByShopCodes(depositDTO, shopCodes));
+    public DataGridResult query(DepositDTO depositDTO) {
+        return new DataGridResult(dailyDepositService.listByShopCodes(depositDTO));
     }
 
     @GetMapping("/export")
     @ResponseBody
-    public void export(DepositDTO depositDTO, HttpServletResponse response,
-                                @RequestParam(value = "shopCodes", required = false) List<String> shopCodes) {
+    public void export(DepositDTO depositDTO, HttpServletResponse response) {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("sheet1");
@@ -140,7 +137,7 @@ public class DailyDepositController {
         for (int i = 0; i < columnNames.length; i++) {
             headRow.createCell(i).setCellValue(columnNames[i]);
         }
-        List<DepositVO> deposits = dailyDepositService.listAll(depositDTO, shopCodes);
+        List<DepositVO> deposits = dailyDepositService.listAll(depositDTO);
         for (int i = 0; i < deposits.size(); i++) {
             DepositVO deposit = deposits.get(i);
             Row row = sheet.createRow(i + 1);

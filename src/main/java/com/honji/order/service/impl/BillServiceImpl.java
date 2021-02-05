@@ -6,11 +6,11 @@ import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.Bill;
 import com.honji.order.mapper.BillMapper;
 import com.honji.order.model.BillDTO;
-import com.honji.order.model.DepositVO;
 import com.honji.order.service.IBillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +30,10 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
     @Override
     public PageInfo<Bill> listForIndex(BillDTO billDTO) {
         PageHelper.startPage(billDTO.getOffset() / billDTO.getLimit() + 1, billDTO.getLimit());
-        List<Bill> bills = billMapper.selectForIndex(billDTO);
+        List<Bill> bills = new ArrayList<>();
+        if (billDTO.getBillTypes() != null && billDTO.getBillTypes().size() > 0) {
+            bills = billMapper.selectForIndex(billDTO);
+        }
         return new PageInfo<>(bills);
     }
 

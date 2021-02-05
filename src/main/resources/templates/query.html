@@ -18,12 +18,12 @@
 
 </style>
 <body>
-    <input type="hidden" id="jobNum" th:value="${jobNum}">
-    <div class="col-md-12 pull-left" id="tb1">
-        <form class="form-inline" id="resource-form">
+    <form class="form-inline" id="resource-form">
+        <input type="hidden" id="jobNum" th:value="${jobNum}">
+        <div class="col-md-12" >
             <div class="form-group form-inner">
                 <label  class="form-lable">店铺名称：</label>
-                <select class="form-control" name="shopCodes" id="shopCodes" multiple
+                <select class="form-control" name="shopCodes" id="shopCodes" multiple required
                         data-live-search="true" data-actions-box="true"
                         data-selected-text-format="count">
                     <option value=""></option>
@@ -32,8 +32,7 @@
                     </option>
                 </select>
             </div>
-
-            <div class="form-group">
+            <div class="form-group form-inner">
                 <label class="form-lable">营业开始日期</label>
                 <div class='input-group date' id='begin-date'>
                     <input type='text' class="form-control" id='begin' />
@@ -42,7 +41,6 @@
                     </span>
                 </div>
             </div>
-
             <div class="form-group">
                 <label class="form-lable">营业结束日期</label>
                 <div class='input-group date' id='end-date'>
@@ -52,7 +50,9 @@
                     </span>
                 </div>
             </div>
+        </div>
 
+        <div class="col-md-12" >
             <div class="form-group">
                 <label class="form-lable">存款开始日期</label>
                 <div class='input-group date' id='deposit-begin-date'>
@@ -75,9 +75,8 @@
 
             <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
             <a class="btn btn-primary " id="exportBtn" >导出exel</a>
-        </form>
-    </div>
-
+        </div>
+    </form>
 
     <table id="table" class="modal-body" style="table-layout: fixed" > </table>
     <div id="deposit" >
@@ -165,37 +164,30 @@
         });
 
         $('#searchBtn').click(function () {
-            $('#table').bootstrapTable('refresh');
+            if($('#resource-form')[0].reportValidity()) {
+                $('#table').bootstrapTable('refresh');
+            }
         });
 
         $('#exportBtn').click(function () {
-            bootbox.confirm("确认导出？",
-            function(result){
-                if(result) {
-                    var jobNum = $('#jobNum').val();
-                    var shopCodes = $('#shopCodes').val();
-                    // console.log($('#shopCodes').val());
-                    var begin = $('#begin').val();
-                    var end = $('#end').val();
-                    var depositBegin = $('#deposit-begin').val();
-                    var depositEnd = $('#deposit-end').val();
-                    window.location.href = "/daily-deposit/export?jobNum=" + jobNum + "&shopCodes=" + shopCodes
-                        +"&begin=" + begin + "&end=" + end + "&depositBegin=" + depositBegin
-                        + "&depositEnd=" + depositEnd;
-                }
-            });
+            if($('#resource-form')[0].reportValidity()) {
+                bootbox.confirm("确认导出？",
+                    function (result) {
+                        if (result) {
+                            var jobNum = $('#jobNum').val();
+                            var shopCodes = $('#shopCodes').val();
+                            // console.log($('#shopCodes').val());
+                            var begin = $('#begin').val();
+                            var end = $('#end').val();
+                            var depositBegin = $('#deposit-begin').val();
+                            var depositEnd = $('#deposit-end').val();
+                            window.location.href = "/daily-deposit/export?jobNum=" + jobNum + "&shopCodes=" + shopCodes
+                                + "&begin=" + begin + "&end=" + end + "&depositBegin=" + depositBegin
+                                + "&depositEnd=" + depositEnd;
+                        }
+                    });
+            }
 
-            /*$.ajax({
-                type: "get",
-                url: "/daily-deposit/export",
-                data: $('#form').serialize(),
-                success: function(data){
-
-                },
-                error:function(xhr,state,errorThrown){
-                    alert("操作失败，请确认数据是否正确后重新尝试！");
-                }
-            });*/
         });
 
         $('#save').click(function() {
@@ -242,7 +234,9 @@
         singleSelect: true,
         sortable: true,
         smartDisplay: false,
-        // showExport: true,
+        ajaxOptions:{
+            traditional:true
+        },
         exportDataType: "all",
         exportTypes: ['xlsx'],
         exportOptions: {

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,8 +21,7 @@ public class DepositDTO {
      * 门店代码
      * bootstrpa-table 传数组参数没有加上数组index，加上traditional:true 也无效
      */
-//    @JsonProperty(value = "shopCodes[]")
-//    private String[] shopCodes ;
+    private List<String> shopCodes ;
 
     /**
      * 营业开始日期

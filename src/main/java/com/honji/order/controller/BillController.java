@@ -36,14 +36,12 @@ public class BillController {
     @ResponseBody
     @GetMapping("/list")
     public DataGridResult list(BillDTO billDTO) {
-        System.out.println("=======" + billDTO.getBillTypes());
         return new DataGridResult(billService.listForIndex(billDTO));
     }
 
     @PostMapping("/remove")
     @ResponseBody
     public boolean remove(BillDTO billDTO) {
-        System.out.println("=======" + billDTO.getBillTypes());
 //        String[] yearMonth = month.split("-");
 //        LocalDateTime begin = LocalDateTime.of(Integer.valueOf(yearMonth[0]),
 //                Integer.valueOf(yearMonth[1]), 1, 0,0, 0);

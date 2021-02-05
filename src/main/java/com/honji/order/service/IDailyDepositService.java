@@ -19,6 +19,6 @@ import java.util.List;
 public interface IDailyDepositService extends IService<DailyDeposit> {
 
     PageInfo<DepositVO> listByCurrentUser(String shopCode, int offset, int limit);
-    PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO, List<String> shopCodeList);
-    List<DepositVO> listAll(DepositDTO depositDTO, List<String> shopCodeList);
+    PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO);
+    List<DepositVO> listAll(DepositDTO depositDTO);
 }

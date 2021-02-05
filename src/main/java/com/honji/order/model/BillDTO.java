@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -34,7 +33,7 @@ public class BillDTO {
 //    private BillTypeEnum billType;
 //    @JsonProperty(value = "billTypes[]")
 //    private String[] billTypes = new String[]{};
-    private List<String> billTypes = new ArrayList<>();
+    private List<String> billTypes;
 
 
     private int offset;

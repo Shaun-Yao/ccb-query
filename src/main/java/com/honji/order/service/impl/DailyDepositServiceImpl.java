@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,25 +49,29 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
     }
 
     @Override
-    public PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO, List<String> shopCodeList) {
+    public PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO) {
 
-        String shopCodes = parseShopCodes(depositDTO.getJobNum(), shopCodeList);
+//        String shopCodes = parseShopCodes(depositDTO);
 
         PageHelper.startPage(depositDTO.getOffset() / depositDTO.getLimit() + 1, depositDTO.getLimit());
-        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes, depositDTO);
+        List<DepositVO> depositVos = new ArrayList<>();
+        if (depositDTO.getShopCodes() != null && depositDTO.getShopCodes().size() > 0) {//店铺集合不为空才查询
+            depositVos = dailyDepositMapper.selectByShopCodes(depositDTO);
+        }
+//        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(depositDTO);
 
         return new PageInfo<>(depositVos);
     }
 
     @Override
-    public List<DepositVO> listAll(DepositDTO depositDTO, List<String> shopCodeList) {
+    public List<DepositVO> listAll(DepositDTO depositDTO) {
 
-        String shopCodes = parseShopCodes(depositDTO.getJobNum(), shopCodeList);
-        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(shopCodes, depositDTO);
+//        String shopCodes = parseShopCodes(depositDTO.getJobNum(), shopCodeList);
+        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(depositDTO);
 
         return depositVos;
     }
-
+/*
     private String parseShopCodes(String jobNum, List<String> shopCodeList) {
         String shopCodes = null;
         //没有查询条件显示当前用户负责的所有门店的存款信息
@@ -84,5 +89,5 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
                     .collect(Collectors.joining(", "));
         }
         return shopCodes;
-    }
+    }*/
 }

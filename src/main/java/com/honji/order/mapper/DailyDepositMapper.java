@@ -121,7 +121,11 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
                 "\tFROM balance_history outt\n" +
                 "\t\tJOIN cash_balance ba ON outt.khdm= ba.khdm \n" +
                 "\t) balance_result ON daily_deposit.id = balance_result.id " +
-                "\twhere 1 = 1 and daily_deposit.khdm in (${shopCodes}) ",
+                "\twhere 1 = 1 ",
+        "<if test='depositDTO.shopCodes !=null and depositDTO.shopCodes.size() > 0'>",
+        " AND daily_deposit.khdm in",
+        "<foreach item='item' index='index' collection='depositDTO.shopCodes' open='(' separator=',' close=')'> #{item} </foreach>",
+        "</if>",
         "<if test='depositDTO.begin !=null and depositDTO.begin!=\"\"'>",
         "AND daily_deposit.date &gt;= '${depositDTO.begin}'",
         "</if>",
@@ -136,7 +140,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
         "</if>",
         " ORDER BY daily_deposit.date desc ",
         "</script>"})
-    List<DepositVO> selectByShopCodes(@Param("shopCodes") String shopCodes, @Param("depositDTO")DepositDTO depositDTO);
+    List<DepositVO> selectByShopCodes(@Param("depositDTO")DepositDTO depositDTO);
 
 
 }

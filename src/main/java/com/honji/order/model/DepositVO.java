@@ -27,8 +27,9 @@ public class DepositVO {
 
     /**
      * 交易日期
+     * 这里使用localdate类型会有类型转换问题
      */
-    private LocalDate date;
+    private String date;
 
     /**
      * 交易金额
@@ -36,9 +37,14 @@ public class DepositVO {
     private double amount;
 
     /**
-     * POS机/刷卡/银联扫码
+     * 刷卡
      */
-    private double pos;
+    private double cardPay;
+
+    /**
+     * 银联扫码
+     */
+//    private double unionPay;
 
     /**
      * 广发兑换券
@@ -96,9 +102,19 @@ public class DepositVO {
     private double cash;
 
     /**
-     * 会员积分/储值卡消费/礼券
+     * 储值卡消费
+     */
+    private double cardConsumption;
+
+    /**
+     * 会员积分
      */
     private double memberPoints;
+
+    /**
+     * 礼券
+     */
+    private double giftCertificate;
 
     /**
      * 存款银行

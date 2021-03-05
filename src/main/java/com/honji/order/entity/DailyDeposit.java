@@ -115,7 +115,6 @@ public class DailyDeposit extends IdEntity {
     /**
      * 存款日期
      */
-
     /*更新值为null会报错，加上dbcType.DATE解决*/
     @TableField(jdbcType = JdbcType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")

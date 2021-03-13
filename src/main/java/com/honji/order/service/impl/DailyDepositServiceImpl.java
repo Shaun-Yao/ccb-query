@@ -51,24 +51,17 @@ public class DailyDepositServiceImpl extends ServiceImpl<DailyDepositMapper, Dai
     @Override
     public PageInfo<DepositVO> listByShopCodes(DepositDTO depositDTO) {
 
-//        String shopCodes = parseShopCodes(depositDTO);
-
         PageHelper.startPage(depositDTO.getOffset() / depositDTO.getLimit() + 1, depositDTO.getLimit());
         List<DepositVO> depositVos = new ArrayList<>();
         if (depositDTO.getShopCodes() != null && depositDTO.getShopCodes().size() > 0) {//店铺集合不为空才查询
             depositVos = dailyDepositMapper.selectByShopCodes(depositDTO);
         }
-//        List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(depositDTO);
-
         return new PageInfo<>(depositVos);
     }
 
     @Override
     public List<DepositVO> listAll(DepositDTO depositDTO) {
-
-//        String shopCodes = parseShopCodes(depositDTO.getJobNum(), shopCodeList);
         List<DepositVO> depositVos = dailyDepositMapper.selectByShopCodes(depositDTO);
-
         return depositVos;
     }
 /*

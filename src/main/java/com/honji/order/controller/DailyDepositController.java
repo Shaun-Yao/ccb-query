@@ -163,15 +163,15 @@ public class DailyDepositController {
             row.createCell(16).setCellValue(deposit.getHeSheng());
             row.createCell(17).setCellValue(deposit.getCash());
             row.createCell(18).setCellValue(deposit.getMemberPoints());
-            row.createCell(18).setCellValue(deposit.getCardConsumption());
-            row.createCell(18).setCellValue(deposit.getGiftCertificate());
-            row.createCell(19).setCellValue(deposit.getExtraCash());
-            row.createCell(20).setCellValue(deposit.getYuePay());
-            row.createCell(21).setCellValue(deposit.getBankName());
-            Cell depositDateCell = row.createCell(22);
+            row.createCell(19).setCellValue(deposit.getCardConsumption());
+            row.createCell(20).setCellValue(deposit.getGiftCertificate());
+            row.createCell(21).setCellValue(deposit.getExtraCash());
+            row.createCell(22).setCellValue(deposit.getYuePay());
+            row.createCell(23).setCellValue(deposit.getBankName());
+            Cell depositDateCell = row.createCell(24);
             depositDateCell.setCellValue(deposit.getDepositDate());
             depositDateCell.setCellStyle(cellStyle);
-            row.createCell(23).setCellValue(deposit.getDeposit());
+            row.createCell(25).setCellValue(deposit.getDeposit());
         }
 
         try {

@@ -41,5 +41,5 @@ pagehelper:
 logging:
   file: logs/ccb.log
   level:
-    com.honji.exhibition.admin.mapper: debug
+    com.honji.order.mapper: debug
     root: INFO

@@ -2,7 +2,6 @@ package com.honji.order.mapper;
 
 import com.github.pagehelper.PageHelper;
 import com.honji.order.model.DepositDTO;
-import com.honji.order.model.DepositVO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ public class DailyDepositMapperTest {
                 .collect(Collectors.joining(","));
 //        depositDTO.setShopCodeStr(shopCodeStr);
         System.out.println(shopCodeStr);
-        List<DepositVO> depositVOs = depositMapper.testProc(depositDTO);
+//        List<DepositVO> depositVOs = depositMapper.testProc(depositDTO);
     }
 }
 

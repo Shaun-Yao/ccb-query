@@ -42,9 +42,9 @@ public class DepositVO {
     private double cardPay;
 
     /**
-     * 银联扫码
+     * POS机/刷卡/银联扫码
      */
-//    private double unionPay;
+    private double pos;
 
     /**
      * 广发兑换券

@@ -459,8 +459,7 @@
                         + Number($('#mallCollection').val()) + Number($('#heSheng').val())
                         + Number($('#cash').val()) + Number($('#memberPoints').val())
                         + Number($('#yuePay').val())).toFixed(2) ;
-            console.log(amount);
-            console.log(sum);
+
             if (amount != sum) {
                 alert("营业额与其它各项结算方式的总和不相等，请修改！");
                 return false;
@@ -471,12 +470,6 @@
             var deposit = $('#depositAmount').val();
             var picture1 = $('#picture1').val();
             var hasBank = bank != null && bank != '';
-            // console.log(bank != '');
-            // console.log(bank != null);
-            //
-            // console.log(deposit);
-            // console.log(depositDate);
-            // console.log(picture1);
 
             if (hasBank || depositDate .length > 0 || deposit .length > 0 || picture1 .length > 0) {
                 if (!bank || depositDate .length == 0 || deposit .length == 0 || picture1 .length == 0) {
@@ -502,6 +495,7 @@
                     $('#picture2').val($(this).attr('file-name'));
                 }
             });*/
+            $('#save').attr("disabled", true);//屏蔽提交按钮
             $.ajax({
                 type: "post",
                 url: "/daily-deposit/save",
@@ -510,6 +504,7 @@
                     $('#myModal').modal('hide');
                     $('#table').bootstrapTable('refresh');
                     calculateBalance();
+                    $('#save').attr("disabled", false);//提交成功后激活提交按钮
                 },
                 error: function(data){
                     alert("保存失败，请关闭网页重新尝试！");
@@ -520,12 +515,6 @@
 
     $('#add').click(function () {
         $gallery.fadeOut(100);//关闭图片预览
-        /*if($('#id').val().length > 0) {//有id表示上一步查看了旧记录，需要清空数据
-            $uploaderFiles.empty();//清空图片
-            $('#picture1').val('');
-            pictureSize = 0;
-            $('#form').resetForm();//无法重置hidden项
-        }*/
 
         $uploaderFiles.empty();//清空图片
         $('#picture1').val('');

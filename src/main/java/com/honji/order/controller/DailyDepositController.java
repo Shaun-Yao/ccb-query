@@ -154,7 +154,7 @@ public class DailyDepositController {
             row.createCell(3).setCellValue(deposit.getAmount());
             row.createCell(4).setCellValue(deposit.getBalance());
             row.createCell(5).setCellValue(deposit.getCashAdjustment());
-            row.createCell(6).setCellValue(deposit.getCardPay());
+            row.createCell(6).setCellValue(deposit.getPos());
             row.createCell(7).setCellValue(deposit.getCgbCoupon());
             row.createCell(8).setCellValue(deposit.getCcbZs());
             row.createCell(9).setCellValue(deposit.getCcbBs());

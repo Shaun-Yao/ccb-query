@@ -18,9 +18,9 @@
 
 </style>
 <body>
-<div class="col-md-12">
-    <h3>注意：由于数据太多查询较慢，请尽量缩小范围查询！</h3>
-</div>
+<!--<div class="col-md-12">-->
+    <!--<h3>注意：由于数据太多查询较慢，请尽量缩小范围查询！</h3>-->
+<!--</div>-->
     <form class="form-inline" id="resource-form">
         <input type="hidden" id="jobNum" th:value="${jobNum}">
         <div class="col-md-12" >
@@ -169,10 +169,10 @@
         $('#searchBtn').click(function () {
             if($('#resource-form')[0].reportValidity()) {
                 var shopCodes = $('#shopCodes').val();
-                if(shopCodes.length > 50) {
-                    alert("查询店铺数量超过50家,请减少后再查询！");
-                    return;
-                }
+                // if(shopCodes.length > 50) {
+                //     alert("查询店铺数量超过50家,请减少后再查询！");
+                //     return;
+                // }
                 $('#table').bootstrapTable('refresh');
             }
         });
@@ -180,10 +180,10 @@
         $('#exportBtn').click(function () {
             if($('#resource-form')[0].reportValidity()) {
                 var shopCodes = $('#shopCodes').val();
-                if(shopCodes.length > 50) {
-                    alert("查询店铺数量超过50家,请减少后再导出！");
-                    return;
-                }
+                // if(shopCodes.length > 50) {
+                //     alert("查询店铺数量超过50家,请减少后再导出！");
+                //     return;
+                // }
                 bootbox.confirm("确认导出？",
                     function (result) {
                         if (result) {

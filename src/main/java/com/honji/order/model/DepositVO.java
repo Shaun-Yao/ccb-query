@@ -137,6 +137,11 @@ public class DepositVO {
     private double yuePay;
 
     /**
+     * 万达支付
+     */
+    private double wanDa;
+
+    /**
      * 多收款金额
      */
     private double extraCash;

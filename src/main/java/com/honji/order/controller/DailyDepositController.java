@@ -74,14 +74,6 @@ public class DailyDepositController {
 
     @GetMapping("/index")
     public String index(@RequestParam String shopCode, Model model) {
-/*
-
-        String user = (String) session.getAttribute("user");
-        if (StringUtils.isEmpty(user)) {
-            System.out.println(222);
-            session.setAttribute("user", shopCode);
-        }
-*/
 
         List<Bank> banks = null;
         QueryWrapper<CashBalance> shopQueryWrapper = new QueryWrapper<>();
@@ -106,12 +98,12 @@ public class DailyDepositController {
     public String query(@RequestParam String jobNum, Model model) {
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("job_num", jobNum);
-//        StringBuffer shopCodes = new StringBuffer();
         List<Authority> authorities = authorityService.list(queryWrapper);
         model.addAttribute("authorities", authorities);
         model.addAttribute("jobNum", jobNum);
-        return "query";
+        return "query-plus";
     }
+
 
     @GetMapping("/query")
     @ResponseBody
@@ -119,9 +111,9 @@ public class DailyDepositController {
         return new DataGridResult(dailyDepositService.listByShopCodes(depositDTO));
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export2")
     @ResponseBody
-    public void export(DepositDTO depositDTO, HttpServletResponse response) {
+    public void export2(DepositDTO depositDTO, HttpServletResponse response) {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("sheet1");
@@ -129,11 +121,7 @@ public class DailyDepositController {
                 "POS机/刷卡/银联扫码", "广发兑换券", "建行扫码", "建行离线", "支付宝", "微信", "扫一扫", "码上收",
                 "百胜支付", "商场代收款", "合胜收款", "现金", "会员积分/储值卡消费/礼券",
                 "多收款", "悦支付","存款银行", "存款日期", "存款额"};// 列名
-        //erp版本
-//        String columnNames[] = { "店铺代码", "店铺名称", "营业日期", "营业额", "结余", "现金调整",
-//                "刷卡", "广发兑换券", "建行扫码", "建行离线", "支付宝", "微信", "扫一扫", "码上收",
-//                "百胜支付", "商场代收款", "合胜收款", "现金", "会员积分", "储值卡消费", "礼券",
-//                "多收款", "悦支付","存款银行", "存款日期", "存款额"};// 列名
+
         CreationHelper creationHelper = workbook.getCreationHelper();
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
@@ -175,7 +163,51 @@ public class DailyDepositController {
             depositDateCell.setCellStyle(cellStyle);
             row.createCell(23).setCellValue(deposit.getDeposit());
 
-            /*erp版本
+        }
+
+        try {
+            response.reset();
+//            response.setContentType("application/vnd.ms-excel");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("存款数据.xlsx", "utf-8"));
+            OutputStream out = response.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/export")
+    @ResponseBody
+    public void export(DepositDTO depositDTO, HttpServletResponse response) {
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("sheet1");
+
+        String columnNames[] = { "店铺代码", "店铺名称", "营业日期", "营业额", "结余", "现金调整",
+                "刷卡", "广发兑换券", "建行扫码", "建行离线", "支付宝", "微信", "扫一扫", "码上收",
+                "百胜支付", "商场代收款", "合胜收款", "现金", "会员积分", "储值卡消费", "礼券",
+                "多收款", "悦支付","存款银行", "存款日期", "存款额"};// 列名
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+
+        Row headRow = sheet.createRow(0);
+        for (int i = 0; i < columnNames.length; i++) {
+            headRow.createCell(i).setCellValue(columnNames[i]);
+        }
+        List<DepositVO> deposits = dailyDepositService.listAll(depositDTO);
+        for (int i = 0; i < deposits.size(); i++) {
+            DepositVO deposit = deposits.get(i);
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(deposit.getKhdm());
+            row.createCell(1).setCellValue(deposit.getKhmc());
+            Cell dateCell = row.createCell(2);
+            dateCell.setCellValue(deposit.getDate());
+            dateCell.setCellStyle(cellStyle);
+
             row.createCell(3).setCellValue(deposit.getAmount());
             row.createCell(4).setCellValue(deposit.getBalance());
             row.createCell(5).setCellValue(deposit.getCashAdjustment());
@@ -201,12 +233,11 @@ public class DailyDepositController {
             depositDateCell.setCellValue(deposit.getDepositDate());
             depositDateCell.setCellStyle(cellStyle);
             row.createCell(25).setCellValue(deposit.getDeposit());
-            */
+
         }
 
         try {
             response.reset();
-//            response.setContentType("application/vnd.ms-excel");
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("存款数据.xlsx", "utf-8"));
             OutputStream out = response.getOutputStream();

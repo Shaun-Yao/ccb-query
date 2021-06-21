@@ -107,6 +107,50 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
 
 
     @Select({"<script>",
+            "SELECT deposit_result.*, authority.khmc FROM\n" +
+                    "(SELECT erp_ls.khdm, erp_ls.rq AS DATE,\n" +
+                    " deposit.cash_adjustment,\n" +
+                    "刷卡 AS cardPay, 广发兑换券 AS cgbCoupon, 建行扫码 AS ccbZs,\n" +
+                    "建行离线 AS ccbBs, 支付宝扫码 AS alipay, 微信扫码 AS wxpay, \n" +
+                    "扫一扫 AS sys, 码上收 AS mss, 百胜扫码 AS bsPay, 商场代收款 AS mallCollection, 合胜收款 AS heSheng, deposit.cash, 储值卡消费 AS cardConsumption, \n" +
+                    "会员积分 memberPoints,礼券 AS giftCertificate, deposit.extra_cash, \n" +
+                    "悦扫码 AS yuePay, 万达支付 AS wan_da, bank.name bankName, deposit.deposit_date, \n" +
+                    "deposit.deposit, deposit.image \n" +
+                    "FROM (\n" +
+                    "\tSELECT * FROM(\n" +
+                    "\t\tSELECT VW_LSXHJS.DM1 AS KHDM, VW_LSXHJS.ysr AS KHMC, POSJS.JSMC,\n" +
+                    "\t\t\tCONVERT ( VARCHAR ( 10 ), VW_LSXHJS.RQ, 23 ) RQ,\n" +
+                    "\t\t\tSUM ( VW_LSXHJS.JE ) JE FROM\n" +
+                    "\t\t\t( SELECT CONVERT ( VARCHAR ( 10 ), DM1 ) DM1, YSR, RQ, JE, JSFS FROM IP180.SPERP.DBO.VW_LSXHJS " +
+                    " WHERE VW_LSXHJS.RQ &gt;= '${depositDTO.begin}' AND VW_LSXHJS.dm1 IN " +
+                    "<foreach item='item' index='index' collection='depositDTO.shopCodes' open='(' separator=',' close=')'> #{item} </foreach>",
+                    "<if test='depositDTO.end !=null and depositDTO.end!=\"\"'>",
+                    "AND VW_LSXHJS.RQ &lt;= '${depositDTO.end}'",
+                    "</if>",
+                    " ) VW_LSXHJS\n" +
+                    "LEFT JOIN IP180.SPERP.DBO.POSJS POSJS ON VW_LSXHJS.JSFS= POSJS.JSDM \n" +
+                    "\t\tGROUP BY VW_LSXHJS.DM1, YSR, POSJS.JSMC, VW_LSXHJS.RQ ) result \n" +
+                    "\t\tPIVOT ( SUM (JE) FOR JSMC IN (现金,刷卡,扫一扫,浦发扫码,建行扫码,建行离线,百胜扫码,码上收,储值卡消费,微信扫码,支付宝扫码, 礼券,会员积分,广发兑换券,商场代收款,合胜收款,悦扫码, 万达支付)) pm \n" +
+                    "\t) erp_ls\n" +
+                    " LEFT JOIN daily_deposit deposit ON erp_ls.khdm = deposit.khdm AND erp_ls.rq = deposit.date \n" +
+                    " LEFT JOIN bank ON deposit.bank = bank.account \n" +
+
+                    ") deposit_result\n" +
+                    " LEFT JOIN (SELECT * FROM authority WHERE type = 1) authority" +
+                    " on deposit_result.khdm = authority.khdm " +
+                    " WHERE 1 = 1 " +
+                    "<if test='depositDTO.depositBegin !=null and depositDTO.depositBegin!=\"\"'>" +
+                    "AND deposit_result.deposit_date &gt;= '${depositDTO.depositBegin}'" +
+                    "</if>" +
+                    "<if test='depositDTO.depositEnd !=null and depositDTO.depositEnd!=\"\"'>",
+                    "AND deposit_result.deposit_date &lt;= '${depositDTO.depositEnd}'",
+                    "</if>",
+                    " ORDER BY deposit_result.date desc",
+            "</script>"})
+    List<DepositVO> selectForIndex(@Param("depositDTO")DepositDTO depositDTO);
+
+
+    @Select({"<script>",
             " SELECT balance_result.TotalAmount AS balance, balance_result.khmc, daily_deposit.* FROM " +
                     "( SELECT deposit.*, bank.name AS bankName FROM dbo.daily_deposit deposit LEFT JOIN bank ON deposit.bank = bank.account ) daily_deposit\n" +
                     "\tLEFT JOIN (\n" +

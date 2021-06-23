@@ -1,5 +1,7 @@
 package com.honji.order.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.CashBalance;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -14,4 +16,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ICashBalanceService extends IService<CashBalance> {
 
     double calBalance(String shopCode);
+
+    PageInfo<CashBalance> listByShopCode(String shopCode, int offset, int limit);
 }

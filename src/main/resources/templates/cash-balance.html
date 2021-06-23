@@ -7,12 +7,9 @@
 
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
-    <link rel="stylesheet" href="/webjars/bootstrap-table/dist/extensions/sticky-header/bootstrap-table-sticky-header.min.css">
-    <link rel="stylesheet" href="/webjars/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.css">
     <link rel="stylesheet" href="/webjars/Eonasdan-bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="/webjars/weui/1.1.2/dist/style/weui.min.css" />
     <link rel="stylesheet" href="/webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css" />
-    <link rel="stylesheet" href="/webjars/viewerjs/dist/viewer.min.css" />
 </head>
 <style type="text/css">
 
@@ -23,19 +20,18 @@
         <div class="col-md-12" >
             <div class="form-group">
                 <label class="form-lable">店铺代码</label>
-                <div >
-                    <input type='text' class="form-control" id='shopCode' />
-                </div>
+                <input type='text' class="form-control" id='shopCode' />
             </div>
 
             <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
-            <a class="btn btn-primary " id="exportBtn" >导出exel</a>
+<!--            <a class="btn btn-primary " id="exportBtn" >导出exel</a>-->
         </div>
     </form>
 
     <table id="table" class="modal-body" > </table>
     <div id="datagrid" >
-
+        <button type="button" class="btn btn-success" id="add">新增</button>
+        <button type="button" class="btn btn-danger" id="remove">删除</button>
     </div>
 
     <!-- 模态框（Modal） -->
@@ -44,15 +40,71 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">现金调整</h4>
+                    <h4 class="modal-title" id="myModalLabel">店铺信息</h4>
                 </div>
-                <form class="form-horizontal" id="form" role="form" action="/shop/add" method="post">
+                <form class="form-horizontal" id="form" role="form" >
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
                         <div class="form-group">
-                            <label for="cashAdjustment" class="col-sm-2 control-label">现金调整</label>
+                            <label for="khdm" class="col-sm-2 control-label">店铺代码</label>
                             <div class="col-sm-10">
-                                <input type="number" min="-100000.00" max="100000.00" step="0.01" class="form-control" id="cashAdjustment" name="cashAdjustment" required >
+                                <input type="text"  class="form-control" id="khdm" name="khdm" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="khmc" class="col-sm-2 control-label">店铺名称</label>
+                            <div class="col-sm-10">
+                                <input type="text"  class="form-control" id="khmc" name="khmc" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="date" class="col-sm-2 control-label">结余日期</label>
+                            <div class="col-sm-10">
+                                <input type="text"  class="form-control" id="date" name="date" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="type" class="col-sm-2 control-label">店铺类型</label>
+                            <div class="col-sm-10">
+                                <input type="text"  class="form-control" id="type" name="type" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="balance" class="col-sm-2 control-label">结余</label>
+                            <div class="col-sm-10">
+                                <input type="number" min="-100000.00" max="100000.00" step="0.01" class="form-control" id="balance" name="balance" required >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deptCode" class="col-sm-2 control-label">部门代码</label>
+                            <div class="col-sm-10">
+                                <input type="number" step="1" class="form-control" id="deptCode" name="deptCode" required >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="czdzCode" class="col-sm-2 control-label">充值到账科目编码</label>
+                            <div class="col-sm-10">
+                                <input type="number" step="1" class="form-control" id="czdzCode" name="czdzCode" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="czwdzCode" class="col-sm-2 control-label">充值未到账科目编码</label>
+                            <div class="col-sm-10">
+                                <input type="number" step="1" class="form-control" id="czwdzCode" name="czwdzCode" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="shdzCode" class="col-sm-2 control-label">私户到账科目编码</label>
+                            <div class="col-sm-10">
+                                <input type="number" step="1" class="form-control" id="shdzCode" name="shdzCode" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="shwdzCode" class="col-sm-2 control-label">私户未到账科目编码</label>
+                            <div class="col-sm-10">
+                                <input type="number" step="1" class="form-control" id="shwdzCode" name="shwdzCode" required >
                             </div>
                         </div>
 
@@ -79,21 +131,26 @@
 <script src="/webjars/jquery-form/4.2.2/jquery.form.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
-<script src="/webjars/bootstrap-table/dist/extensions/sticky-header/bootstrap-table-sticky-header.min.js"></script>
-<script src="/webjars/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
 <script src="/webjars/momentjs/2.24.0/min/moment-with-locales.min.js"></script>
-<script src="/webjars/Eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js">
-</script><script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
+<script src="/webjars/Eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
 <script src="/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
 <script src="/webjars/bootstrap-select/1.13.17/js/i18n/defaults-zh_CN.min.js"></script>
-<script src="/webjars/viewerjs/dist/viewer.min.js"></script>
 </body>
 <script th:inline="javascript">
 
     $(function () {
 
+        $('#add').click(function () {
+            if($('#id').val().length > 0) {
+                $('#form').resetForm();
+                $('#id').val('');
+            }
+
+            $('#myModal').modal('show');
+        });
 
         $('#searchBtn').click(function () {
             if($('#resource-form')[0].reportValidity()) {
@@ -125,20 +182,54 @@
 
         $('#save').click(function() {
             if($('#form')[0].reportValidity()) {
-                //$('#form').submit();
                 $.ajax({
                     type: "post",
-                    url: "/daily-deposit/updateCashAdjustment",
+                    url: "/cash-balance/save",
                     data: $('#form').serialize(),
-                    success: function(data){
-                        $('#myModal').modal('hide');
-                        $('#table').bootstrapTable('refresh');
+                    success: function(result){
+                        if(result) {
+                            $('#myModal').modal('hide');
+                            $('#table').bootstrapTable('refresh');
+                        } else {
+                            alert("数据库返回失败！");
+                        }
+
                     },
                     error:function(xhr,state,errorThrown){
                         alert("操作失败，请确认数据是否正确后重新尝试！");
                     }
                 });
             }
+        });
+
+        $('#remove').click(function () {
+            if($('#table').bootstrapTable('getSelections').length == 0) {
+                return;
+            }
+
+            var ids = [];
+            $.each($('#table').bootstrapTable('getSelections'), function(index, item){
+                ids.push(item.id);
+            });
+            bootbox.confirm("确认删除？",
+                function(result){
+                    if(result) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/cash-balance/remove",
+                            traditional: true,
+                            data: {
+                                ids: ids
+                            },
+                            success: function(data){
+                                $('#table').bootstrapTable('refresh');
+                            },
+                            error:function(){
+                                alert("操作失败，请刷新页面重新尝试！");
+                            }
+                        });
+                    }
+                })
         });
     });
 
@@ -152,7 +243,6 @@
         showButtonText: true,
         stickyHeader: true,
         fixedColumns: true,
-        fixedNumber: 3,
         // showFooter: true,
         // search: true,
         // showButtonText: true,
@@ -164,7 +254,6 @@
         showRefresh: true,
         toolbar: "#datagrid",
         clickToSelect: true,
-        singleSelect: true,
         sortable: true,
         smartDisplay: false,
         ajaxOptions:{
@@ -185,17 +274,69 @@
             //console.log(row.id);
         },
         onDblClickRow: function (row, $element) {
-            $('#id').val(row.id);
-            $('#cashAdjustment').val(row.cashAdjustment);
-            $('#myModal').modal('show');
+            $.ajax({
+                type: "get",
+                url: "/cash-balance/get",
+                data: {id: row.id},
+                success: function(result){
+                    $('#id').val(result.id);
+                    $('#khdm').val(result.khdm);
+                    $('#khmc').val(result.khmc);
+                    $('#date').val(result.date);
+                    $('#type').val(result.type);
+                    $('#balance').val(result.balance);
+                    $('#deptCode').val(result.deptCode);
+                    $('#czdzCode').val(result.czdzCode);
+                    $('#czwdzCode').val(result.czwdzCode);
+                    $('#shdzCode').val(result.shdzCode);
+                    $('#shwdzCode').val(result.shwdzCode);
+                    $('#myModal').modal('show');
+                },
+                error:function(xhr,state,errorThrown){
+                    alert("操作失败，记录已经不存在请刷新重试！");
+                }
+            });
+
         },
-        columns: [ {
+        columns: [{
+            field: '',
+            checkbox: true, // 显示一个勾选框
+            align: 'center', // 居中显示
+        }, {
             field: 'id',
             title: 'ID',
             visible: false
         }, {
             field: 'khdm',
             title: '店铺代码',
+            width: '100'
+        }, {
+            field: 'khmc',
+            title: '店铺名称',
+            width: '100'
+        }, {
+            field: 'balance',
+            title: '结余',
+            width: '100'
+        }, {
+            field: 'deptCode',
+            title: '部门代码',
+            width: '100'
+        }, {
+            field: 'czdzCode',
+            title: '充值到账科目编码',
+            width: '100'
+        }, {
+            field: 'czwdzCode',
+            title: '充值未到账科目编码',
+            width: '100'
+        }, {
+            field: 'shdzCode',
+            title: '私户到账科目编码',
+            width: '100'
+        }, {
+            field: 'shwdzCode',
+            title: '私户未到账科目编码',
             width: '100'
         }]
     });

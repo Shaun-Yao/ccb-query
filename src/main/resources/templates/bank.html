@@ -19,13 +19,21 @@
     <form class="form-inline" id="resource-form">
         <div class="col-md-12" >
             <div class="form-group">
-                <label class="form-lable">店铺代码</label>
-                <input type='text' class="form-control" id='shopCode' />
+                <label for="accountKey" class="form-lable">银行账号</label>
+                <input type='text' class="form-control" id='accountKey' />
             </div>
 
             <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
-<!--            <a class="btn btn-primary " id="exportBtn" >导出exel</a>-->
+
+            <div class="form-group form-inner">
+                <input type="file" class="form-lable" name="file" id="file"
+                       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+            </div>
+            <a class="btn btn-primary" id="import" >导入</a>
+
+            <a class="btn btn-info " id="exportBtn" >导出</a>
         </div>
+
     </form>
 
     <table id="table" class="modal-body" > </table>
@@ -46,65 +54,28 @@
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
                         <div class="form-group">
-                            <label for="khdm" class="col-sm-2 control-label">店铺代码</label>
+                            <label for="account" class="col-sm-2 control-label">银行账号</label>
                             <div class="col-sm-10">
-                                <input type="text"  class="form-control" id="khdm" name="khdm" required >
+                                <input type="text"  class="form-control" id="account" name="account" required >
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="khmc" class="col-sm-2 control-label">店铺名称</label>
+                            <label for="name" class="col-sm-2 control-label">银行名称</label>
                             <div class="col-sm-10">
-                                <input type="text"  class="form-control" id="khmc" name="khmc" required >
+                                <input type="text"  class="form-control" id="name" name="name" required >
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="date" class="col-sm-2 control-label">结余日期</label>
-                            <div class="col-sm-10">
-                                <input type="text"  class="form-control" id="date" name="date" required >
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="type" class="col-sm-2 control-label">店铺类型</label>
+                            <label for="type" class="col-sm-2 control-label">银行类型</label>
                             <div class="col-sm-10">
                                 <input type="text"  class="form-control" id="type" name="type" required >
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="balance" class="col-sm-2 control-label">结余</label>
-                            <div class="col-sm-10">
-                                <input type="number" min="-100000.00" max="100000.00" step="0.01" class="form-control" id="balance" name="balance" required >
-                            </div>
-                        </div>
 
                         <div class="form-group">
-                            <label for="deptCode" class="col-sm-2 control-label">部门代码</label>
+                            <label for="code" class="col-sm-2 control-label">到账编码</label>
                             <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="deptCode" name="deptCode" required >
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="czdzCode" class="col-sm-2 control-label">充值到账科目编码</label>
-                            <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="czdzCode" name="czdzCode" required >
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="czwdzCode" class="col-sm-2 control-label">充值未到账科目编码</label>
-                            <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="czwdzCode" name="czwdzCode" required >
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="shdzCode" class="col-sm-2 control-label">私户到账科目编码</label>
-                            <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="shdzCode" name="shdzCode" required >
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="shwdzCode" class="col-sm-2 control-label">私户未到账科目编码</label>
-                            <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="shwdzCode" name="shwdzCode" required >
+                                <input type="number" step="1" class="form-control" id="code" name="code" required >
                             </div>
                         </div>
 
@@ -148,13 +119,11 @@
                 $('#form').resetForm();
                 $('#id').val('');
             }
-
             $('#myModal').modal('show');
         });
 
         $('#searchBtn').click(function () {
             if($('#resource-form')[0].reportValidity()) {
-                var shopCodes = $('#shopCodes').val();
                 $('#table').bootstrapTable('refresh');
             }
         });
@@ -164,27 +133,18 @@
                 bootbox.confirm("确认导出？",
                     function (result) {
                         if (result) {
-                            var jobNum = $('#jobNum').val();
-                            var shopCodes = $('#shopCodes').val();
-                            // console.log($('#shopCodes').val());
-                            var begin = $('#begin').val();
-                            var end = $('#end').val();
-                            var depositBegin = $('#deposit-begin').val();
-                            var depositEnd = $('#deposit-end').val();
-                            window.location.href = "/daily-deposit/export?jobNum=" + jobNum + "&shopCodes=" + shopCodes
-                                + "&begin=" + begin + "&end=" + end + "&depositBegin=" + depositBegin
-                                + "&depositEnd=" + depositEnd;
+                            var account = $('#accountKey').val();
+                            window.location.href = "/bank/export?account=" + account;
                         }
                     });
             }
-
         });
 
         $('#save').click(function() {
             if($('#form')[0].reportValidity()) {
                 $.ajax({
                     type: "post",
-                    url: "/cash-balance/save",
+                    url: "/bank/save",
                     data: $('#form').serialize(),
                     success: function(result){
                         if(result) {
@@ -193,7 +153,6 @@
                         } else {
                             alert("数据库返回失败！");
                         }
-
                     },
                     error:function(xhr,state,errorThrown){
                         alert("操作失败，请确认数据是否正确后重新尝试！");
@@ -216,7 +175,7 @@
                     if(result) {
                         $.ajax({
                             type: "POST",
-                            url: "/cash-balance/remove",
+                            url: "/bank/remove",
                             traditional: true,
                             data: {
                                 ids: ids
@@ -231,25 +190,59 @@
                     }
                 })
         });
+
+        $('#import').click(function () {
+
+            var file = $('#file')[0].files[0];
+            if (file != undefined) {
+                bootbox.confirm("确认导入？",
+                    function (result) {
+                        if (result) {
+                            if (file.size > 10 * 1024 * 1024) {
+                                alert("文件超过10M，不允许上传");
+                                return;
+                            }
+                            var formData = new FormData();
+                            formData.append('file', file);
+                            $.ajax({
+                                url: "/bank/import",
+                                type: "POST",
+                                async: false,
+                                cache: false,
+                                processData: false,// 告诉jQuery不要去处理发送的数据
+                                contentType: false,// 告诉jQuery不要去设置Content-Type请求头
+                                data: formData,
+                                success: function(result){
+                                    if (result) {
+                                        alert("导入成功！");
+                                    } else {
+                                        alert("导入失败或者账单没有数据，请确认后重新尝试！");
+                                    }
+                                },
+                                error:function(xhr,state,errorThrown){
+                                    alert("导入出现错误，请重新尝试！");
+                                }
+                            });
+                        }
+                    });
+
+            } else {
+                alert("您还未选择文件！");
+            }
+
+        });
     });
 
     $('#table').bootstrapTable({
         // height: 1000,
         // width: 800,
-        url: '/cash-balance/query',
+        url: '/bank/query',
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
         showButtonText: true,
         stickyHeader: true,
         fixedColumns: true,
-        // showFooter: true,
-        // search: true,
-        // showButtonText: true,
-        // searchOnEnterKey: true,
-        // showSearchButton: true,
-        // showSearchClearButton: true,
-        // showColumnsSearch: true,
         showColumns: true,
         showRefresh: true,
         toolbar: "#datagrid",
@@ -262,7 +255,7 @@
         pageNumber: 1,     //初始化加载第一页，默认第一页
         pageSize: 10,      //每页的记录行数（*）
         queryParams: function (params) {
-            params.shopCode = $('#shopCode').val();
+            params.account = $('#accountKey').val();
             //导出全部数据没有传limit给后台, 把limit设置为全部数据
             if (typeof(params.limit) == "undefined") {
 
@@ -276,20 +269,14 @@
         onDblClickRow: function (row, $element) {
             $.ajax({
                 type: "get",
-                url: "/cash-balance/get",
+                url: "/bank/get",
                 data: {id: row.id},
                 success: function(result){
                     $('#id').val(result.id);
-                    $('#khdm').val(result.khdm);
-                    $('#khmc').val(result.khmc);
-                    $('#date').val(result.date);
+                    $('#account').val(result.account);
+                    $('#name').val(result.name);
+                    $('#code').val(result.code);
                     $('#type').val(result.type);
-                    $('#balance').val(result.balance);
-                    $('#deptCode').val(result.deptCode);
-                    $('#czdzCode').val(result.czdzCode);
-                    $('#czwdzCode').val(result.czwdzCode);
-                    $('#shdzCode').val(result.shdzCode);
-                    $('#shwdzCode').val(result.shwdzCode);
                     $('#myModal').modal('show');
                 },
                 error:function(xhr,state,errorThrown){
@@ -307,36 +294,16 @@
             title: 'ID',
             visible: false
         }, {
-            field: 'khdm',
-            title: '店铺代码',
+            field: 'account',
+            title: '账号',
             width: '100'
         }, {
-            field: 'khmc',
-            title: '店铺名称',
+            field: 'name',
+            title: '名称',
             width: '100'
         }, {
-            field: 'balance',
-            title: '结余',
-            width: '100'
-        }, {
-            field: 'deptCode',
-            title: '部门代码',
-            width: '100'
-        }, {
-            field: 'czdzCode',
-            title: '充值到账科目编码',
-            width: '100'
-        }, {
-            field: 'czwdzCode',
-            title: '充值未到账科目编码',
-            width: '100'
-        }, {
-            field: 'shdzCode',
-            title: '私户到账科目编码',
-            width: '100'
-        }, {
-            field: 'shwdzCode',
-            title: '私户未到账科目编码',
+            field: 'code',
+            title: '到账编码',
             width: '100'
         }]
     });

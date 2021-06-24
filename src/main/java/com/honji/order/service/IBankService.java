@@ -1,7 +1,9 @@
 package com.honji.order.service;
 
+import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.Bank;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.honji.order.entity.CashBalance;
 
 /**
  * <p>
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IBankService extends IService<Bank> {
 
+    PageInfo<Bank> listByAccount(String account, int offset, int limit);
 }

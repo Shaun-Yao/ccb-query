@@ -24,7 +24,12 @@
             </div>
 
             <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
-<!--            <a class="btn btn-primary " id="exportBtn" >导出exel</a>-->
+            <div class="form-group form-inner">
+                <input type="file" class="form-lable" name="file" id="file"
+                       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+            </div>
+            <a class="btn btn-primary" id="import" >导入</a>
+            <a class="btn btn-info " id="exportBtn" >导出</a>
         </div>
     </form>
 
@@ -66,7 +71,11 @@
                         <div class="form-group">
                             <label for="type" class="col-sm-2 control-label">店铺类型</label>
                             <div class="col-sm-10">
-                                <input type="text"  class="form-control" id="type" name="type" required >
+                                <select class="form-control" name="type" id="type" required>
+                                    <option ></option>
+                                    <option value="1">公户</option>
+                                    <option value="2">私户</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -86,25 +95,25 @@
                         <div class="form-group">
                             <label for="czdzCode" class="col-sm-2 control-label">充值到账科目编码</label>
                             <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="czdzCode" name="czdzCode" required >
+                                <input type="number" step="1" class="form-control" id="czdzCode" name="czdzCode"  >
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="czwdzCode" class="col-sm-2 control-label">充值未到账科目编码</label>
                             <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="czwdzCode" name="czwdzCode" required >
+                                <input type="number" step="1" class="form-control" id="czwdzCode" name="czwdzCode"  >
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="shdzCode" class="col-sm-2 control-label">私户到账科目编码</label>
                             <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="shdzCode" name="shdzCode" required >
+                                <input type="number" step="1" class="form-control" id="shdzCode" name="shdzCode"  >
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="shwdzCode" class="col-sm-2 control-label">私户未到账科目编码</label>
                             <div class="col-sm-10">
-                                <input type="number" step="1" class="form-control" id="shwdzCode" name="shwdzCode" required >
+                                <input type="number" step="1" class="form-control" id="shwdzCode" name="shwdzCode"  >
                             </div>
                         </div>
 
@@ -159,27 +168,6 @@
             }
         });
 
-        $('#exportBtn').click(function () {
-            if($('#resource-form')[0].reportValidity()) {
-                bootbox.confirm("确认导出？",
-                    function (result) {
-                        if (result) {
-                            var jobNum = $('#jobNum').val();
-                            var shopCodes = $('#shopCodes').val();
-                            // console.log($('#shopCodes').val());
-                            var begin = $('#begin').val();
-                            var end = $('#end').val();
-                            var depositBegin = $('#deposit-begin').val();
-                            var depositEnd = $('#deposit-end').val();
-                            window.location.href = "/daily-deposit/export?jobNum=" + jobNum + "&shopCodes=" + shopCodes
-                                + "&begin=" + begin + "&end=" + end + "&depositBegin=" + depositBegin
-                                + "&depositEnd=" + depositEnd;
-                        }
-                    });
-            }
-
-        });
-
         $('#save').click(function() {
             if($('#form')[0].reportValidity()) {
                 $.ajax({
@@ -230,6 +218,58 @@
                         });
                     }
                 })
+        });
+
+        $('#exportBtn').click(function () {
+            if($('#resource-form')[0].reportValidity()) {
+                bootbox.confirm("确认导出？",
+                    function (result) {
+                        if (result) {
+                            var shopCode = $('#shopCode').val();
+                            window.location.href = "/cash-balance/export?shopCode=" + shopCode;
+                        }
+                    });
+            }
+        });
+
+        $('#import').click(function () {
+            var file = $('#file')[0].files[0];
+            if (file != undefined) {
+                bootbox.confirm("确认导入？",
+                    function (result) {
+                        if (result) {
+                            if (file.size > 10 * 1024 * 1024) {
+                                alert("文件超过10M，不允许上传");
+                                return;
+                            }
+                            var formData = new FormData();
+                            formData.append('file', file);
+                            $.ajax({
+                                url: "/cash-balance/import",
+                                type: "POST",
+                                async: false,
+                                cache: false,
+                                processData: false,// 告诉jQuery不要去处理发送的数据
+                                contentType: false,// 告诉jQuery不要去设置Content-Type请求头
+                                data: formData,
+                                success: function(result){
+                                    if (result) {
+                                        alert("导入成功！");
+                                        $('#table').bootstrapTable('refresh');
+                                    } else {
+                                        alert("导入失败或者账单没有数据，请确认后重新尝试！");
+                                    }
+                                },
+                                error:function(xhr,state,errorThrown){
+                                    alert("导入出现错误，请重新尝试！");
+                                }
+                            });
+                        }
+                    });
+
+            } else {
+                alert("您还未选择文件！");
+            }
         });
     });
 

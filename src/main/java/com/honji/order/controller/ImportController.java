@@ -62,7 +62,6 @@ public class ImportController {
     public boolean baiShengPay(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
-        System.out.println(fileName);
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
         List<Bill> list = new ArrayList<>();
@@ -413,6 +412,7 @@ public class ImportController {
         String fileName = file.getOriginalFilename();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+
         List<Bill> list = new ArrayList<>();
         boolean result = false;
         if (workbook != null) {

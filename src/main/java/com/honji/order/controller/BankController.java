@@ -90,9 +90,6 @@ public class BankController {
         XSSFSheet sheet = workbook.createSheet("sheet1");
 
         String columnNames[] = { "银行账号", "银行名称", "到账编码", "类型"};// 列名
-        CreationHelper creationHelper = workbook.getCreationHelper();
-        CellStyle cellStyle = workbook.createCellStyle();
-        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
 
         Row headRow = sheet.createRow(0);
         for (int i = 0; i < columnNames.length; i++) {

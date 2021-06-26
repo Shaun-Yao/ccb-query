@@ -30,7 +30,6 @@
                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
             </div>
             <a class="btn btn-primary" id="import" >导入</a>
-
             <a class="btn btn-info " id="exportBtn" >导出</a>
         </div>
 
@@ -68,7 +67,12 @@
                         <div class="form-group">
                             <label for="type" class="col-sm-2 control-label">银行类型</label>
                             <div class="col-sm-10">
-                                <input type="text"  class="form-control" id="type" name="type" required >
+                                <select class="form-control" name="type" id="type" required>
+                                    <option ></option>
+                                    <option value="1">公户</option>
+                                    <option value="2">私户</option>
+                                    <option value="3">现金</option>
+                                </select>
                             </div>
                         </div>
 
@@ -128,17 +132,6 @@
             }
         });
 
-        $('#exportBtn').click(function () {
-            if($('#resource-form')[0].reportValidity()) {
-                bootbox.confirm("确认导出？",
-                    function (result) {
-                        if (result) {
-                            var account = $('#accountKey').val();
-                            window.location.href = "/bank/export?account=" + account;
-                        }
-                    });
-            }
-        });
 
         $('#save').click(function() {
             if($('#form')[0].reportValidity()) {
@@ -191,8 +184,19 @@
                 })
         });
 
-        $('#import').click(function () {
+        $('#exportBtn').click(function () {
+            if($('#resource-form')[0].reportValidity()) {
+                bootbox.confirm("确认导出？",
+                    function (result) {
+                        if (result) {
+                            var account = $('#accountKey').val();
+                            window.location.href = "/bank/export?account=" + account;
+                        }
+                    });
+            }
+        });
 
+        $('#import').click(function () {
             var file = $('#file')[0].files[0];
             if (file != undefined) {
                 bootbox.confirm("确认导入？",

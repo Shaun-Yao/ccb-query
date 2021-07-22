@@ -94,6 +94,28 @@ public class DailyDepositController {
         return "daily_deposit";
     }
 
+    @GetMapping("/index2")
+    public String index2(@RequestParam String shopCode, Model model) {
+
+        List<Bank> banks = null;
+        QueryWrapper<CashBalance> shopQueryWrapper = new QueryWrapper<>();
+        shopQueryWrapper.eq("khdm", shopCode);
+        CashBalance cashBalance = cashBalanceService.getOne(shopQueryWrapper);
+        if (cashBalance.getType() == 1) {
+            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
+            queryWrapper.orderByAsc("type", "account");
+            banks = bankService.list(queryWrapper);
+        } else {
+            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
+            queryWrapper.ne("type", "1");
+            banks = bankService.list(queryWrapper);
+        }
+
+        model.addAttribute("shopCode", shopCode);
+        model.addAttribute("banks", banks);
+        return "deposit";
+    }
+
     @GetMapping("/toQuery")
     public String query(@RequestParam String jobNum, Model model) {
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();

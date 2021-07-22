@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Hello, Bootstrap Table!</title>
+
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="/webjars/weui/1.1.2/dist/style/weui.min.css" />
+    <link rel="stylesheet" href="/webjars/viewerjs/dist/viewer.min.css" />
+</head>
+<body>
+
+    <div class="pull-right">
+        <h3>
+            <span th:text="${shopCode}">信息标签</span>
+            <span id="balance"></span>
+        </h3>
+    </div>
+    <table id="table" class="modal-body"></table>
+    <div id="deposit" >
+        <button type="button" class="btn btn-success" id="add">新增</button>
+        <button type="button" class="btn btn-danger" id="remove">删除</button>
+    </div>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">销售信息</h4>
+                </div>
+                <form class="form-horizontal" id="form" role="form" action="/daily-deposit/add" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="id" name="id" >
+                        <input type="hidden" id="shopCode" name="khdm" th:value="${shopCode}" >
+                        <input type="hidden" id="cashAdjustment" name="cashAdjustment"><!--隐藏不给修改，更新时才能按原值更新-->
+
+                        <div class="form-group">
+                            <label for="date" class="col-sm-2 control-label">营业日期</label>
+                            <div class="col-sm-4">
+                                <input type="date" min="2020-06-30" class="form-control" id="date" name="date" required>
+                            </div>
+                            <label for="amount" class="col-sm-2 control-label">营业额</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="amount" name="amount" required >
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">存款银行</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="bank" id="bank" >
+                                    <option value=""></option>
+                                    <option th:each="bank : ${banks}"
+                                            th:value="${bank.account}" th:text="${bank.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <label for="depositDate" class="col-sm-2 control-label">存款日期</label>
+                            <div class="col-sm-4">
+                                <input type="date" min="2020-06-30" class="form-control" id="depositDate" name="depositDate" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="depositAmount" class="col-sm-2 control-label">存款额</label>
+                            <div class="col-sm-4">
+                                <input type="number" min="-1000000.00" max="100000.00" step="0.01" class="form-control" id="depositAmount" name="deposit"  >
+                            </div>
+                        </div>
+
+                        <div class="page__bd">
+                            <div class="weui-gallery" id="gallery">
+                                <span class="weui-gallery__img" id="galleryImg"></span>
+                                <div class="weui-gallery__opr">
+                                    <a href="javascript:" class="weui-gallery__del">
+                                        <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="weui-cells weui-cells_form">
+                                <div class="weui-cell">
+                                    <div class="weui-cell__bd">
+                                        <div class="weui-uploader">
+                                            <div class="weui-uploader__hd">
+                                                <p class="weui-uploader__title">图片上传</p>
+                                                <div class="weui-uploader__info"></div>
+                                            </div>
+                                            <div class="weui-uploader__bd">
+                                                <ul class="weui-uploader__files" id="uploaderFiles">
+
+                                                </ul>
+                                                <div class="weui-uploader__input-box">
+                                                    <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="image" id="picture1" >
+                        <input type="hidden" name="picture2" id="picture2" >
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="save" class="btn btn-primary">提交更改</button>
+                    </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div><!-- 模态框（Modal）end -->
+
+<script src="/webjars/jquery/3.1.1/jquery.min.js"></script><script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery-form/4.2.2/jquery.form.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="/webjars/viewerjs/dist/viewer.min.js"></script>
+</body>
+<script th:inline="javascript">
+
+    function parseDate(date) {
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+        var yyyy = date.getFullYear();
+        if(dd<10){
+            dd='0'+dd;
+        }
+        if(mm<10){
+            mm='0'+mm;
+        }
+        return yyyy+'-' + mm+'-' + dd;
+    }
+
+    $(function () {
+        var tomorrow = new Date();
+        var before31days = new Date();
+        tomorrow.setDate(new Date().getDate()+1);
+        before31days.setDate(new Date().getDate() - 31);
+
+        // document.getElementById("depositDate").setAttribute("max", tomorrow);
+        $('input[type=date]').attr("min", "2020-06-30");
+        // $('input[type=date]').attr("min", parseDate(before31days));
+        $('input[type=date]').attr("max", parseDate(tomorrow));
+
+        calculateBalance();//初始化计算结余
+        //禁止数字框，日期框滚轮修改数据
+        $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
+            $(this).on('wheel.disableScroll', function (e) {
+                e.preventDefault();
+            })
+        });
+        $('form').on('blur', 'input[type=number], input[type=date]', function (e) {
+            $(this).off('wheel.disableScroll');
+        });
+    });
+
+    function calculateBalance() {
+        $.ajax({
+            url: "/cash-balance/calculate?shopCode=" + $('#shopCode').val(),
+            type: "GET",
+            success: function(result){
+                $('#balance').text("结余：" + result + "元");
+            },
+            error:function(xhr,state,errorThrown){
+                alert("查询结余，请重新尝试！");
+            }
+        });
+    }
+
+    var fileArr=new Array();
+    var pictureSize = 0;
+    var tmpl = '<li class="weui-uploader__file" file-name="" style="background-image:url(#url#)"></li>',
+        $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
+        $uploaderInput = $("#uploaderInput"),
+        $uploaderFiles = $("#uploaderFiles");
+
+    $uploaderInput.on("change", function(e){
+        var  files = e.target.files;
+        var length = fileArr.length;
+        for (var i = 0, len = files.length; i < len; ++i) {
+            var file = files[i];
+            // if(length + i + 1 > 2) {
+            //     break;
+            // }
+            if (file.size > 5 * 1024 * 1024) {
+                alert("图片超过5M，不允许上传");
+                continue;
+            }
+            var formData = new FormData();
+            formData.append("file", file);
+            $.ajax({
+                url: "/daily-deposit/upload?shopCode=" + $('#shopCode').val(),
+                type: "POST",
+                async: false,
+                cache: false,
+                processData: false,// 告诉jQuery不要去处理发送的数据
+                contentType: false,// 告诉jQuery不要去设置Content-Type请求头
+                data: formData,
+                success: function(result){
+                    pictureSize = pictureSize + 1;
+                    $uploaderFiles.append($(tmpl.replace('#url#', "/daily-deposit/showImage?fileName=" + result)).attr('file-name', result));
+                    $('#picture1').val(result);
+                    //checkPhotoSize();
+                },
+                error:function(xhr,state,errorThrown){
+                    alert("图片上传失败，请重新尝试！");
+                }
+            });
+
+            fileArr.push(file);
+
+        }
+        checkPhotoSize();
+    });
+
+    //控制显示三张以内照片
+    function checkPhotoSize(){
+        if(pictureSize > 0){
+            $(".weui-uploader__input-box").hide();
+        }else{
+            $(".weui-uploader__input-box").show();
+        }
+    };
+
+    var index; //第几张图片
+    $uploaderFiles.on("click", "li", function(){
+        index = $(this).index();
+        $galleryImg.attr("style", this.getAttribute("style"));
+        $gallery.fadeIn(100);
+    });
+    $gallery.on("click", function(){
+        $gallery.fadeOut(100);
+    });
+
+    //删除图片
+    $(".weui-gallery__del").click(function() {
+        $('#picture1').val('');
+        $uploaderFiles.find("li").eq(index).remove();
+        pictureSize = pictureSize - 1;
+        checkPhotoSize();
+    });
+
+    $('#table').bootstrapTable({
+        url: '/daily-deposit/list?shopCode=' + $('#shopCode').val(),
+        pagination: true,
+        sidePagination: "server",
+        locale: 'zh-CN',
+        // search: true,
+        // showButtonText: true,
+        // searchOnEnterKey: true,
+        // showSearchButton: true,
+        // showSearchClearButton: true,
+        // showRefresh: true,
+        toolbar: "#deposit",
+        clickToSelect: true,
+        singleSelect: true,
+        sortable: true,
+        smartDisplay: false,
+        pageNumber: 1,     //初始化加载第一页，默认第一页
+        pageSize: 10,      //每页的记录行数（*）
+        queryParams: function (params) {
+            //导出全部数据没有传limit给后台, 把limit设置为全部数据
+            if (typeof(params.limit) == "undefined") {
+                params.limit = this.totalRows;
+            }
+            return params;
+        },
+        onClickRow: function (row, $element) {
+            //console.log(row.id);
+        },
+        onDblClickRow: function (row, $element) {
+            $.ajax({
+                type: "GET",
+                url: "/daily-deposit/get?id=" + row.id,
+                async: false,
+                success: function(data){
+
+                    $gallery.fadeOut(100);//关闭图片预览
+                    $('#form').clearForm();
+                    $('#id').val(data.id);
+                    $('#amount').val(data.amount);
+                    $('#date').val(data.date);
+                    $('#pos').val(data.pos);
+                    $('#cgbCoupon').val(data.cgbCoupon);
+                    $('#ccbZs').val(data.ccbZs);
+                    $('#ccbBs').val(data.ccbBs);
+                    $('#alipay').val(data.alipay);
+                    $('#wxpay').val(data.wxpay);
+                    $('#sys').val(data.sys);
+                    $('#mss').val(data.mss);
+                    $('#bsPay').val(data.bsPay);
+                    $('#mallCollection').val(data.mallCollection);
+                    $('#heSheng').val(data.heSheng);
+                    $('#cash').val(data.cash);
+                    $('#memberPoints').val(data.memberPoints);
+                    $('#cashAdjustment').val(data.cashAdjustment);
+                    $('#extraCash').val(data.extraCash);
+                    $('#yuePay').val(data.yuePay);
+                    $('#depositDate').val(data.depositDate);
+                    $('#depositAmount').val(data.deposit);
+                    $('#picture1').val(data.image);
+                    //console.log(data.bank);
+                    //console.log($("#bank option:contains('" + 0000 + "')")[0]);
+                    if(data.bank != null && data.bank != '') {
+                        $("#bank").val(data.bank);
+                        //$("#bank option:contains('" + data.bank + "')")[0].selected=true;
+                    }
+                    //根据自定义属性值选中
+                    // $("input:radio[name=arrivedTravelMode][arrivedTravelMode=" + data.arrivedTravelMode + "]")[0].checked=true;
+
+                    // $("input:radio[name=leavedTravelMode][leavedTravelMode=" + data.leavedTravelMode + "]")[0].checked=true;
+                    // $("#leavedPickUpLocation option:contains('" + data.leavedPickUpLocation + "')")[0].selected=true;
+                    // $("#leavedStation option:contains('" + data.leavedStation + "')")[0].selected=true;
+                    $uploaderFiles.empty();
+                    pictureSize = 0;
+                    if (data.image != null && data.image != '') {
+                        $uploaderFiles.append($(tmpl.replace('#url#', "/daily-deposit/showImage?fileName=" + data.image)).attr('file-name', data.image));
+                        pictureSize = pictureSize + 1;
+                    }
+
+                    checkPhotoSize();
+
+                }
+            });
+            $('#myModal').modal('show');
+        },
+        columns: [ {
+            field: '',
+            checkbox: true, // 显示一个勾选框
+            align: 'center', // 居中显示
+
+            // formatter: function (value, row, index) {
+            //     return row.id;
+            // }
+        },{
+            field: 'id',
+            title: 'ID',
+            visible: false
+        }, {
+            field: 'date',
+            title: '营业日期'
+        }, {
+            field: 'amount',
+            title: '营业额'
+        }, {
+            field: 'bankName',
+            title: '存款银行'
+        }, {
+            field: 'depositDate',
+            title: '存款日期'
+        }, {
+            field: 'deposit',
+            title: '存款额'
+        }]
+    });
+
+    $('#save').click(function() {
+        if($('#form')[0].reportValidity()) {
+
+            var bank = $('#bank').val();
+            var depositDate = $('#depositDate').val();
+            var deposit = $('#depositAmount').val();
+            var picture1 = $('#picture1').val();
+            var hasBank = bank != null && bank != '';
+
+            if (hasBank || depositDate .length > 0 || deposit .length > 0 || picture1 .length > 0) {
+                if (!bank || depositDate .length == 0 || deposit .length == 0 || picture1 .length == 0) {
+                    alert("存款银行、存款日期、存款额、存款单要么都填，要么都不填!");
+                    return false;
+                }
+            }
+
+            $('#save').attr("disabled", true);//屏蔽提交按钮
+            $.ajax({
+                type: "post",
+                url: "/daily-deposit/save",
+                data: $('#form').serialize(),
+                success: function(data){
+                    $('#myModal').modal('hide');
+                    $('#table').bootstrapTable('refresh');
+                    calculateBalance();
+                    $('#save').attr("disabled", false);//提交成功后激活提交按钮
+                },
+                error: function(data){
+                    alert("保存失败，请关闭网页重新尝试！");
+                }
+            });
+        }
+    });
+
+    $('#add').click(function () {
+        $gallery.fadeOut(100);//关闭图片预览
+
+        $uploaderFiles.empty();//清空图片
+        $('#picture1').val('');
+        pictureSize = 0;
+        checkPhotoSize();
+        $('#form').resetForm();
+        $('#id').val('');
+        // $("input:radio[name=arrivedTravelMode]").get(0).checked=true;
+        // $("#arrivedPickUpStation option").get(1).selected=true;
+        // $("input:radio[name=leavedTravelMode]").get(0).checked=true;
+        // $("#leavedStation option").get(1).selected=true;
+        $('#myModal').modal('show');
+    });
+
+    $('#remove').click(function () {
+        if($('#table').bootstrapTable('getSelections').length == 0) {
+            return;
+        }
+
+        var id = $('#table').bootstrapTable('getSelections')[0].id;
+        bootbox.confirm("确认删除？",
+            function(result){
+                if(result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/daily-deposit/remove",
+                        traditional: true,
+                        data: {
+                            id: id
+                        },
+                        success: function(data){
+                            calculateBalance();
+                            $('#table').bootstrapTable('refresh');
+                        },
+                        error:function(xhr,state,errorThrown){
+                            alert("删除失败，请关闭网页重新尝试！");
+                        }
+                    });
+                }
+            })
+    });
+</script>
+</html>

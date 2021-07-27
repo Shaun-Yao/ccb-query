@@ -97,7 +97,7 @@ public class MysqlGenerator {
         strategy.setEnableSqlFilter(false);//since 3.3.1
         strategy.setNaming(NamingStrategy.underline_to_camel);
         strategy.setColumnNaming(NamingStrategy.underline_to_camel);
-        strategy.setSuperEntityClass("com.honji.order.IdEntity");
+        strategy.setSuperEntityClass("com.honji.order.BaseEntity");
         strategy.setEntityLombokModel(true);
         //strategy.setSuperControllerClass("com.honji.exhibition.BaseController");
         strategy.setInclude(scanner("表名"));

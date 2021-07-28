@@ -40,4 +40,9 @@ public class CashDifferenceServiceImpl extends ServiceImpl<CashDifferenceMapper,
         }
         return new PageInfo<>(differenceVOs);
     }
+
+    @Override
+    public List<DifferenceVO> listAll(DifferenceDTO dto) {
+        return differenceMapper.query(dto);
+    }
 }

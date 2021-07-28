@@ -26,6 +26,12 @@ public class DifferenceVO {
     private String shopName;
 
     /**
+     * 创建日期
+     */
+
+    private String createdTime;
+
+    /**
      * 小票日期
      * 这里使用localdate类型会有类型转换问题
      */
@@ -46,5 +52,13 @@ public class DifferenceVO {
      */
     private BigDecimal actualAmount;
 
+    /**
+     * 差额
+     */
+    private BigDecimal difference;
+
+    public BigDecimal getDifference(){
+        return amount.subtract(actualAmount);
+    }
 
 }

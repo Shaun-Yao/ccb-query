@@ -8,6 +8,8 @@ import com.honji.order.model.DepositVO;
 import com.honji.order.model.DifferenceDTO;
 import com.honji.order.model.DifferenceVO;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -19,4 +21,6 @@ import com.honji.order.model.DifferenceVO;
 public interface ICashDifferenceService extends IService<CashDifference> {
 
     PageInfo<DifferenceVO> query(DifferenceDTO dto);
+
+    List<DifferenceVO> listAll(DifferenceDTO dto);
 }

@@ -7,14 +7,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.honji.order.entity.Authority;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.CashDifference;
-import com.honji.order.model.BillDTO;
-import com.honji.order.model.DataGridResult;
-import com.honji.order.model.DepositDTO;
-import com.honji.order.model.DifferenceDTO;
+import com.honji.order.model.*;
 import com.honji.order.service.IAuthorityService;
 import com.honji.order.service.IBillService;
 import com.honji.order.service.ICashBalanceService;
 import com.honji.order.service.ICashDifferenceService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -22,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -107,5 +113,54 @@ public class CashDifferenceController {
     @ResponseBody
     public boolean remove(String id) {
         return differenceService.removeById(id);
+    }
+
+    @GetMapping("/export")
+    @ResponseBody
+    public void export(DifferenceDTO dto, HttpServletResponse response) {
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("sheet1");
+
+        String columnNames[] = { "店铺代码", "店铺名称", "填写时间", "小票日期", "小票单号", "小票金额", "实收金额", "差额"};// 列名
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+
+        Row headRow = sheet.createRow(0);
+        for (int i = 0; i < columnNames.length; i++) {
+            headRow.createCell(i).setCellValue(columnNames[i]);
+        }
+        List<DifferenceVO> differences = differenceService.listAll(dto);
+        for (int i = 0; i < differences.size(); i++) {
+            DifferenceVO difference = differences.get(i);
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(difference.getShopCode());
+            row.createCell(1).setCellValue(difference.getShopName());
+            Cell createdTimeCell = row.createCell(2);
+            Cell dateCell = row.createCell(3);
+            createdTimeCell.setCellValue(difference.getCreatedTime());
+            createdTimeCell.setCellStyle(cellStyle);
+            dateCell.setCellValue(difference.getDate());
+            dateCell.setCellStyle(cellStyle);
+
+            row.createCell(4).setCellValue(difference.getNumber());
+            row.createCell(5).setCellValue(difference.getAmount().doubleValue());
+            row.createCell(6).setCellValue(difference.getActualAmount().doubleValue());
+            row.createCell(7).setCellValue(difference.getDifference().doubleValue());
+
+        }
+
+        try {
+            response.reset();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("现金差额数据.xlsx", "utf-8"));
+            OutputStream out = response.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

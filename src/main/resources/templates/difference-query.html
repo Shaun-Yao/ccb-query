@@ -110,39 +110,18 @@
                 bootbox.confirm("确认导出？",
                     function (result) {
                         if (result) {
-                            var jobNum = $('#jobNum').val();
-                            var shopCodes = $('#shopCodes').val();
-                            // console.log($('#shopCodes').val());
-                            var begin = $('#begin').val();
-                            var end = $('#end').val();
-                            var depositBegin = $('#deposit-begin').val();
-                            var depositEnd = $('#deposit-end').val();
-                            window.location.href = "/cash-difference/export?jobNum=" + jobNum + "&shopCodes=" + shopCodes
-                                + "&begin=" + begin + "&end=" + end + "&depositBegin=" + depositBegin
-                                + "&depositEnd=" + depositEnd;
+                            let shopCodes = $('#shopCodes').val();
+                            let begin = $('#begin').val();
+                            let end = $('#end').val();
+                            window.location.href = "/cash-difference/export?shopCodes=" + shopCodes
+                                + "&begin=" + begin + "&end=" + end;
                         }
                     });
             }
 
         });
 
-        $('#save').click(function() {
-            if($('#form')[0].reportValidity()) {
-                //$('#form').submit();
-                $.ajax({
-                    type: "post",
-                    url: "/cash-difference/updateCashAdjustment",
-                    data: $('#form').serialize(),
-                    success: function(data){
-                        $('#myModal').modal('hide');
-                        $('#table').bootstrapTable('refresh');
-                    },
-                    error:function(xhr,state,errorThrown){
-                        alert("操作失败，请确认数据是否正确后重新尝试！");
-                    }
-                });
-            }
-        });
+
     });
 
     $('#table').bootstrapTable({
@@ -196,6 +175,9 @@
             field: 'shopName',
             title: '店铺名称'
         }, {
+            field: 'createdTime',
+            title: '填写时间'
+        }, {
             field: 'date',
             title: '小票日期'
         }, {
@@ -207,6 +189,9 @@
         }, {
             field: 'actualAmount',
             title: '实收金额'
+        }, {
+            field: 'difference',
+            title: '差额'
         }]
     });
 

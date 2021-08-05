@@ -3,6 +3,7 @@ package com.honji.order.service;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.CashDifference;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.honji.order.entity.PrivateTerminal;
 import com.honji.order.model.DepositDTO;
 import com.honji.order.model.DepositVO;
 import com.honji.order.model.DifferenceDTO;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 public interface ICashDifferenceService extends IService<CashDifference> {
 
+    PageInfo<CashDifference> listForIndex(int offset, int limit, String shopCode);
     PageInfo<DifferenceVO> query(DifferenceDTO dto);
 
     List<DifferenceVO> listAll(DifferenceDTO dto);

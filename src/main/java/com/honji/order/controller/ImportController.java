@@ -47,7 +47,7 @@ public class ImportController {
     @GetMapping("/index")
     public String index() {
 
-        return "index";
+        return null;
     }
 
 
@@ -92,7 +92,7 @@ public class ImportController {
                 Cell orderCell = row.getCell(17);
 
                 Cell tradeTypeCell = row.getCell(4);//交易类型
-                Cell remarkCell = row.getCell(19);//备注
+//                Cell remarkCell = row.getCell(19);//备注
 
                 String time = String.valueOf(dateCell.getLocalDateTimeCellValue().toLocalDate())
                         .trim().concat(" ").concat(timeCell.getStringCellValue().trim());
@@ -113,11 +113,12 @@ public class ImportController {
                 //String remark = remarkCell.getStringCellValue();
                 BillTypeEnum type = BillTypeEnum.BS_PAY;
 
+                //扫一扫账单已经迁到百胜刷卡账单
                 //如果备注字段为空并且交易类型为“消费” 则是扫一扫类型
-                if ((remarkCell == null || StringUtils.isBlank(remarkCell.getStringCellValue()))
-                        && "消费".equals(tradeType)) {
-                    type = BillTypeEnum.BS_SYS;
-                }
+//                if ((remarkCell == null || StringUtils.isBlank(remarkCell.getStringCellValue()))
+//                        && "消费".equals(tradeType)) {
+//                    type = BillTypeEnum.BS_SYS;
+//                }
 
                 Bill bill = new Bill(date, amount, fee, terminalNum,orderId,
                         merchant, null, type.getCode());
@@ -440,7 +441,7 @@ public class ImportController {
                 Cell amountCell = row.getCell(10);
                 Cell feeCell = row.getCell(12);
                 Cell orderCell = row.getCell(15);
-                Cell merchantCell = row.getCell(2);
+                Cell typeCell = row.getCell(3);//业务类型
 
                 String time = dateCell.getStringCellValue().trim().concat(" ")
                         .concat(timeCell.getStringCellValue().trim());
@@ -449,12 +450,15 @@ public class ImportController {
                 String terminalNum = terminalCell.getStringCellValue().trim();
                 double amount = amountCell.getNumericCellValue();
                 double fee = feeCell.getNumericCellValue();
-                String merchant = merchantCell.getStringCellValue().trim();
+                String typeStr = typeCell.getStringCellValue().trim();
                 String orderId = orderCell.getStringCellValue().trim();
-
+                BillTypeEnum type = BillTypeEnum.UNION_PAY;
+                //如果业务类型为“POS通总部清算” 则是扫一扫类型
+                if ("POS通总部清算".equals(typeStr)) {
+                    type = BillTypeEnum.BS_SYS;
+                }
                 Bill bill = new Bill(date, amount, fee, terminalNum,
-                        orderId, null, null, BillTypeEnum.UNION_PAY.getCode());
-//                BaiShengSwipe baiShengSwipe = new BaiShengSwipe(date, time, amount, fee, terminalNum, orderId, merchant, 3);
+                        orderId, null, null, type.getCode());
                 list.add(bill);
 
             }

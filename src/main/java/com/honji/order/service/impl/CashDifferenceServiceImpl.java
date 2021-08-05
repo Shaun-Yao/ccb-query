@@ -1,8 +1,10 @@
 package com.honji.order.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.CashDifference;
 import com.honji.order.mapper.CashBalanceMapper;
 import com.honji.order.mapper.CashDifferenceMapper;
@@ -30,6 +32,16 @@ public class CashDifferenceServiceImpl extends ServiceImpl<CashDifferenceMapper,
 
     @Autowired
     private CashDifferenceMapper differenceMapper;
+
+    @Override
+    public PageInfo<CashDifference> listForIndex(int offset, int limit, String shopCode) {
+        PageHelper.startPage(offset / limit + 1, limit);
+        QueryWrapper<CashDifference> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("shop_code", shopCode);
+        queryWrapper.orderByDesc("date");
+        List<CashDifference> differences = differenceMapper.selectList(queryWrapper);
+        return new PageInfo<>(differences);
+    }
 
     @Override
     public PageInfo<DifferenceVO> query(DifferenceDTO dto) {

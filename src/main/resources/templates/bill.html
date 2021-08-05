@@ -97,7 +97,7 @@
             $(this).remove();
         });
 
-    //百胜支付和扫一扫是同一份账单一起导入，所以隐藏百胜扫一扫选项
+    //扫一扫和银联是同一份账单一起导入，所以隐藏扫一扫选项
         $("#billTypeImport option[value='bs-sys']").each(function() {
             $(this).remove();
         });

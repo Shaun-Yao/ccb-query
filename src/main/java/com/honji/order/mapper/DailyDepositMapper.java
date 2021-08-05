@@ -109,7 +109,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
     @Select({"<script>",
             "SELECT deposit_result.*, authority.khmc FROM\n" +
                     "(SELECT erp_ls.khdm, erp_ls.rq AS DATE,\n" +
-                    " deposit.cash_adjustment,\n" +
+                    " deposit.id, deposit.cash_adjustment,\n" +
                     "刷卡 AS cardPay, 广发兑换券 AS cgbCoupon, 建行扫码 AS ccbZs,\n" +
                     "建行离线 AS ccbBs, 支付宝扫码 AS alipay, 微信扫码 AS wxpay, \n" +
                     "扫一扫 AS sys, 码上收 AS mss, 百胜扫码 AS bsPay, 商场代收款 AS mallCollection, 合胜收款 AS heSheng, deposit.cash, 储值卡消费 AS cardConsumption, \n" +
@@ -132,7 +132,7 @@ public interface DailyDepositMapper extends BaseMapper<DailyDeposit> {
                     "\t\tGROUP BY VW_LSXHJS.DM1, YSR, POSJS.JSMC, VW_LSXHJS.RQ ) result \n" +
                     "\t\tPIVOT ( SUM (JE) FOR JSMC IN (现金,刷卡,扫一扫,浦发扫码,建行扫码,建行离线,百胜扫码,码上收,储值卡消费,微信扫码,支付宝扫码, 礼券,会员积分,广发兑换券,商场代收款,合胜收款,悦扫码, 万达支付)) pm \n" +
                     "\t) erp_ls\n" +
-                    " LEFT JOIN daily_deposit deposit ON erp_ls.khdm = deposit.khdm AND erp_ls.rq = deposit.date \n" +
+                    " JOIN daily_deposit deposit ON erp_ls.khdm = deposit.khdm AND erp_ls.rq = deposit.date \n" +
                     " LEFT JOIN bank ON deposit.bank = bank.account \n" +
 
                     ") deposit_result\n" +

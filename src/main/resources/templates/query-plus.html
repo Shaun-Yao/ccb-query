@@ -292,11 +292,11 @@
             $('#cashAdjustment').val(row.cashAdjustment);
             $('#myModal').modal('show');
         },
-        columns: [ /*{
+        columns: [ {
             field: 'id',
             title: 'ID',
             visible: false
-        },*/ {
+        }, {
             field: 'khdm',
             title: '店铺代码',
             width: '100'
@@ -413,8 +413,11 @@
             title: '票据',
             width: '80',
             formatter: function (value, row, index) {
-                //console.log(value);
-                return "<a href='#' class='image' onclick=showImage('" + value + "')>查看</a>";
+                if (value == null) {
+                    return "无";
+                } else {
+                    return "<a href='#' class='image' onclick=showImage('" + value + "')>查看</a>";
+                }
             }
         }]
     });

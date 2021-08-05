@@ -9,7 +9,6 @@ import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.CashDifference;
 import com.honji.order.model.*;
 import com.honji.order.service.IAuthorityService;
-import com.honji.order.service.IBillService;
 import com.honji.order.service.ICashBalanceService;
 import com.honji.order.service.ICashDifferenceService;
 import org.apache.poi.ss.usermodel.Cell;
@@ -73,11 +72,8 @@ public class CashDifferenceController {
     @GetMapping("/list")
     public DataGridResult list(@RequestParam(defaultValue = "0") int offset, @RequestParam int limit,
                                @RequestParam String shopCode) {
-        IPage<CashDifference> page = new Page<>(offset / limit + 1, limit);
-        QueryWrapper<CashDifference> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("shop_code", shopCode);
-        queryWrapper.orderByDesc("date");
-        return new DataGridResult(differenceService.page(page, queryWrapper));
+
+        return new DataGridResult(differenceService.listForIndex(offset, limit, shopCode));
     }
 
     @GetMapping("/to-query")

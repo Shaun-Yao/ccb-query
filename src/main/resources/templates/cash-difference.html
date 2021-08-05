@@ -104,7 +104,7 @@
         tomorrow.setDate(new Date().getDate()+1);
         before31days.setDate(new Date().getDate() - 31);
 
-        $('input[type=date]').attr("min", "2021-06-30");
+        $('input[type=date]').attr("min", "2021-08-01");
         $('input[type=date]').attr("max", parseDate(tomorrow));
 
 
@@ -193,21 +193,27 @@
 
     $('#save').click(function() {
         if($('#form')[0].reportValidity()) {
+            let amount = $('#amount').val();
+            let actualAmount = $('#actualAmount').val();
+            if(amount === actualAmount) {
+                bootbox.alert('小票金额与实收金额不允许相等');
+            } else {
+                $('#save').attr("disabled", true);//屏蔽提交按钮
+                $.ajax({
+                    type: "post",
+                    url: "/cash-difference/save",
+                    data: $('#form').serialize(),
+                    success: function(data){
+                        $('#myModal').modal('hide');
+                        $('#table').bootstrapTable('refresh');
+                        $('#save').attr("disabled", false);//提交成功后激活提交按钮
+                    },
+                    error: function(data){
+                        alert("保存失败，请确认日期小票单号是否重复！");
+                    }
+                });
+            }
 
-            $('#save').attr("disabled", true);//屏蔽提交按钮
-            $.ajax({
-                type: "post",
-                url: "/cash-difference/save",
-                data: $('#form').serialize(),
-                success: function(data){
-                    $('#myModal').modal('hide');
-                    $('#table').bootstrapTable('refresh');
-                    $('#save').attr("disabled", false);//提交成功后激活提交按钮
-                },
-                error: function(data){
-                    alert("保存失败，请关闭网页重新尝试！");
-                }
-            });
         }
     });
 

@@ -7,7 +7,6 @@
 
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
-    <link rel="stylesheet" href="/webjars/weui/1.1.2/dist/style/weui.min.css" />
 </head>
 <body>
 
@@ -76,12 +75,12 @@
         </div><!-- /.modal -->
     </div><!-- 模态框（Modal）end -->
 
-<script src="/webjars/jquery/3.1.1/jquery.min.js"></script><script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="/webjars/jquery-form/4.2.2/jquery.form.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
 <script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
-<script src="/webjars/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
 </body>
 <script th:inline="javascript">
 
@@ -193,8 +192,8 @@
 
     $('#save').click(function() {
         if($('#form')[0].reportValidity()) {
-            let amount = $('#amount').val();
-            let actualAmount = $('#actualAmount').val();
+            var amount = $('#amount').val();
+            var actualAmount = $('#actualAmount').val();
             if(amount === actualAmount) {
                 bootbox.alert('小票金额与实收金额不允许相等');
             } else {

@@ -11,7 +11,7 @@ public enum BillTypeEnum {
     BS_PAY("bs-pay", "百胜支付"),
     BS_SYS("bs-sys", "扫一扫"),
     BS_MSS("bs-mss", "百胜码上收"),
-    BS_SK("bs-sk", "百胜刷卡"),
+//    BS_SK("bs-sk", "百胜刷卡"),
     PF_SK("pf-sk", "浦发刷卡"),
     PF_SM("pf-sm", "浦发扫码"),
     UNION_PAY("union-pay", "银联刷卡"),

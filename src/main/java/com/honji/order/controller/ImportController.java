@@ -236,12 +236,11 @@ public class ImportController {
      * @return
      * @throws IOException
      */
-    @ResponseBody
+   /* @ResponseBody
     @PostMapping("/bs-sk")
     public boolean bssk(@RequestParam MultipartFile file) throws IOException {
 
         String fileName = file.getOriginalFilename();
-        //checkFile(file);
         //获得Workbook工作薄对象
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
@@ -277,8 +276,6 @@ public class ImportController {
                 Cell orderCell = row.getCell(9);
                 Cell merchantCell = row.getCell(14);
 
-//                System.out.println(timeCell.getLocalDateTimeCellValue());
-
                 //百胜刷卡刷卡认“清算日期”,而清算日期没有时间，需要在交易时间列获取时间，但交易时间又包含了日期，所以需要拆分
                 String timeVal = timeCell.getLocalDateTimeCellValue().toLocalTime().format(timeFormatter);
                 String time = dateCell.getStringCellValue().trim().concat(" ").concat(timeVal);
@@ -292,7 +289,6 @@ public class ImportController {
 
                 Bill bill = new Bill(date, amount, fee, terminalNum,
                         orderId, merchant, null, BillTypeEnum.BS_SK.getCode());
-//                Bill bill = new Bill(date, amount, fee, terminalNum, orderId, merchant, 1);
                 list.add(bill);
 
             }
@@ -314,7 +310,7 @@ public class ImportController {
         list = null;//释放list
         System.gc();
         return result;
-    }
+    }*/
 
     /**
      * 浦发刷卡

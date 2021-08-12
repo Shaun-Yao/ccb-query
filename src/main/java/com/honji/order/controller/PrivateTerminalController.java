@@ -1,16 +1,9 @@
 package com.honji.order.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.honji.order.entity.Bill;
-import com.honji.order.entity.CashDifference;
 import com.honji.order.entity.PrivateTerminal;
-import com.honji.order.enums.BillTypeEnum;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DifferenceDTO;
-import com.honji.order.model.DifferenceVO;
 import com.honji.order.service.IPrivateTerminalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -26,8 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,16 +95,20 @@ public class PrivateTerminalController {
                 Cell bsMssCell = row.getCell(2);
                 Cell yuePayCell = row.getCell(3);
                 Cell unionSysCell = row.getCell(4);
-                Cell topUpCell = row.getCell(5);
+                Cell unionPayCell = row.getCell(5);
+                Cell topUpCell = row.getCell(6);
 
                 String shopCode = shopCodeCell.getStringCellValue().trim();
-                String bsPay = bsPayCell.getStringCellValue().trim();
-                String bsMss = bsMssCell.getStringCellValue().trim();
-                String yuePay = yuePayCell.getStringCellValue().trim();
-                String unionSys = unionSysCell.getStringCellValue().trim();
-                String topUp = topUpCell.getStringCellValue().trim();
 
-                PrivateTerminal terminal = new PrivateTerminal(shopCode, bsPay, bsMss, yuePay, unionSys, topUp);
+                DataFormatter dataFormatter = new DataFormatter();
+                String bsPay = dataFormatter.formatCellValue(bsPayCell);
+                String bsMss = dataFormatter.formatCellValue(bsMssCell);
+                String yuePay = dataFormatter.formatCellValue(yuePayCell);
+                String unionSys = dataFormatter.formatCellValue(unionSysCell);
+                String unionPay = dataFormatter.formatCellValue(unionPayCell);
+                String topUp = dataFormatter.formatCellValue(topUpCell);
+
+                PrivateTerminal terminal = new PrivateTerminal(shopCode, bsPay, bsMss, yuePay, unionSys, unionPay, topUp);
                 list.add(terminal);
 
             }
@@ -146,7 +141,8 @@ public class PrivateTerminalController {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("sheet1");
 
-        String columnNames[] = { "店铺代码", "百胜支付终端码", "码上收终端码", "悦支付终端码", "银联扫一扫终端码", "充值终端码"};// 列名
+        String columnNames[] = { "店铺代码", "百胜支付终端码", "码上收终端码", "悦支付终端码",
+                "银联扫一扫终端码", "银联刷卡终端码", "充值终端码"};// 列名
 
         Row headRow = sheet.createRow(0);
         for (int i = 0; i < columnNames.length; i++) {
@@ -156,12 +152,13 @@ public class PrivateTerminalController {
         for (int i = 0; i < terminals.size(); i++) {
             PrivateTerminal terminal = terminals.get(i);
             Row row = sheet.createRow(i + 1);
-            row.createCell(0).setCellValue(terminal.getShopCode());
+            row.createCell(0).setCellValue(terminal.getKhdm());
             row.createCell(1).setCellValue(terminal.getBsPay());
             row.createCell(2).setCellValue(terminal.getBsMss());
             row.createCell(3).setCellValue(terminal.getYuePay());
             row.createCell(4).setCellValue(terminal.getUnionSys());
-            row.createCell(5).setCellValue(terminal.getTopUp());
+            row.createCell(5).setCellValue(terminal.getUnionPay());
+            row.createCell(6).setCellValue(terminal.getTopUp());
 
         }
 

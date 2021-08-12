@@ -36,10 +36,10 @@
                         <input type="hidden" id="id" name="id" >
 
                         <div class="form-group">
-                            <label for="shopCode" class="col-sm-2 control-label">店铺代码</label>
+                            <label for="khdm" class="col-sm-2 control-label">店铺代码</label>
                             <div class="col-sm-8">
                                 <input type="text" maxlength="10" class="form-control"
-                                       id="shopCode" name="shopCode" required >
+                                       id="khdm" name="khdm" required >
                             </div>
                         </div>
                         <div class="form-group">
@@ -71,6 +71,14 @@
                             <div class="col-sm-8">
                                 <input type="text" pattern="\d{8}" maxlength="8" class="form-control"
                                        id="unionSys" name="unionSys" required >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="unionPay" class="col-sm-2 control-label">银联刷卡终端码</label>
+                            <div class="col-sm-8">
+                                <input type="text" pattern="\d{8}" maxlength="8" class="form-control"
+                                       id="unionPay" name="unionPay" required >
                             </div>
                         </div>
 
@@ -168,11 +176,12 @@
                 success: function(data){
                     $('#form').clearForm();
                     $('#id').val(data.id);
-                    $('#shopCode').val(data.shopCode);
+                    $('#khdm').val(data.khdm);
                     $('#bsPay').val(data.bsPay);
                     $('#bsMss').val(data.bsMss);
                     $('#yuePay').val(data.yuePay);
                     $('#unionSys').val(data.unionSys);
+                    $('#unionPay').val(data.unionPay);
                     $('#topUp').val(data.topUp);
                 }
             });
@@ -191,7 +200,7 @@
             title: 'ID',
             visible: false
         }, {
-            field: 'shopCode',
+            field: 'khdm',
             title: '店铺代码'
         }, {
             field: 'bsPay',
@@ -205,6 +214,9 @@
         }, {
             field: 'unionSys',
             title: '银联扫一扫终端码'
+        }, {
+            field: 'unionPay',
+            title: '银联刷卡终端码'
         }, {
             field: 'topUp',
             title: '充值终端码'
@@ -226,7 +238,8 @@
                     $('#save').attr("disabled", false);//提交成功后激活提交按钮
                 },
                 error: function(data){
-                    alert("保存失败，请关闭网页重新尝试！");
+                    alert("保存失败，请确认所填终端号是否与其它店重复！");
+                    $('#save').attr("disabled", false);//激活提交按钮
                 }
             });
         }
@@ -272,7 +285,7 @@
                             alert("导入成功！");
                             $('#table').bootstrapTable('refresh');
                         } else {
-                            alert("导入失败或者账单没有数据，请确认后重新尝试！");
+                            alert("导入失败，请确认终端号是否重复或已经存在！");
                         }
 
                     },

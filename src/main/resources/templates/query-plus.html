@@ -29,7 +29,6 @@
                 <select class="form-control" name="shopCodes" id="shopCodes" multiple required
                         data-live-search="true" data-actions-box="true"
                         data-selected-text-format="count">
-                    <!--<option value=""></option>-->
                     <option th:each="authority : ${authorities}"
                             th:value="${authority.khdm}" th:text="${authority.khmc}">
                     </option>
@@ -141,6 +140,10 @@
 <script th:inline="javascript">
 
     $(function () {
+
+        $('#shopCodes').selectpicker();
+        $('#table').bootstrapTable('refresh');
+
         //禁止数字框，日期框滚轮修改数据
         $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
             $(this).on('wheel.disableScroll', function (e) {
@@ -160,7 +163,8 @@
             minDate : '2020-06-30',
             maxDate : moment().add('d', 1).toDate() //最大日期为1天后，即明天
         });
-        $('#shopCodes').selectpicker();
+
+
         $("#gallery").on("click", function(){
             //console.log(2323);
             $("#gallery").fadeOut(100);
@@ -179,17 +183,11 @@
 
         $('#exportBtn').click(function () {
             if($('#resource-form')[0].reportValidity()) {
-                var shopCodes = $('#shopCodes').val();
-                // if(shopCodes.length > 50) {
-                //     alert("查询店铺数量超过50家,请减少后再导出！");
-                //     return;
-                // }
                 bootbox.confirm("确认导出？",
                     function (result) {
                         if (result) {
                             var jobNum = $('#jobNum').val();
                             var shopCodes = $('#shopCodes').val();
-                            // console.log($('#shopCodes').val());
                             var begin = $('#begin').val();
                             var end = $('#end').val();
                             var depositBegin = $('#deposit-begin').val();
@@ -327,7 +325,7 @@
         }, {
             field: 'pos',
             title: 'POS机',
-            width: '160'
+            width: '80'
         }, {
             field: 'cgbCoupon',
             title: '广发兑换券',
@@ -375,7 +373,7 @@
         }, {
             field: 'memberPoints',
             title: '会员积分',
-            width: '200'
+            width: '80'
         }, {
             field: 'cardConsumption',
             title: '储值卡消费',
@@ -423,7 +421,6 @@
     });
 
     function showImage(fileName) {
-        // console.log(23423);
         var image = new Image();
         image.src = "/daily-deposit/showImage?fileName=" + fileName;
         var viewer = new Viewer(image, {

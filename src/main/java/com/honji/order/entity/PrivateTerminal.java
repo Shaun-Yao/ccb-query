@@ -19,19 +19,21 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class PrivateTerminal extends IdEntity {
     public PrivateTerminal(String shopCode, String bsPay, String bsMss,
-                           String yuePay, String unionSys, String topUp) {
-        this.shopCode = shopCode;
+                           String yuePay, String unionSys, String unionPay, String topUp) {
+        this.khdm = shopCode;
         this.bsPay = bsPay;
         this.bsMss = bsMss;
         this.yuePay = yuePay;
         this.unionSys = unionSys;
+        this.unionSys = unionSys;
+        this.unionPay = unionPay;
         this.topUp = topUp;
     }
 
     /**
      * 店铺代码
      */
-    private String shopCode;
+    private String khdm;
 
     /**
      * 百胜支付终端码
@@ -52,6 +54,11 @@ public class PrivateTerminal extends IdEntity {
      * 银联扫一扫终端码
      */
     private String unionSys;
+
+    /**
+     * 银联刷卡
+     */
+    private String unionPay;
 
     /**
      * 充值终端码

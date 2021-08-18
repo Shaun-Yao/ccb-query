@@ -18,11 +18,10 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class PrivateTerminal extends IdEntity {
-    public PrivateTerminal(String shopCode, String bsPay, String bsMss,
+    public PrivateTerminal(String shopCode, String bsPay,
                            String yuePay, String unionSys, String unionPay, String topUp) {
         this.khdm = shopCode;
         this.bsPay = bsPay;
-        this.bsMss = bsMss;
         this.yuePay = yuePay;
         this.unionSys = unionSys;
         this.unionSys = unionSys;
@@ -43,7 +42,7 @@ public class PrivateTerminal extends IdEntity {
     /**
      * 码上收终端码
      */
-    private String bsMss;
+//    private String bsMss;
 
     /**
      * 悦支付终端码

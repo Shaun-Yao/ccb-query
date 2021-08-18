@@ -1,12 +1,11 @@
 package com.honji.order.controller;
 
 
-import com.honji.order.entity.PrivateTerminal;
+import com.honji.order.entity.PublicTerminal;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DifferenceDTO;
-import com.honji.order.service.IPrivateTerminalService;
+import com.honji.order.service.IPublicTerminalService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -29,26 +28,25 @@ import java.util.List;
  * </p>
  *
  * @author yao
- * @since 2021-07-31
+ * @since 2021-08-12
  */
 @Slf4j
 @Controller
-@RequestMapping("/private-terminal")
-public class PrivateTerminalController {
-
+@RequestMapping("/public-terminal")
+public class PublicTerminalController {
 
     @Autowired
-    private IPrivateTerminalService terminalService;
+    private IPublicTerminalService terminalService;
 
 
     @GetMapping("/index")
     public String index() {
-        return "private-terminal";
+        return "public-terminal";
     }
 
     @ResponseBody
     @GetMapping("/get")
-    public PrivateTerminal get(@RequestParam String id) {
+    public PublicTerminal get(@RequestParam String id) {
         return terminalService.getById(id);
     }
 
@@ -61,7 +59,7 @@ public class PrivateTerminalController {
 
     @ResponseBody
     @PostMapping("/save")
-    public boolean save(@ModelAttribute PrivateTerminal terminal) {
+    public boolean save(@ModelAttribute PublicTerminal terminal) {
         return terminalService.saveOrUpdate(terminal);
     }
 
@@ -72,7 +70,7 @@ public class PrivateTerminalController {
         String fileName = file.getOriginalFilename();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-        List<PrivateTerminal> list = new ArrayList<>();
+        List<PublicTerminal> list = new ArrayList<>();
         boolean result = false;
         if (workbook != null) {
 
@@ -92,22 +90,18 @@ public class PrivateTerminalController {
                 }
 
                 Cell shopCodeCell = row.getCell(0);
-                Cell bsPayCell = row.getCell(1);
-                Cell yuePayCell = row.getCell(2);
-                Cell unionSysCell = row.getCell(3);
-                Cell unionPayCell = row.getCell(4);
-                Cell topUpCell = row.getCell(5);
+                Cell ccbCell = row.getCell(1);
+                Cell posCell = row.getCell(2);
+                Cell topUpCell = row.getCell(3);
 
                 String shopCode = shopCodeCell.getStringCellValue().trim();
 
                 DataFormatter dataFormatter = new DataFormatter();
-                String bsPay = dataFormatter.formatCellValue(bsPayCell);
-                String yuePay = dataFormatter.formatCellValue(yuePayCell);
-                String unionSys = dataFormatter.formatCellValue(unionSysCell);
-                String unionPay = dataFormatter.formatCellValue(unionPayCell);
+                String ccb = dataFormatter.formatCellValue(ccbCell);
+                String pos = dataFormatter.formatCellValue(posCell);
                 String topUp = dataFormatter.formatCellValue(topUpCell);
 
-                PrivateTerminal terminal = new PrivateTerminal(shopCode, bsPay, yuePay, unionSys, unionPay, topUp);
+                PublicTerminal terminal = new PublicTerminal(shopCode, ccb, pos, topUp);
                 list.add(terminal);
 
             }
@@ -116,14 +110,14 @@ public class PrivateTerminalController {
             try {
                 result = terminalService.saveBatch(list);
             } catch (Exception e) {
-                log.error("私户终端号 {} 导入出现异常 {}", fileName, e.getMessage());
+                log.error("公户终端号 {} 导入出现异常 {}", fileName, e.getMessage());
                 //e.printStackTrace();
             }
             long end = System.currentTimeMillis();
             if (result) {
-                log.info("私户终端号 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+                log.info("公户终端号 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
             } else {
-                log.error("私户终端号 {} 导入失败", fileName);
+                log.error("公户终端号 {} 导入失败", fileName);
             }
 
         }
@@ -139,31 +133,26 @@ public class PrivateTerminalController {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("sheet1");
-
-        String columnNames[] = { "店铺代码", "百胜支付终端码", "悦支付终端码",
-                "银联扫一扫终端码", "银联刷卡终端码", "充值终端码"};// 列名
+        String columnNames[] = { "店铺代码", "建行终端码", "浦发刷卡或银联刷卡终端码", "充值终端码"};// 列名
 
         Row headRow = sheet.createRow(0);
         for (int i = 0; i < columnNames.length; i++) {
             headRow.createCell(i).setCellValue(columnNames[i]);
         }
-        List<PrivateTerminal> terminals = terminalService.list();
+        List<PublicTerminal> terminals = terminalService.list();
         for (int i = 0; i < terminals.size(); i++) {
-            PrivateTerminal terminal = terminals.get(i);
+            PublicTerminal terminal = terminals.get(i);
             Row row = sheet.createRow(i + 1);
             row.createCell(0).setCellValue(terminal.getKhdm());
-            row.createCell(1).setCellValue(terminal.getBsPay());
-            row.createCell(2).setCellValue(terminal.getYuePay());
-            row.createCell(3).setCellValue(terminal.getUnionSys());
-            row.createCell(4).setCellValue(terminal.getUnionPay());
-            row.createCell(5).setCellValue(terminal.getTopUp());
-
+            row.createCell(1).setCellValue(terminal.getCcb());
+            row.createCell(2).setCellValue(terminal.getPos());
+            row.createCell(3).setCellValue(terminal.getTopUp());
         }
 
         try {
             response.reset();
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("私户终端号.xlsx", "utf-8"));
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("公户终端号.xlsx", "utf-8"));
             OutputStream out = response.getOutputStream();
             workbook.write(out);
             out.flush();
@@ -179,5 +168,4 @@ public class PrivateTerminalController {
     public boolean remove(@RequestParam List<String> ids) {
         return terminalService.removeByIds(ids);
     }
-
 }

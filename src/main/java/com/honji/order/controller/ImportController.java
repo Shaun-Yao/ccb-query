@@ -484,7 +484,7 @@ public class ImportController {
      * @return
      * @throws IOException
      */
-    @ResponseBody
+    /*@ResponseBody
     @PostMapping("/bs-mss")
     public boolean mss(@RequestParam MultipartFile file) throws IOException {
 
@@ -554,7 +554,7 @@ public class ImportController {
         System.gc();
         return result;
     }
-
+*/
 
     /**
      * 建行

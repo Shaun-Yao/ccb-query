@@ -1,6 +1,5 @@
 package com.honji.order;
 
-import com.honji.order.service.ICcbOrderService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -16,7 +15,7 @@ import java.util.Map;
 public class CcbAccountQry
 {
     @Autowired
-    private static ICcbOrderService ccbOrderService;
+//    private static ICcbOrderService ccbOrderService;
     //@SuppressWarnings("unchecked")
 	public static void main(String[] args)throws Exception     
     {

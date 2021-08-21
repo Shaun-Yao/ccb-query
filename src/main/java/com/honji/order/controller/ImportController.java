@@ -57,7 +57,7 @@ public class ImportController {
      * @return
      * @throws IOException
      */
-    @ResponseBody
+    /*@ResponseBody
     @PostMapping("bs-pay")
     public boolean baiShengPay(@RequestParam MultipartFile file) throws IOException {
 
@@ -120,6 +120,85 @@ public class ImportController {
 //                    type = BillTypeEnum.BS_SYS;
 //                }
 
+                Bill bill = new Bill(date, amount, fee, terminalNum,orderId,
+                        merchant, null, type.getCode());
+                list.add(bill);
+
+            }
+            long start = System.currentTimeMillis();
+
+            try {
+                result = billService.saveBatch(list);
+            } catch (Exception e) {
+                log.error("百胜支付 {} 导入出现异常 {}", fileName, e.getMessage());
+                //e.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            if (result) {
+                log.info("百胜支付 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+            } else {
+                log.error("百胜支付 {} 导入失败", fileName);
+            }
+
+        }
+        list = null;//释放list
+        System.gc();
+        return result;
+    }*/
+
+
+    @ResponseBody
+    @PostMapping("bs-pay")
+    public boolean baiShengPay(@RequestParam MultipartFile file) throws IOException {
+
+        String fileName = file.getOriginalFilename();
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        List<Bill> list = new ArrayList<>();
+        boolean result = false;
+        if (workbook != null) {
+
+            //获得当前sheet工作表
+            Sheet sheet = workbook.getSheetAt(0);
+            //获得当前sheet的开始行
+            int firstRowNum = sheet.getFirstRowNum() + 4;
+            //获得当前sheet的结束行
+            int lastRowNum = sheet.getLastRowNum();
+
+            //循环除了所有行,从第5行开始
+            for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
+                //获得当前行
+                Row row = sheet.getRow(rowNum);
+                if (row == null) {
+                    continue;
+                }
+
+                Cell dateCell = row.getCell(0);//百胜支付认“清算日期”
+                Cell timeCell = row.getCell(2);
+                Cell terminalCell = row.getCell(3);
+                Cell amountCell = row.getCell(4);
+                Cell feeCell = row.getCell(6);
+                Cell merchantCell = row.getCell(13);
+                Cell orderCell = row.getCell(17);
+
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                //百胜支付认“清算日期”,而清算日期没有时间，需要在交易时间列获取时间，但交易时间又包含了日期，所以需要拆分
+                String timeVal = timeCell.getLocalDateTimeCellValue().toLocalTime().format(timeFormatter);
+                String time = dateCell.getStringCellValue().trim().concat(" ").concat(timeVal);
+                LocalDateTime date = LocalDateTime.parse(time, unhyphenatedFormatter);
+                String terminalNum;
+                if (terminalCell.getCellType() == CellType.STRING) {
+                    terminalNum = terminalCell.getStringCellValue().trim();
+                } else { //不是string 就是Numeric
+                    int num = (int) terminalCell.getNumericCellValue();
+                    terminalNum = String.valueOf(num);
+                }
+                double amount = amountCell.getNumericCellValue();
+                double fee = feeCell.getNumericCellValue();
+                String merchant = merchantCell.getStringCellValue().trim();
+                String orderId = orderCell.getStringCellValue().trim();
+
+                BillTypeEnum type = BillTypeEnum.BS_PAY;
                 Bill bill = new Bill(date, amount, fee, terminalNum,orderId,
                         merchant, null, type.getCode());
                 list.add(bill);

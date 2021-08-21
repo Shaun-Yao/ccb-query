@@ -2,9 +2,7 @@ package com.honji.order.schedule;
 
 import com.honji.order.HttpClientUtil;
 import com.honji.order.MD5;
-import com.honji.order.entity.CcbOrder;
 import com.honji.order.entity.CcbPos;
-import com.honji.order.service.ICcbOrderService;
 import com.honji.order.service.ICcbPosService;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
@@ -26,8 +24,8 @@ import java.util.*;
 @EnableAsync
 public class ScheduleTask {
 
-    @Autowired
-    private ICcbOrderService ccbOrderService;
+//    @Autowired
+//    private ICcbOrderService ccbOrderService;
     @Autowired
     private ICcbPosService ccbPosService;
 
@@ -78,14 +76,15 @@ public class ScheduleTask {
         }
 */
 
-        for (CcbPos ccbPos : ccbPosList) {
-            save(ccbPos.getKhdm(), ccbPos.getPosId(), yesterday, 1);
-            Thread.sleep(SLEEP_TIME);
-        }
+//        for (CcbPos ccbPos : ccbPosList) {
+//            save(ccbPos.getKhdm(), ccbPos.getPosId(), yesterday, 1);
+//            Thread.sleep(SLEEP_TIME);
+//        }
 
     }
 
 
+/*
 
     private void save(String khdm, String posId, LocalDate date, int page) throws InterruptedException {
 
@@ -142,6 +141,7 @@ public class ScheduleTask {
         }
 
     }
+*/
 
     private String request(String posId, LocalDate date, int page) {
         String MERCHANTID ="105000151314578";

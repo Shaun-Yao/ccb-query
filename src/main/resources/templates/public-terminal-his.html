@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Hello, Bootstrap Table!</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
+</head>
+<body>
+
+    <table id="table" class="modal-body"></table>
+    <div id="datagrid" >
+        <button type="button" class="btn btn-success" id="add">新增</button>
+        <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <button type="button" class="btn btn-primary" id="exportBtn">导出</button>
+        <button type="button" class="btn btn-info" id="importBtn">导入</button>
+
+        <form id="import-form">
+            <input type="file" class="form-lable" name="file" id="file" required
+                   accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+
+        </form>
+
+        <form class="form-inline" id="search-form">
+            <div class="form-group">
+                <label for="date" class="form-lable">日期：</label>
+                <input type="date" class="form-control" name="date" id="date">
+            </div>
+            <div class="form-group">
+                <label for="search" class="form-lable">关键字：</label>
+                <input type="text" class="form-control" name="search" id="search">
+            </div>
+            <button type="button" class="btn btn-primary" id="query">查询</button>
+        </form>
+
+    </div>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">销售信息</h4>
+                </div>
+                <form class="form-horizontal" id="form" role="form"  method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="id" name="id" >
+
+                        <div class="form-group">
+                            <label for="khdm" class="col-sm-2 control-label">店铺代码</label>
+                            <div class="col-sm-8">
+                                <input type="text" maxlength="10" class="form-control"
+                                       id="khdm" name="khdm" required >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ccb" class="col-sm-2 control-label">建行终端码</label>
+                            <div class="col-sm-8">
+                                <input type="text" maxlength="10" class="form-control"
+                                       id="ccb" name="ccb" required >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pos" class="col-sm-2 control-label">浦发刷卡或银联刷卡终端码</label>
+                            <div class="col-sm-8">
+                                <input type="text" maxlength="10" class="form-control"
+                                       id="pos" name="pos" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="topUp" class="col-sm-2 control-label">充值终端码</label>
+                            <div class="col-sm-8">
+                                <input type="text" maxlength="10" class="form-control"
+                                       id="topUp" name="topUp" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="createdDate" class="col-sm-2 control-label">日期</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" name="createdDate" id="createdDate">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="save" class="btn btn-primary">提交更改</button>
+                    </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div><!-- 模态框（Modal）end -->
+
+<script src="/webjars/jquery/3.1.1/jquery.min.js"></script><script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery-form/4.2.2/jquery.form.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
+</body>
+<script th:inline="javascript">
+
+    $(function () {
+        $('#query').click(function () {
+            $('#table').bootstrapTable('refresh',
+                {ajaxOption:{
+                        data: $('#resource-form').serialize()
+                    }
+                });
+        });
+    });
+
+
+    $('#table').bootstrapTable({
+        url: '/public-terminal-his/list',
+        pagination: true,
+        sidePagination: "server",
+        locale: 'zh-CN',
+
+        toolbar: "#datagrid",
+        clickToSelect: true,
+        singleSelect: false,
+        sortable: true,
+        smartDisplay: false,
+        pageNumber: 1,     //初始化加载第一页，默认第一页
+        pageSize: 10,      //每页的记录行数（*）
+        queryParams: function (params) {
+            params.date = $('#date').val();
+            params.search = $('#search').val();
+            return params;
+        },
+        onClickRow: function (row, $element) {
+            //console.log(row.id);
+        },
+        onDblClickRow: function (row, $element) {
+            $.ajax({
+                type: "GET",
+                url: "/public-terminal-his/get?id=" + row.id,
+                async: false,
+                success: function(data){
+                    $('#form').clearForm();
+                    $('#id').val(data.id);
+                    $('#khdm').val(data.khdm);
+                    $('#ccb').val(data.ccb);
+                    $('#pos').val(data.pos);
+                    $('#topUp').val(data.topUp);
+                    $('#createdDate').val(data.createdDate);
+                }
+            });
+            $('#myModal').modal('show');
+        },
+        columns: [ {
+            field: '',
+            checkbox: true, // 显示一个勾选框
+            align: 'center', // 居中显示
+        },{
+            field: 'id',
+            title: 'ID',
+            visible: false
+        }, {
+            field: 'khdm',
+            title: '店铺代码'
+        }, {
+            field: 'ccb',
+            title: '建行终端码'
+        }, {
+            field: 'pos',
+            title: '浦发刷卡或银联刷卡终端码'
+        }, {
+            field: 'topUp',
+            title: '充值终端码'
+        }, {
+            field: 'createdDate',
+            title: '日期'
+        }]
+    });
+
+
+    $('#save').click(function() {
+        if($('#form')[0].reportValidity()) {
+
+            $('#save').attr("disabled", true);//屏蔽提交按钮
+            $.ajax({
+                type: "post",
+                url: "/public-terminal-his/save",
+                data: $('#form').serialize(),
+                success: function(data){
+                    $('#myModal').modal('hide');
+                    $('#table').bootstrapTable('refresh');
+                    $('#save').attr("disabled", false);//提交成功后激活提交按钮
+                },
+                error: function(data){
+                    alert("保存失败，请确认所填终端号是否与其它店重复！");
+                    $('#save').attr("disabled", false);//激活提交按钮
+                }
+            });
+        }
+    });
+
+    $('#add').click(function () {
+        $('#form').resetForm();
+        $('#id').val('');
+        $('#myModal').modal('show');
+    });
+
+    $('#exportBtn').click(function () {
+        let date = $('#date').val();
+        if (date === '') {
+            bootbox.alert('请选择日期！');
+            return;
+        }
+        bootbox.confirm("确认导出？",
+            function (result) {
+                if (result) {
+                    window.location.href = "/public-terminal-his/export?date=" + $('#date').val();
+                }
+            });
+    });
+
+    $('#importBtn').click(function () {
+
+        if($('#import-form')[0].reportValidity()) {
+            let file = $('#file')[0].files[0];
+
+            if (file != undefined) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("文件超过5M，不允许上传");
+                    return;
+                }
+                let formData = new FormData();
+                formData.append('file', file);
+                $.ajax({
+                    url: "/public-terminal-his/import/",
+                    type: "POST",
+                    async: false,
+                    cache: false,
+                    processData: false,// 告诉jQuery不要去处理发送的数据
+                    contentType: false,// 告诉jQuery不要去设置Content-Type请求头
+                    data: formData,
+                    success: function(result){
+                        if (result) {
+                            alert("导入成功！");
+                            $('#table').bootstrapTable('refresh');
+                        } else {
+                            alert("导入失败，请确认终端号是否重复或已经存在！");
+                        }
+
+                    },
+                    error:function(xhr,state,errorThrown){
+                        alert("导入出现错误，请重新尝试！");
+                    }
+                });
+            } else {
+                alert("您还未选择文件！");
+            }
+        }
+    });
+
+    $('#remove').click(function () {
+        if($('#table').bootstrapTable('getSelections').length == 0) {
+            return;
+        }
+
+        let ids = [];
+        $.each($('#table').bootstrapTable('getSelections'), function(index, item){
+            ids.push(item.id);
+        });
+        bootbox.confirm("确认删除？",
+            function(result){
+                if(result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/public-terminal-his/remove",
+                        traditional: true,
+                        data: {
+                            ids: ids
+                        },
+                        success: function(data){
+                            $('#table').bootstrapTable('refresh');
+                        },
+                        error:function(xhr,state,errorThrown){
+                            alert("删除失败，请关闭网页重新尝试！");
+                        }
+                    });
+                }
+            })
+    });
+</script>
+</html>

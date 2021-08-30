@@ -2,11 +2,12 @@ package com.honji.order.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.honji.order.entity.PrivateTerminalHis;
 import com.honji.order.entity.PublicTerminalHis;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DifferenceDTO;
 import com.honji.order.model.TerminalDTO;
-import com.honji.order.service.IPublicTerminalHisService;
+import com.honji.order.service.IPrivateTerminalHisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -31,25 +32,26 @@ import java.util.List;
  * </p>
  *
  * @author yao
- * @since 2021-08-12
+ * @since 2021-07-31
  */
 @Slf4j
 @Controller
-@RequestMapping("/public-terminal-his")
-public class PublicTerminalHisController {
+@RequestMapping("/private-terminal-his")
+public class PrivateTerminalHisController {
+
 
     @Autowired
-    private IPublicTerminalHisService terminalService;
+    private IPrivateTerminalHisService terminalService;
 
 
     @GetMapping("/index")
     public String index() {
-        return "public-terminal-his";
+        return "private-terminal-his";
     }
 
     @ResponseBody
     @GetMapping("/get")
-    public PublicTerminalHis get(@RequestParam String id) {
+    public PrivateTerminalHis get(@RequestParam String id) {
         return terminalService.getById(id);
     }
 
@@ -62,7 +64,7 @@ public class PublicTerminalHisController {
 
     @ResponseBody
     @PostMapping("/save")
-    public boolean save(@ModelAttribute PublicTerminalHis terminal) {
+    public boolean save(@ModelAttribute PrivateTerminalHis terminal) {
         return terminalService.saveOrUpdate(terminal);
     }
 
@@ -73,7 +75,7 @@ public class PublicTerminalHisController {
         String fileName = file.getOriginalFilename();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-        List<PublicTerminalHis> list = new ArrayList<>();
+        List<PrivateTerminalHis> list = new ArrayList<>();
         boolean result = false;
         if (workbook != null) {
 
@@ -93,15 +95,19 @@ public class PublicTerminalHisController {
                 }
 
                 Cell shopCodeCell = row.getCell(0);
-                Cell ccbCell = row.getCell(1);
-                Cell posCell = row.getCell(2);
-                Cell topUpCell = row.getCell(3);
-                Cell dateCell = row.getCell(4);
+                Cell bsPayCell = row.getCell(1);
+                Cell yuePayCell = row.getCell(2);
+                Cell unionSysCell = row.getCell(3);
+                Cell unionPayCell = row.getCell(4);
+                Cell topUpCell = row.getCell(5);
+                Cell dateCell = row.getCell(6);
 
                 String shopCode = shopCodeCell.getStringCellValue().trim();
                 DataFormatter dataFormatter = new DataFormatter();
-                String ccb = dataFormatter.formatCellValue(ccbCell);
-                String pos = dataFormatter.formatCellValue(posCell);
+                String bsPay = dataFormatter.formatCellValue(bsPayCell);
+                String yuePay = dataFormatter.formatCellValue(yuePayCell);
+                String unionSys = dataFormatter.formatCellValue(unionSysCell);
+                String unionPay = dataFormatter.formatCellValue(unionPayCell);
                 String topUp = dataFormatter.formatCellValue(topUpCell);
                 LocalDate createdDate = null;
                 if(dateCell.getCellType() == CellType.STRING) {
@@ -111,9 +117,8 @@ public class PublicTerminalHisController {
                     createdDate = dateCell.getLocalDateTimeCellValue().toLocalDate();
                 }
 
-                //暂时不能使用构造方法，另一功能的sql查询会匹配到构造方法并报错
-                PublicTerminalHis terminal = new PublicTerminalHis().setKhdm(shopCode)
-                        .setCcb(ccb).setPos(pos).setTopUp(topUp).setCreatedDate(createdDate);
+                PrivateTerminalHis terminal = new PrivateTerminalHis().setKhdm(shopCode).setBsPay(bsPay).setYuePay(yuePay)
+                        .setUnionSys(unionSys).setUnionPay(unionPay).setTopUp(topUp).setCreatedDate(createdDate);
                 list.add(terminal);
 
             }
@@ -122,14 +127,14 @@ public class PublicTerminalHisController {
             try {
                 result = terminalService.saveBatch(list);
             } catch (Exception e) {
-                log.error("公户历史终端号 {} 导入出现异常 {}", fileName, e.getMessage());
+                log.error("私户历史终端号 {} 导入出现异常 {}", fileName, e.getMessage());
                 //e.printStackTrace();
             }
             long end = System.currentTimeMillis();
             if (result) {
-                log.info("公户历史终端号 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
+                log.info("私户历史终端号 {} 导入成功，耗时{}秒", fileName, (start - end) / 1000);
             } else {
-                log.error("公户历史终端号 {} 导入失败", fileName);
+                log.error("私户历史终端号 {} 导入失败", fileName);
             }
 
         }
@@ -145,30 +150,34 @@ public class PublicTerminalHisController {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("sheet1");
-        String columnNames[] = { "店铺代码", "建行终端码", "浦发刷卡或银联刷卡终端码", "充值终端码", "日期"};// 列名
+
+        String columnNames[] = { "店铺代码", "百胜支付终端码", "悦支付终端码",
+                "银联扫一扫终端码", "银联刷卡终端码", "充值终端码", "日期"};// 列名
 
         Row headRow = sheet.createRow(0);
         for (int i = 0; i < columnNames.length; i++) {
             headRow.createCell(i).setCellValue(columnNames[i]);
         }
-        QueryWrapper<PublicTerminalHis> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<PrivateTerminalHis> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("created_date", date);
-        List<PublicTerminalHis> terminals = terminalService.list(queryWrapper);
+        List<PrivateTerminalHis> terminals = terminalService.list(queryWrapper);
         for (int i = 0; i < terminals.size(); i++) {
-            PublicTerminalHis terminal = terminals.get(i);
+            PrivateTerminalHis terminal = terminals.get(i);
             Row row = sheet.createRow(i + 1);
             row.createCell(0).setCellValue(terminal.getKhdm());
-            row.createCell(1).setCellValue(terminal.getCcb());
-            row.createCell(2).setCellValue(terminal.getPos());
-            row.createCell(3).setCellValue(terminal.getTopUp());
-            row.createCell(4).setCellValue(terminal.getCreatedDate().toString());
+            row.createCell(1).setCellValue(terminal.getBsPay());
+            row.createCell(2).setCellValue(terminal.getYuePay());
+            row.createCell(3).setCellValue(terminal.getUnionSys());
+            row.createCell(4).setCellValue(terminal.getUnionPay());
+            row.createCell(5).setCellValue(terminal.getTopUp());
+            row.createCell(6).setCellValue(terminal.getCreatedDate().toString());
         }
 
         try {
             response.reset();
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setHeader("Content-Disposition", "attachment;filename="
-                    + URLEncoder.encode("公户历史终端号".concat(date).concat(".xlsx"), "utf-8"));
+                    + URLEncoder.encode("私户终端号".concat(date).concat(".xlsx"), "utf-8"));
             OutputStream out = response.getOutputStream();
             workbook.write(out);
             out.flush();
@@ -184,4 +193,5 @@ public class PublicTerminalHisController {
     public boolean remove(@RequestParam List<String> ids) {
         return terminalService.removeByIds(ids);
     }
+
 }

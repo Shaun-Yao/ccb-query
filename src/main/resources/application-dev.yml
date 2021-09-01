@@ -2,7 +2,9 @@ server:
   port: 9001
 
 web:
-  upload-path: E:/deposit/
+  sale-path: E:/finance/sale/
+  deposit-path: E:/finance/deposit/
+  upload-path: E:/finance/
 
 spring:
   datasource:

@@ -11,17 +11,13 @@
     <link rel="stylesheet" href="/webjars/viewerjs/dist/viewer.min.css" />
 </head>
 <body>
-<!--
-    <div class="pull-right">
-        <h3>
-            <span th:text="${shopCode}">信息标签</span>
-            <span id="balance"></span>
-        </h3>
-    </div>-->
+
+
     <table id="table" class="modal-body"></table>
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <span style="color: red; font-size: medium">此表仅为每日销售填写，存款填写请移步“门店存款登记表”</span>
     </div>
 
 
@@ -33,41 +29,34 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="myModalLabel">销售信息</h4>
                 </div>
-                <form class="form-horizontal" id="form" role="form" action="/deposit/add" method="post">
+                <form class="form-horizontal" id="form" role="form" action="/sale/add" method="post">
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
                         <input type="hidden" id="shopCode" name="shopCode" th:value="${shopCode}" >
 
                         <div class="form-group">
-                            <label for="date" class="col-sm-2 control-label">存款日期</label>
-                            <div class="col-sm-6">
-                                <input type="date"  class="form-control" id="date" name="date" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">营业日期</label>
                             <div class="col-sm-6">
-                                <input type="date" class="form-control" id="saleDate" name="saleDate" required>
+                                <input type="date" class="form-control" id="date" name="date" required>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">存款银行</label>
+                            <label for="amount" class="col-sm-2 control-label">营业额</label>
                             <div class="col-sm-6">
-                                <select class="form-control" name="bank" id="bank" required>
-                                    <option value=""></option>
-                                    <option th:each="bank : ${banks}"
-                                            th:value="${bank.account}" th:text="${bank.name}">
-                                    </option>
-                                </select>
+                                <input type="number" min="-5000.00" max="99999.00" step="0.01" class="form-control" id="amount" name="amount" required >
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="amount" class="col-sm-2 control-label">存款额</label>
+                            <label for="cash" class="col-sm-2 control-label">现金</label>
                             <div class="col-sm-6">
-                                <input type="number" min="0.01" max="99999.00" step="0.01" class="form-control" id="amount" name="amount" required >
+                                <input type="number" min="0" max="50000.00" step="0.01" class="form-control" id="cash" name="cash" >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="extraCash" class="col-sm-2 control-label">多收款</label>
+                            <div class="col-sm-6">
+                                <input type="number" min="0" max="50000.00" step="0.01" class="form-control" id="extraCash" name="extraCash" >
                             </div>
                         </div>
                         <div class="form-group">
@@ -76,7 +65,6 @@
                                 <textarea rows="2" cols="30" id="remark" name="remark" placeholder="有特殊情况时再才需要写备注"></textarea>
                             </div>
                         </div>
-
 
                         <div class="page__bd">
                             <div class="weui-gallery" id="gallery">
@@ -93,7 +81,7 @@
                                     <div class="weui-cell__bd">
                                         <div class="weui-uploader">
                                             <div class="weui-uploader__hd">
-                                                <p class="weui-uploader__title">上传存款票据图片</p>
+                                                <p class="weui-uploader__title">上传日结小票图片</p>
                                                 <div class="weui-uploader__info"></div>
                                             </div>
                                             <div class="weui-uploader__bd">
@@ -110,7 +98,7 @@
                             </div>
                         </div>
 
-                        <input type="hidden" name="image" id="picture1" >
+                        <input type="hidden" name="image" id="picture1">
 
                     </div>
                     <div class="modal-footer">
@@ -150,7 +138,6 @@
         $('input[type=date]').attr("min", "2021-09-01");
         $('input[type=date]').attr("max", parseDate(new Date()));
 
-        calculateBalance();//初始化计算结余
         //禁止数字框，日期框滚轮修改数据
         $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
             $(this).on('wheel.disableScroll', function (e) {
@@ -161,19 +148,6 @@
             $(this).off('wheel.disableScroll');
         });
     });
-
-    function calculateBalance() {
-        $.ajax({
-            url: "/cash-balance/calculate?shopCode=" + $('#shopCode').val(),
-            type: "GET",
-            success: function(result){
-                $('#balance').text("结余：" + result + "元");
-            },
-            error:function(xhr,state,errorThrown){
-                bootbox.alert("查询结余，请重新尝试！");
-            }
-        });
-    }
 
     var fileArr=new Array();
     var pictureSize = 0;
@@ -197,7 +171,7 @@
             var formData = new FormData();
             formData.append("file", file);
             $.ajax({
-                url: "/deposit/upload?shopCode=" + $('#shopCode').val(),
+                url: "/sale/upload?shopCode=" + $('#shopCode').val(),
                 type: "POST",
                 async: false,
                 cache: false,
@@ -206,7 +180,7 @@
                 data: formData,
                 success: function(result){
                     pictureSize = pictureSize + 1;
-                    $uploaderFiles.append($(tmpl.replace('#url#', "/deposit/showImage?fileName=" + result)).attr('file-name', result));
+                    $uploaderFiles.append($(tmpl.replace('#url#', "/sale/showImage?fileName=" + result)).attr('file-name', result));
                     $('#picture1').val(result);
                     //checkPhotoSize();
                 },
@@ -249,16 +223,10 @@
     });
 
     $('#table').bootstrapTable({
-        url: '/deposit/list?shopCode=' + $('#shopCode').val(),
+        url: '/sale/list?shopCode=' + $('#shopCode').val(),
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
-        // search: true,
-        // showButtonText: true,
-        // searchOnEnterKey: true,
-        // showSearchButton: true,
-        // showSearchClearButton: true,
-        // showRefresh: true,
         toolbar: "#deposit",
         clickToSelect: true,
         singleSelect: true,
@@ -279,7 +247,7 @@
         onDblClickRow: function (row, $element) {
             $.ajax({
                 type: "GET",
-                url: "/deposit/get?id=" + row.id,
+                url: "/sale/get?id=" + row.id,
                 async: false,
                 success: function(data){
 
@@ -288,18 +256,18 @@
                     $('#id').val(data.id);
                     $('#amount').val(data.amount);
                     $('#date').val(data.date);
-                    $('#saleDate').val(data.saleDate);
+                    $('#cash').val(data.cash);
+                    $('#extraCash').val(data.extraCash);
+                    $('#remark').val(data.remark);
                     $('#picture1').val(data.image);
-                    $("#bank").val(data.bank);
                     $uploaderFiles.empty();
                     pictureSize = 0;
                     if (data.image != null && data.image != '') {
-                        $uploaderFiles.append($(tmpl.replace('#url#', "/deposit/showImage?fileName=" + data.image)).attr('file-name', data.image));
+                        $uploaderFiles.append($(tmpl.replace('#url#', "/sale/showImage?fileName=" + data.image)).attr('file-name', data.image));
                         pictureSize = pictureSize + 1;
                     }
 
                     checkPhotoSize();
-
                 }
             });
             $('#myModal').modal('show');
@@ -318,16 +286,16 @@
             visible: false
         }, {
             field: 'date',
-            title: '存款日期'
-        }, {
-            field: 'saleDate',
             title: '营业日期'
         }, {
-            field: 'bankName',
-            title: '存款银行'
-        }, {
             field: 'amount',
-            title: '存款额'
+            title: '营业额'
+        }, {
+            field: 'cash',
+            title: '现金'
+        }, {
+            field: 'extraCash',
+            title: '多收款'
         }, {
             field: 'remark',
             title: '备注'
@@ -336,25 +304,23 @@
 
     $('#save').click(function() {
         if($('#form')[0].reportValidity()) {
-
             var pictures = $uploaderFiles.find("li");
             if (pictures.length == 0) {
-                bootbox.alert('请上传存款票据图片！');
+                bootbox.alert('请上传日结小票图片！');
                 return;
             }
             $('#save').attr("disabled", true);//屏蔽提交按钮
             $.ajax({
                 type: "post",
-                url: "/deposit/save",
+                url: "/sale/save",
                 data: $('#form').serialize(),
                 success: function(data){
                     $('#myModal').modal('hide');
                     $('#table').bootstrapTable('refresh');
-                    calculateBalance();
                     $('#save').attr("disabled", false);//提交成功后激活提交按钮
                 },
                 error: function(data){
-                    bootbox.alert("保存失败，请确认存款日期是否重复！");
+                    bootbox.alert("保存失败，请确认营业日期是否重复！");
                 }
             });
         }
@@ -362,17 +328,12 @@
 
     $('#add').click(function () {
         $gallery.fadeOut(100);//关闭图片预览
-
         $uploaderFiles.empty();//清空图片
         $('#picture1').val('');
         pictureSize = 0;
         checkPhotoSize();
         $('#form').resetForm();
         $('#id').val('');
-        // $("input:radio[name=arrivedTravelMode]").get(0).checked=true;
-        // $("#arrivedPickUpStation option").get(1).selected=true;
-        // $("input:radio[name=leavedTravelMode]").get(0).checked=true;
-        // $("#leavedStation option").get(1).selected=true;
         $('#myModal').modal('show');
     });
 
@@ -387,13 +348,12 @@
                 if(result) {
                     $.ajax({
                         type: "POST",
-                        url: "/deposit/remove",
+                        url: "/sale/remove",
                         traditional: true,
                         data: {
                             id: id
                         },
                         success: function(data){
-                            calculateBalance();
                             $('#table').bootstrapTable('refresh');
                         },
                         error:function(xhr,state,errorThrown){

@@ -2,6 +2,8 @@ server:
   port: 9006
 
 web:
+  sale-path: \\10.10.10.188\183财务存款票据\sale\
+  deposit-path: \\10.10.10.188\183财务存款票据\deposit\
   upload-path: \\10.10.10.188\183财务存款票据\
 
 spring:

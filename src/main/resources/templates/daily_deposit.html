@@ -22,6 +22,7 @@
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <span style="color: red; font-size: medium">营业日期截止到8月31日，存款日期截止到9月1日，请于9月1日将8月份的销售和存款全部完成。后续将启用新版填写数据</span>
     </div>
 
 
@@ -42,7 +43,7 @@
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">营业日期</label>
                             <div class="col-sm-4">
-                                <input type="date" min="2020-06-30" class="form-control" id="date" name="date" required>
+                                <input type="date" min="2021-08-01" max="2021-08-31"  class="form-control" id="date" name="date" required>
                             </div>
                             <label for="amount" class="col-sm-2 control-label">营业额</label>
                             <div class="col-sm-4">
@@ -147,7 +148,7 @@
                             </div>
                             <label for="depositDate" class="col-sm-2 control-label">存款日期</label>
                             <div class="col-sm-4">
-                                <input type="date" min="2020-06-30" class="form-control" id="depositDate" name="depositDate" >
+                                <input type="date" min="2021-08-01" max="2021-09-01" class="form-control" id="depositDate" name="depositDate" >
                             </div>
 
                         </div>
@@ -234,9 +235,9 @@
         before31days.setDate(new Date().getDate() - 31);
 
         // document.getElementById("depositDate").setAttribute("max", tomorrow);
-        $('input[type=date]').attr("min", "2020-06-30");
+        // $('input[type=date]').attr("min", "2021-08-01");
         // $('input[type=date]').attr("min", parseDate(before31days));
-        $('input[type=date]').attr("max", parseDate(tomorrow));
+        // $('input[type=date]').attr("max", "2021-08-31");
 
         calculateBalance();//初始化计算结余
         //禁止数字框，日期框滚轮修改数据

@@ -1,5 +1,6 @@
 package com.honji.order.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -52,6 +53,12 @@ public class Deposit extends IdEntity {
      * 存款银行
      */
     private String bank;
+
+    /**
+     * 存款银行名称，不用持久化
+     */
+    @TableField(exist = false)
+    private String bankName;
 
     /**
      * 备注

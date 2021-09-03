@@ -17,7 +17,7 @@
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
-        <span style="color: red; font-size: medium">此表仅为每日销售填写，存款填写请移步“门店存款登记表”</span>
+        <span style="color: red; font-size: medium">此表仅为每日销售填写，注意是上传“日结小票”图片，不需要拼存款图</span>
     </div>
 
 
@@ -62,7 +62,7 @@
                         <div class="form-group">
                             <label for="remark" class="col-sm-2 control-label">备注</label>
                             <div class="col-sm-6">
-                                <textarea rows="2" cols="30" id="remark" name="remark" placeholder="有特殊情况时再才需要写备注"></textarea>
+                                <textarea rows="2" cols="30" id="remark" name="remark" placeholder="有特殊情况时才需要写备注"></textarea>
                             </div>
                         </div>
 
@@ -321,6 +321,7 @@
                 },
                 error: function(data){
                     bootbox.alert("保存失败，请确认营业日期是否重复！");
+                    $('#save').attr("disabled", false);//提交失败后激活提交按钮
                 }
             });
         }

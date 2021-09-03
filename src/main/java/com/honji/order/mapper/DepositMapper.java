@@ -18,7 +18,9 @@ import java.util.List;
 public interface DepositMapper extends BaseMapper<Deposit> {
 
     @Select({"<script>",
-            "SELECT * FROM deposit where shop_code = '${shopCode}'",
+            "SELECT deposit.*, bank.name as bankName FROM deposit ",
+            " LEFT JOIN bank on deposit.bank = bank.account",
+            " where shop_code = '${shopCode}'",
             " ORDER BY date desc ",
             "</script>"})
     List<Deposit> selectForIndex(String shopCode);

@@ -22,6 +22,7 @@
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <span style="color: red; font-size: medium">此表仅为存款填写，注意是上传“存款票据”图片，不需要拼日结小票图</span>
     </div>
 
 
@@ -31,7 +32,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">销售信息</h4>
+                    <h4 class="modal-title" id="myModalLabel">存款信息</h4>
                 </div>
                 <form class="form-horizontal" id="form" role="form" action="/deposit/add" method="post">
                     <div class="modal-body">
@@ -73,7 +74,7 @@
                         <div class="form-group">
                             <label for="remark" class="col-sm-2 control-label">备注</label>
                             <div class="col-sm-6">
-                                <textarea rows="2" cols="30" id="remark" name="remark" placeholder="有特殊情况时再才需要写备注"></textarea>
+                                <textarea rows="2" cols="30" id="remark" name="remark" placeholder="有特殊情况时才需要写备注"></textarea>
                             </div>
                         </div>
 
@@ -253,12 +254,6 @@
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
-        // search: true,
-        // showButtonText: true,
-        // searchOnEnterKey: true,
-        // showSearchButton: true,
-        // showSearchClearButton: true,
-        // showRefresh: true,
         toolbar: "#deposit",
         clickToSelect: true,
         singleSelect: true,
@@ -291,6 +286,7 @@
                     $('#saleDate').val(data.saleDate);
                     $('#picture1').val(data.image);
                     $("#bank").val(data.bank);
+                    $("#remark").val(data.remark);
                     $uploaderFiles.empty();
                     pictureSize = 0;
                     if (data.image != null && data.image != '') {
@@ -355,6 +351,7 @@
                 },
                 error: function(data){
                     bootbox.alert("保存失败，请确认存款日期是否重复！");
+                    $('#save').attr("disabled", false);//提交失败后激活提交按钮
                 }
             });
         }

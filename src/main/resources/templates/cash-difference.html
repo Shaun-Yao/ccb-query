@@ -29,17 +29,27 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">销售信息</h4>
+                    <h4 class="modal-title" id="myModalLabel">现金差异</h4>
                 </div>
                 <form class="form-horizontal" id="form" role="form" action="/cash-difference/add" method="post">
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
                         <input type="hidden" id="shopCode" name="shopCode" th:value="${shopCode}" >
-                        <!--<input type="hidden" id="createdTime" name="createdTime" >-->
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">小票日期</label>
                             <div class="col-sm-8">
                                 <input type="date" min="2021-06-30" class="form-control" id="date" name="date" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="type" class="col-sm-2 control-label">类型</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="type" id="type" required>
+                                    <option></option>
+                                    <option th:each="type : ${T(com.honji.order.enums.DifferenceTypeEnum).values()}"
+                                            th:value="${type}" th:text="${type.desc}">
+                                    </option>
+                                </select>
                             </div>
                         </div>
 
@@ -59,9 +69,22 @@
                         </div>
 
                         <div class="form-group">
+                            <div class="col-sm-10">
+                                <span style="color: red">当类型为“现金补单”时，实收金额无需填写，系统会自动设置为0</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label for="actualAmount" class="col-sm-2 control-label">实收金额</label>
                             <div class="col-sm-8">
-                                <input type="number" min="1.00" max="9999.00" step="0.01" class="form-control" id="actualAmount" name="actualAmount" required >
+                                <input type="number" min="0.01" max="9999.00" step="0.01" class="form-control" id="actualAmount" name="actualAmount" required >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="remark" class="col-sm-2 control-label">备注</label>
+                            <div class="col-sm-6">
+                                <textarea rows="2" cols="30" maxlength="50" id="remark" name="remark" placeholder="差异说明" required></textarea>
                             </div>
                         </div>
 
@@ -98,13 +121,9 @@
     }
 
     $(function () {
-        var tomorrow = new Date();
-        var before31days = new Date();
-        tomorrow.setDate(new Date().getDate()+1);
-        before31days.setDate(new Date().getDate() - 31);
 
         $('input[type=date]').attr("min", "2021-08-01");
-        $('input[type=date]').attr("max", parseDate(tomorrow));
+        $('input[type=date]').attr("max", parseDate(new Date()));
 
 
         //禁止数字框，日期框滚轮修改数据
@@ -116,6 +135,24 @@
         $('form').on('blur', 'input[type=number], input[type=date]', function (e) {
             $(this).off('wheel.disableScroll');
         });
+
+        $('#type').on('change', function() {
+            if (this.value == 'CASH_SUPPLEMENT') {
+                $('#actualAmount').prop('disabled', true);
+                // $('#actualAmount').val(0);
+            } else {
+                $('#actualAmount').prop('disabled', false);
+                // $('#actualAmount').val('');
+            }
+        });
+
+        $('#myModal').on('show.bs.modal', function () {
+            if ($('#type').val() == 'CASH_SUPPLEMENT') {
+                $('#actualAmount').prop('disabled', true);
+            } else {
+                $('#actualAmount').prop('disabled', false);
+            }
+        })
     });
 
 
@@ -124,12 +161,6 @@
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
-        // search: true,
-        // showButtonText: true,
-        // searchOnEnterKey: true,
-        // showSearchButton: true,
-        // showSearchClearButton: true,
-        // showRefresh: true,
         toolbar: "#deposit",
         clickToSelect: true,
         singleSelect: true,
@@ -138,10 +169,7 @@
         pageNumber: 1,     //初始化加载第一页，默认第一页
         pageSize: 10,      //每页的记录行数（*）
         queryParams: function (params) {
-            //导出全部数据没有传limit给后台, 把limit设置为全部数据
-            if (typeof(params.limit) == "undefined") {
-                params.limit = this.totalRows;
-            }
+
             return params;
         },
         onClickRow: function (row, $element) {
@@ -156,9 +184,11 @@
                     $('#form').clearForm();
                     $('#id').val(data.id);
                     $('#date').val(data.date);
+                    $('#type').val(data.type);
                     $('#number').val(data.shortNumber);
                     $('#amount').val(data.amount);
                     $('#actualAmount').val(data.actualAmount);
+                    $('#remark').val(data.remark);
                 }
             });
             $('#myModal').modal('show');
@@ -166,11 +196,7 @@
         columns: [ {
             field: '',
             checkbox: true, // 显示一个勾选框
-            align: 'center', // 居中显示
-
-            // formatter: function (value, row, index) {
-            //     return row.id;
-            // }
+            align: 'center'
         },{
             field: 'id',
             title: 'ID',
@@ -187,6 +213,16 @@
         }, {
             field: 'actualAmount',
             title: '实收金额'
+        }, {
+            field: 'type',
+            title: '类型',
+            formatter: function (value, row, index) {
+                if (value == 'ZERO') {
+                    return '顾客抹零';
+                } else {
+                    return '现金补单';
+                }
+            }
         }]
     });
 
@@ -208,6 +244,7 @@
                         $('#save').attr("disabled", false);//提交成功后激活提交按钮
                     },
                     error: function(data){
+                        $('#save').attr("disabled", false);
                         alert("保存失败，请确认日期小票单号是否重复！");
                     }
                 });

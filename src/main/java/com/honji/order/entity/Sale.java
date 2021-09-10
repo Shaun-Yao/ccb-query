@@ -35,26 +35,6 @@ public class Sale extends IdEntity {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    /**
-     * 营业额
-     */
-    private BigDecimal amount;
-
-
-    /**
-     * 现金
-     */
-    private BigDecimal cash;
-
-    /**
-     * 多收款金额
-     */
-    private BigDecimal extraCash;
-
-    /**
-     * 备注
-     */
-    private String remark;
 
     /**
      * 图片

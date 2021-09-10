@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 public enum ShopTypeEnum {
 
-    CCB_SM("public", "公户"),
-    CCB_LX("private", "私户")
+    PUBLIC("public", "公户"),
+    PRIVATE("private", "私户")
     ;
     ShopTypeEnum(String code, String desc) {
         this.code = code;

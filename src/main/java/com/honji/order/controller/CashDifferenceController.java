@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.honji.order.entity.Authority;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.CashDifference;
+import com.honji.order.enums.DifferenceTypeEnum;
 import com.honji.order.model.*;
 import com.honji.order.service.IAuthorityService;
 import com.honji.order.service.ICashBalanceService;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -95,6 +97,10 @@ public class CashDifferenceController {
     @ResponseBody
     @PostMapping("/save")
     public boolean save(@ModelAttribute CashDifference cashDifference) {
+        System.out.println("===" + cashDifference.getType());
+        if (cashDifference.getType() == DifferenceTypeEnum.CASH_SUPPLEMENT) {
+            cashDifference.setActualAmount(BigDecimal.ZERO);//现金补单实收金额固定为0
+        }
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
         String date = cashDifference.getDate().format(dtf);
         //小票单号组成：门店的代码+“_xpd”+“小票日期”+后4位数字

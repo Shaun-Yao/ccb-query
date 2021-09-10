@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.honji.order.enums.DifferenceTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,6 +39,11 @@ public class CashDifference extends BaseEntity {
     private LocalDate date;
 
     /**
+     * 类型
+     */
+    private DifferenceTypeEnum type;
+
+    /**
      * 小票金额
      */
     private BigDecimal amount;
@@ -57,6 +63,11 @@ public class CashDifference extends BaseEntity {
      */
     @TableField(exist = false)
     private String shortNumber;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
     /**
      * 只返回小票单号后4位

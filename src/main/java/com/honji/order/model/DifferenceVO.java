@@ -53,6 +53,11 @@ public class DifferenceVO {
     private BigDecimal actualAmount;
 
     /**
+     * 备注
+     */
+    private String remark;
+
+    /**
      * 差额
      */
     private BigDecimal difference;

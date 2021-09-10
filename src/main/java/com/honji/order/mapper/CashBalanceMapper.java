@@ -36,4 +36,18 @@ public interface CashBalanceMapper extends BaseMapper<CashBalance> {
             "ON 1 = 1")
     double calBalance(@Param("shopCode") String shopCode);
 
+    @Select({"SELECT erp.amount - deposit.amount as amount FROM \n" ,
+            "( SELECT sum(现金) amount FROM \n" ,
+            "\t(SELECT POSJS.JSMC, sum(VW_LSXHJS.JE) JE FROM\n" ,
+            "\t(select convert(varchar(10),DM1) DM1, RQ, JE, JSFS From IP180.SPERP.DBO.VW_LSXHJS" ,
+            "\tWHERE dm1 = '${shopCode}' and VW_LSXHJS.RQ >= '2021-09-01')  VW_LSXHJS\n" ,
+            "\tLeft Join IP180.SPERP.DBO.POSJS POSJS on VW_LSXHJS.JSFS= POSJS.JSDM   \n" ,
+            "\tGroup By VW_LSXHJS.DM1, POSJS.JSMC,VW_LSXHJS.RQ\n" ,
+            "\t) result " ,
+            "\tPIVOT (SUM(JE) for JSMC in (现金)) pm\n" ,
+            ") erp\n" ,
+            "JOIN (SELECT isnull(SUM(case when 1=1 then amount else 0 end),0) amount FROM deposit WHERE shop_code = '${shopCode}'\n" ,
+            ") deposit ON 1 = 1"})
+    double calBalance2(@Param("shopCode") String shopCode);
+
 }

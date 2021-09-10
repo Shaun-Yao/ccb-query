@@ -41,31 +41,6 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="amount" class="col-sm-2 control-label">营业额</label>
-                            <div class="col-sm-6">
-                                <input type="number" min="-5000.00" max="99999.00" step="0.01" class="form-control" id="amount" name="amount" required >
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="cash" class="col-sm-2 control-label">现金</label>
-                            <div class="col-sm-6">
-                                <input type="number" min="0" max="50000.00" step="0.01" class="form-control" id="cash" name="cash" >
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="extraCash" class="col-sm-2 control-label">多收款</label>
-                            <div class="col-sm-6">
-                                <input type="number" min="0" max="50000.00" step="0.01" class="form-control" id="extraCash" name="extraCash" >
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="remark" class="col-sm-2 control-label">备注</label>
-                            <div class="col-sm-6">
-                                <textarea rows="2" cols="30" id="remark" name="remark" placeholder="有特殊情况时才需要写备注"></textarea>
-                            </div>
-                        </div>
-
                         <div class="page__bd">
                             <div class="weui-gallery" id="gallery">
                                 <span class="weui-gallery__img" id="galleryImg"></span>
@@ -254,11 +229,7 @@
                     $gallery.fadeOut(100);//关闭图片预览
                     $('#form').clearForm();
                     $('#id').val(data.id);
-                    $('#amount').val(data.amount);
                     $('#date').val(data.date);
-                    $('#cash').val(data.cash);
-                    $('#extraCash').val(data.extraCash);
-                    $('#remark').val(data.remark);
                     $('#picture1').val(data.image);
                     $uploaderFiles.empty();
                     pictureSize = 0;
@@ -275,11 +246,7 @@
         columns: [ {
             field: '',
             checkbox: true, // 显示一个勾选框
-            align: 'center', // 居中显示
-
-            // formatter: function (value, row, index) {
-            //     return row.id;
-            // }
+            align: 'center'
         },{
             field: 'id',
             title: 'ID',
@@ -288,19 +255,33 @@
             field: 'date',
             title: '营业日期'
         }, {
-            field: 'amount',
-            title: '营业额'
-        }, {
-            field: 'cash',
-            title: '现金'
-        }, {
-            field: 'extraCash',
-            title: '多收款'
-        }, {
-            field: 'remark',
-            title: '备注'
+            field: 'image',
+            title: '日结小票',
+            formatter: function (value, row, index) {
+                return "<a href='#' class='image' onclick=showImage('" + value + "')>查看小票</a>";
+            }
         }]
     });
+
+    function showImage(fileName) {
+        var image = new Image();
+        image.src = "/sale/showImage?fileName=" + fileName;
+        var viewer = new Viewer(image, {
+            toolbar: {
+                reset: true,
+                rotateLeft: true,
+                rotateRight: true,
+                flipHorizontal: true,
+                flipVertical: true
+            },
+            navbar: false,
+
+            hidden: function () {
+                viewer.destroy();
+            }
+        });
+        viewer.show();
+    }
 
     $('#save').click(function() {
         if($('#form')[0].reportValidity()) {

@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum DifferenceTypeEnum {
 
     ZERO("zero", "顾客抹零"),
-    CASH_SUPPLEMENT("cash_supplement", "现金补单")
+    CASH_SUPPLEMENT("cash_supplement", "现金补单"),
+    CASH_ADJUSTMENT("cash_adjustment", "现金调整")
     ;
     DifferenceTypeEnum(String code, String desc) {
         this.code = code;

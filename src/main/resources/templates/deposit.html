@@ -22,7 +22,7 @@
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
-        <span style="color: red; font-size: medium">此表仅为存款填写，注意是上传“存款票据”图片，不需要拼日结小票图</span>
+        <span style="color: red; font-size: medium">请不要脑补！当天没有存款就不需要填写！存一笔填一笔，对着存款票据上面的日期、金额如实填写！</span>
     </div>
 
 
@@ -338,6 +338,11 @@
                 bootbox.alert('请上传存款票据图片！');
                 return;
             }
+            if ($('#date').val() < $('#saleDate').val()) {
+                bootbox.alert('不允许营业日期大于存款日期！');
+                return;
+            }
+
             $('#save').attr("disabled", true);//屏蔽提交按钮
             $.ajax({
                 type: "post",

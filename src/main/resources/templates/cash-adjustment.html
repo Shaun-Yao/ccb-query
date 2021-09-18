@@ -7,20 +7,15 @@
 
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css" />
 </head>
 <body>
 
-    <div class="pull-right">
-        <h3>
-            <span th:text="${shopCode}">信息标签</span>
-            <span th:text="${shopName}"></span>
-        </h3>
-    </div>
+
     <table id="table" class="modal-body"></table>
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
-        <span style="color: red; font-size: large">顾客抹零</span>
     </div>
 
 
@@ -30,13 +25,26 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3 class="modal-title" id="myModalLabel">顾客抹零</h3>
+                    <h3 class="modal-title" id="myModalLabel">现金调整</h3>
                 </div>
                 <form class="form-horizontal" id="form" role="form" action="/cash-difference/add" method="post">
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
-                        <input type="hidden" id="shopCode" name="shopCode" th:value="${shopCode}" >
-                        <input type="hidden" name="type" value="ZERO" >
+                        <input type="hidden" name="type" value="CASH_ADJUSTMENT" >
+
+                        <div class="form-group">
+                            <label for="shopCode" class="col-sm-2 control-label">店铺</label>
+                            <div class="col-sm-8">
+                                <select class="form-control selectpicker" name="shopCode" id="shopCode" required
+                                        data-live-search="true" data-actions-box="true"
+                                        data-selected-text-format="count">
+                                    <option></option>
+                                    <option th:each="shop : ${shops}"
+                                            th:value="${shop.khdm}" th:text="${shop.khmc}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
 
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">小票日期</label>
@@ -45,29 +53,40 @@
                             </div>
                         </div>
 
-
                         <div class="form-group">
-                            <label for="number" class="col-sm-2 control-label">小票单号</label>
-                            <div class="col-sm-8">
-                                <input type="text" pattern="\d{4}" maxlength="4" class="form-control"
-                                       id="number" name="number" placeholder="只需填写最后4位数字" required >
+                            <div class="col-sm-10">
+                                <span style="color: red">如无单号则填写9000-9999范围内单号，避免与其它单号冲突</span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="amount" class="col-sm-2 control-label">小票金额</label>
+                            <label for="number" class="col-sm-2 control-label">小票单号</label>
+                            <div class="col-sm-8">
+                                <input type="text" pattern="\d{4}" maxlength="4" class="form-control" required
+                                       id="number" name="number" placeholder="只需填写最后4位数字" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount" class="col-sm-2 control-label">pos机小票金额</label>
                             <div class="col-sm-8">
                                 <input type="number" min="1.00" max="9999.00" step="0.01" class="form-control" id="amount" name="amount" required >
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="actualAmount" class="col-sm-2 control-label">实收金额</label>
+                            <label for="actualAmount" class="col-sm-2 control-label">日结单金额</label>
                             <div class="col-sm-8">
                                 <input type="number" min="1.00" max="9999.00" step="0.01" class="form-control" id="actualAmount" name="actualAmount" required >
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label for="remark" class="col-sm-2 control-label">备注</label>
+                            <div class="col-sm-6">
+                                <textarea rows="2" cols="30" maxlength="50" id="remark" name="remark" placeholder="差异说明" required></textarea>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="modal-footer">
@@ -85,6 +104,7 @@
 <script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
 <script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
 </body>
 <script th:inline="javascript">
 
@@ -102,8 +122,9 @@
     }
 
     $(function () {
+        $('.selectpicker').selectpicker();
 
-        $('input[type=date]').attr("min", "2021-08-01");
+        $('input[type=date]').attr("min", "2021-09-01");
         $('input[type=date]').attr("max", parseDate(new Date()));
 
 
@@ -117,28 +138,11 @@
             $(this).off('wheel.disableScroll');
         });
 
-        $('#type').on('change', function() {
-            if (this.value == 'CASH_SUPPLEMENT') {
-                $('#actualAmount').prop('disabled', true);
-                // $('#actualAmount').val(0);
-            } else {
-                $('#actualAmount').prop('disabled', false);
-                // $('#actualAmount').val('');
-            }
-        });
-
-        $('#myModal').on('show.bs.modal', function () {
-            if ($('#type').val() == 'CASH_SUPPLEMENT') {
-                $('#actualAmount').prop('disabled', true);
-            } else {
-                $('#actualAmount').prop('disabled', false);
-            }
-        })
     });
 
 
     $('#table').bootstrapTable({
-        url: '/cash-difference/list?type=ZERO&shopCode=' + $('#shopCode').val(),
+        url: '/cash-difference/list-adjustment',
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
@@ -164,6 +168,7 @@
                 success: function(data){
                     $('#form').clearForm();
                     $('#id').val(data.id);
+                    $('#shopCode').val(data.shopCode);
                     $('#date').val(data.date);
                     $('#type').val(data.type);
                     $('#number').val(data.shortNumber);
@@ -172,6 +177,8 @@
                     $('#remark').val(data.remark);
                 }
             });
+            //添加选项或者设置selected都需要refresh
+            $('.selectpicker').selectpicker('refresh');
             $('#myModal').modal('show');
         },
         columns: [ {
@@ -190,10 +197,10 @@
             title: '小票单号'
         }, {
             field: 'amount',
-            title: '小票金额'
+            title: 'pos机小票金额'
         }, {
             field: 'actualAmount',
-            title: '实收金额'
+            title: '日结单金额'
         }]
     });
 
@@ -220,13 +227,13 @@
                     }
                 });
             }
-
         }
     });
 
     $('#add').click(function () {
         $('#form').resetForm();
         $('#id').val('');
+        $('.selectpicker').selectpicker('refresh');
         $('#myModal').modal('show');
     });
 

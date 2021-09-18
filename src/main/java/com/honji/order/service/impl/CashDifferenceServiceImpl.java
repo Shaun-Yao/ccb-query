@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.CashDifference;
+import com.honji.order.enums.DifferenceTypeEnum;
 import com.honji.order.mapper.CashBalanceMapper;
 import com.honji.order.mapper.CashDifferenceMapper;
 import com.honji.order.model.DepositVO;
@@ -34,10 +35,13 @@ public class CashDifferenceServiceImpl extends ServiceImpl<CashDifferenceMapper,
     private CashDifferenceMapper differenceMapper;
 
     @Override
-    public PageInfo<CashDifference> listForIndex(int offset, int limit, String shopCode) {
+    public PageInfo<CashDifference> listForIndex(int offset, int limit,
+                                                 String shopCode, DifferenceTypeEnum type) {
         PageHelper.startPage(offset / limit + 1, limit);
         QueryWrapper<CashDifference> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("shop_code", shopCode);
+        //现金调整是财务添加的记录，门店不可以看到
+        queryWrapper.eq("type", type.getCode());
         queryWrapper.orderByDesc("date");
         List<CashDifference> differences = differenceMapper.selectList(queryWrapper);
         return new PageInfo<>(differences);

@@ -4,6 +4,8 @@ package com.honji.order.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.Authority;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.CashDifference;
@@ -64,6 +66,23 @@ public class CashDifferenceController {
         return "cash-difference";
     }
 
+    @GetMapping("/supplement")
+    public String supplement(@RequestParam String shopCode, Model model) {
+        QueryWrapper<CashBalance> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("khdm", shopCode);
+        CashBalance cashBalance = cashBalanceService.getOne(queryWrapper);
+        model.addAttribute("shopName", cashBalance.getKhmc());
+        model.addAttribute("shopCode", shopCode);
+        return "cash-supplement";
+    }
+
+    @GetMapping("/adjustment")
+    public String adjustment(Model model) {
+        List<CashBalance> shops =  cashBalanceService.list();
+        model.addAttribute("shops", shops);
+        return "cash-adjustment";
+    }
+
     @ResponseBody
     @GetMapping("/get")
     public CashDifference get(@RequestParam String id) {
@@ -73,9 +92,20 @@ public class CashDifferenceController {
     @ResponseBody
     @GetMapping("/list")
     public DataGridResult list(@RequestParam(defaultValue = "0") int offset, @RequestParam int limit,
-                               @RequestParam String shopCode) {
+                               @RequestParam String shopCode, @RequestParam DifferenceTypeEnum type) {
 
-        return new DataGridResult(differenceService.listForIndex(offset, limit, shopCode));
+        return new DataGridResult(differenceService.listForIndex(offset, limit, shopCode, type));
+    }
+
+    @ResponseBody
+    @GetMapping("/list-adjustment")
+    public DataGridResult listAdjustment(@RequestParam int offset, @RequestParam int limit) {
+        PageHelper.startPage(offset / limit + 1, limit);
+        QueryWrapper<CashDifference> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("type", DifferenceTypeEnum.CASH_ADJUSTMENT.getCode());
+        queryWrapper.orderByDesc("date");
+        List<CashDifference> differences = differenceService.list(queryWrapper);
+        return new DataGridResult(new PageInfo<>(differences));
     }
 
     @GetMapping("/to-query")
@@ -97,7 +127,6 @@ public class CashDifferenceController {
     @ResponseBody
     @PostMapping("/save")
     public boolean save(@ModelAttribute CashDifference cashDifference) {
-        System.out.println("===" + cashDifference.getType());
         if (cashDifference.getType() == DifferenceTypeEnum.CASH_SUPPLEMENT) {
             cashDifference.setActualAmount(BigDecimal.ZERO);//现金补单实收金额固定为0
         }

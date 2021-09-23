@@ -19,108 +19,79 @@
 </style>
 <body>
 <!--<div class="col-md-12">-->
-    <!--<h3>注意：由于数据太多查询较慢，请尽量缩小范围查询！</h3>-->
+<!--<h3>注意：由于数据太多查询较慢，请尽量缩小范围查询！</h3>-->
 <!--</div>-->
-    <form class="form-inline" id="resource-form">
-        <input type="hidden" id="jobNum" th:value="${jobNum}">
-        <div class="col-md-12" >
-            <div class="form-group form-inner">
-                <label  class="form-lable">店铺名称：</label>
-                <select class="form-control" name="shopCodes" id="shopCodes" multiple required
-                        data-live-search="true" data-actions-box="true"
-                        data-selected-text-format="count">
-                    <!--<option value=""></option>-->
-                    <option th:each="authority : ${authorities}"
-                            th:value="${authority.khdm}" th:text="${authority.khmc}">
-                    </option>
-                </select>
-            </div>
-            <div class="form-group form-inner">
-                <label class="form-lable">营业开始日期</label>
-                <div class='input-group date' id='begin-date'>
-                    <input type='text' class="form-control" id='begin' required />
-                    <span class="input-group-addon">
+<form class="form-inline" id="resource-form">
+    <input type="hidden" id="jobNum" th:value="${jobNum}">
+    <div class="col-md-12" >
+        <div class="form-group form-inner">
+            <label  class="form-lable">店铺名称：</label>
+            <select class="form-control" name="shopCodes" id="shopCodes" multiple required
+                    data-live-search="true" data-actions-box="true"
+                    data-selected-text-format="count">
+                <option th:each="authority : ${authorities}"
+                        th:value="${authority.khdm}" th:text="${authority.khmc}">
+                </option>
+            </select>
+        </div>
+        <div class="form-group form-inner">
+            <label class="form-lable">营业开始日期</label>
+            <div class='input-group date' id='begin-date'>
+                <input type='text' class="form-control" id='begin' required />
+                <span class="input-group-addon">
                         <span class="glyphicon glyphicon-time"></span>
                     </span>
-                </div>
             </div>
-            <div class="form-group">
-                <label class="form-lable">营业结束日期</label>
-                <div class='input-group date' id='end-date'>
-                    <input type='text' class="form-control" id='end' required />
-                    <span class="input-group-addon">
+        </div>
+        <div class="form-group">
+            <label class="form-lable">营业结束日期</label>
+            <div class='input-group date' id='end-date'>
+                <input type='text' class="form-control" id='end' required />
+                <span class="input-group-addon">
                         <span class="glyphicon glyphicon-time"></span>
                     </span>
-                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12" >
+        <div class="form-group">
+            <label class="form-lable">存款开始日期</label>
+            <div class='input-group date' id='deposit-begin-date'>
+                <input type='text' class="form-control" id='deposit-begin' />
+                <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-time"></span>
+                    </span>
             </div>
         </div>
 
-        <div class="col-md-12" >
-            <div class="form-group">
-                <label class="form-lable">存款开始日期</label>
-                <div class='input-group date' id='deposit-begin-date'>
-                    <input type='text' class="form-control" id='deposit-begin' />
-                    <span class="input-group-addon">
+        <div class="form-group">
+            <label class="form-lable">存款结束日期</label>
+            <div class='input-group date' id='deposit-end-date'>
+                <input type='text' class="form-control" id='deposit-end' />
+                <span class="input-group-addon">
                         <span class="glyphicon glyphicon-time"></span>
                     </span>
-                </div>
             </div>
-
-            <div class="form-group">
-                <label class="form-lable">存款结束日期</label>
-                <div class='input-group date' id='deposit-end-date'>
-                    <input type='text' class="form-control" id='deposit-end' />
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-time"></span>
-                    </span>
-                </div>
-            </div>
-
-            <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
-            <a class="btn btn-primary " id="exportBtn" >导出exel</a>
         </div>
-    </form>
 
-    <table id="table" class="modal-body" style="table-layout: fixed" > </table>
-    <div id="deposit" >
+        <a class="btn btn-info  glyphicon glyphicon-search form-search" id="searchBtn" >搜索</a>
+        <a class="btn btn-primary " id="exportBtn" >导出exel</a>
+    </div>
+</form>
+
+<table id="table" class="modal-body" style="table-layout: fixed" > </table>
+<div id="deposit" >
+
+</div>
+
+
+<div class="page__bd">
+    <div class="weui-gallery" id="gallery">
+        <span class="weui-gallery__img" id="galleryImg" style="background-image:url(#url#)"></span>
 
     </div>
-
-    <!-- 模态框（Modal） -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">现金调整</h4>
-                </div>
-                <form class="form-horizontal" id="form" role="form" action="/shop/add" method="post">
-                    <div class="modal-body">
-                        <input type="hidden" id="id" name="id" >
-                        <div class="form-group">
-                            <label for="cashAdjustment" class="col-sm-2 control-label">现金调整</label>
-                            <div class="col-sm-10">
-                                <input type="number" min="-100000.00" max="100000.00" step="0.01" class="form-control" id="cashAdjustment" name="cashAdjustment" required >
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="button" id="save" class="btn btn-primary">提交更改</button>
-                    </div>
-                </form>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
-    </div>
-
-
-    <div class="page__bd">
-        <div class="weui-gallery" id="gallery">
-            <span class="weui-gallery__img" id="galleryImg" style="background-image:url(#url#)"></span>
-
-        </div>
-    </div>
+</div>
 
 <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
 <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -141,6 +112,10 @@
 <script th:inline="javascript">
 
     $(function () {
+
+        $('#shopCodes').selectpicker();
+        $('#table').bootstrapTable('refresh');
+
         //禁止数字框，日期框滚轮修改数据
         $('form').on('focus', 'input[type=number], input[type=date]', function (e) {
             $(this).on('wheel.disableScroll', function (e) {
@@ -160,7 +135,8 @@
             minDate : '2020-06-30',
             maxDate : moment().add('d', 1).toDate() //最大日期为1天后，即明天
         });
-        $('#shopCodes').selectpicker();
+
+
         $("#gallery").on("click", function(){
             //console.log(2323);
             $("#gallery").fadeOut(100);
@@ -179,22 +155,16 @@
 
         $('#exportBtn').click(function () {
             if($('#resource-form')[0].reportValidity()) {
-                var shopCodes = $('#shopCodes').val();
-                // if(shopCodes.length > 50) {
-                //     alert("查询店铺数量超过50家,请减少后再导出！");
-                //     return;
-                // }
                 bootbox.confirm("确认导出？",
                     function (result) {
                         if (result) {
                             var jobNum = $('#jobNum').val();
                             var shopCodes = $('#shopCodes').val();
-                            // console.log($('#shopCodes').val());
                             var begin = $('#begin').val();
                             var end = $('#end').val();
                             var depositBegin = $('#deposit-begin').val();
                             var depositEnd = $('#deposit-end').val();
-                            window.location.href = "/daily-deposit/export?jobNum=" + jobNum + "&shopCodes=" + shopCodes
+                            window.location.href = "/deposit/export?shopCodes=" + shopCodes
                                 + "&begin=" + begin + "&end=" + end + "&depositBegin=" + depositBegin
                                 + "&depositEnd=" + depositEnd;
                         }
@@ -225,7 +195,7 @@
     $('#table').bootstrapTable({
         height: 1000,
         // width: 800,
-        url: '/daily-deposit/query?jobNum=' + $('#jobNum').val(),
+        url: '/deposit/query?jobNum=' + $('#jobNum').val(),
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
@@ -233,13 +203,6 @@
         stickyHeader: true,
         fixedColumns: true,
         fixedNumber: 3,
-        // showFooter: true,
-        // search: true,
-        // showButtonText: true,
-        // searchOnEnterKey: true,
-        // showSearchButton: true,
-        // showSearchClearButton: true,
-        // showColumnsSearch: true,
         showColumns: true,
         showRefresh: true,
         toolbar: "#deposit",
@@ -272,14 +235,6 @@
             //导出全部数据没有传limit给后台, 把limit设置为全部数据
             if (typeof(params.limit) == "undefined") {
 
-                // if(params.shopCodes.length == 0) {
-                //     if ( params.end == ""
-                //         && params.depositBegin == "" && params.depositEnd == "") {
-                //         alert("请添加查询条件后再导出");
-                //         return false;
-                //     }
-                //
-                // }
                 params.limit = this.totalRows;
             }
             return params;
@@ -288,9 +243,7 @@
             //console.log(row.id);
         },
         onDblClickRow: function (row, $element) {
-            $('#id').val(row.id);
-            $('#cashAdjustment').val(row.cashAdjustment);
-            $('#myModal').modal('show');
+
         },
         columns: [ {
             field: 'id',
@@ -317,17 +270,13 @@
             title: '结余',
             width: '80'
         }, {
-            field: 'cashAdjustment',
-            title: '现金调整',
-            width: '80'
-        }/*, {
             field: 'cardPay',
             title: '刷卡',
             width: '80'
-        }*/, {
+        }, {
             field: 'pos',
-            title: 'POS机/刷卡/银联扫码',
-            width: '160'
+            title: 'POS机',
+            width: '80'
         }, {
             field: 'cgbCoupon',
             title: '广发兑换券',
@@ -374,9 +323,9 @@
             width: '80'
         }, {
             field: 'memberPoints',
-            title: '会员积分/储值卡消费/礼券',
-            width: '200'
-        }/*, {
+            title: '会员积分',
+            width: '80'
+        }, {
             field: 'cardConsumption',
             title: '储值卡消费',
             width: '80'
@@ -384,13 +333,17 @@
             field: 'giftCertificate',
             title: '礼券',
             width: '80'
-        }*/, {
+        }, {
             field: 'extraCash',
             title: '多收款',
             width: '80'
         }, {
             field: 'yuePay',
             title: '悦支付',
+            width: '80'
+        }, {
+            field: 'wanDa',
+            title: '万达支付',
             width: '80'
         }, {
             field: 'bankName',
@@ -409,16 +362,18 @@
             title: '票据',
             width: '80',
             formatter: function (value, row, index) {
-                //console.log(value);
-                return "<a href='#' class='image' onclick=showImage('" + value + "')>查看</a>";
+                if (value == null) {
+                    return "无";
+                } else {
+                    return "<a href='#' class='image' onclick=showImage('" + value + "')>查看</a>";
+                }
             }
         }]
     });
 
     function showImage(fileName) {
-        // console.log(23423);
         var image = new Image();
-        image.src = "/daily-deposit/showImage?fileName=" + fileName;
+        image.src = "/deposit/showImage?fileName=" + fileName;
         var viewer = new Viewer(image, {
             toolbar: {
                 // zoomIn: true,
@@ -436,16 +391,8 @@
                 viewer.destroy();
             }
         });
-        // image.click();
         viewer.show();
     }
-
-    /*$('.image').click(function () {
-        console.log(222);
-        var url = "/daily_deposit/showImage?fileName=" + $(this).attr('file-name');
-        $('#galleryImg').css("background-image","url(" + url + ")");
-        $gallery.fadeIn(100);
-    });*/
 
 
 </script>

@@ -355,7 +355,7 @@
                     $('#save').attr("disabled", false);//提交成功后激活提交按钮
                 },
                 error: function(data){
-                    bootbox.alert("保存失败，请确认存款日期是否重复！");
+                    bootbox.alert("保存失败，请确认存款日期或者营业日期是否重复！");
                     $('#save').attr("disabled", false);//提交失败后激活提交按钮
                 }
             });

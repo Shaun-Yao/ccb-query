@@ -46,7 +46,7 @@ public interface CashBalanceMapper extends BaseMapper<CashBalance> {
             "\t) result " ,
             "\tPIVOT (SUM(JE) for JSMC in (现金)) pm\n" ,
             ") erp\n" ,
-            "JOIN (SELECT isnull(SUM(case when 1=1 then amount else 0 end),0) amount FROM deposit WHERE shop_code = '${shopCode}'\n" ,
+            "JOIN (SELECT isnull(SUM(case when 1=1 then amount else 0 end), 0) amount FROM deposit WHERE shop_code = '${shopCode}'\n" ,
             ") deposit ON 1 = 1"})
     double calBalance2(@Param("shopCode") String shopCode);
 

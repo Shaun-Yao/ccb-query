@@ -216,7 +216,7 @@
                     },
                     error: function(data){
                         $('#save').attr("disabled", false);
-                        alert("保存失败，请确认日期小票单号是否重复！");
+                        bootbox.alert("保存失败，请确认日期小票单号是否重复！");
                     }
                 });
             }

@@ -6,6 +6,7 @@ import com.honji.order.entity.Authority;
 import com.honji.order.entity.Bank;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.Deposit;
+import com.honji.order.enums.ShopTypeEnum;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DepositDTO;
 import com.honji.order.model.DepositVO;
@@ -79,7 +80,7 @@ public class DepositController {
         QueryWrapper<CashBalance> shopQueryWrapper = new QueryWrapper<>();
         shopQueryWrapper.eq("khdm", shopCode);
         CashBalance cashBalance = cashBalanceService.getOne(shopQueryWrapper);
-        if (cashBalance.getType() == 1) {//公户门店可以存到所有分店账号
+        if (ShopTypeEnum.PUBLIC.equals(cashBalance.getType())) {//公户门店可以存到所有分店账号
             QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
             queryWrapper.orderByAsc("type", "account");
             banks = bankService.list(queryWrapper);

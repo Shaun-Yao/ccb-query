@@ -1,22 +1,26 @@
 package com.honji.order.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum ShopTypeEnum {
 
-    PUBLIC("public", "公户"),
-    PRIVATE("private", "私户")
+    PUBLIC( "公户"),
+    PRIVATE( "私户")
     ;
-    ShopTypeEnum(String code, String desc) {
-        this.code = code;
+    ShopTypeEnum(String desc) {
         this.desc = desc;
     }
 
     @EnumValue
-    private final String code;
     private final String desc;
 
+    public static ShopTypeEnum findByDesc(final String desc){
+        return Arrays.stream(values()).filter(value -> value.getDesc().equals(desc)).findFirst().orElse(null);
+    }
 
 }

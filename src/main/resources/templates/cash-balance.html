@@ -37,6 +37,7 @@
     <div id="datagrid" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <span style="font-size: medium; color: red">结余日期固定为2021.8.31</span>
     </div>
 
     <!-- 模态框（Modal） -->
@@ -63,23 +64,18 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="date" class="col-sm-2 control-label">结余日期</label>
-                            <div class="col-sm-10">
-                                <input type="text"  class="form-control" id="date" name="date" required >
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label for="type" class="col-sm-2 control-label">店铺类型</label>
                             <div class="col-sm-10">
                                 <select class="form-control" name="type" id="type" required>
-                                    <option ></option>
-                                    <option value="1">公户</option>
-                                    <option value="2">私户</option>
+                                    <option></option>
+                                    <option th:each="elem : ${T(com.honji.order.enums.ShopTypeEnum).values()}"
+                                            th:value="${elem}" th:text="${elem.desc}">
+                                    </option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="balance" class="col-sm-2 control-label">结余</label>
+                            <label for="balance" class="col-sm-2 control-label">期初结余</label>
                             <div class="col-sm-10">
                                 <input type="number" min="-100000.00" max="100000.00" step="0.01" class="form-control" id="balance" name="balance" required >
                             </div>
@@ -257,7 +253,7 @@
                                         alert("导入成功！");
                                         $('#table').bootstrapTable('refresh');
                                     } else {
-                                        alert("导入失败或者账单没有数据，请确认后重新尝试！");
+                                        alert("导入失败，请确认门店代码是否重复！");
                                     }
                                 },
                                 error:function(xhr,state,errorThrown){
@@ -283,13 +279,6 @@
         showButtonText: true,
         stickyHeader: true,
         fixedColumns: true,
-        // showFooter: true,
-        // search: true,
-        // showButtonText: true,
-        // searchOnEnterKey: true,
-        // showSearchButton: true,
-        // showSearchClearButton: true,
-        // showColumnsSearch: true,
         showColumns: true,
         showRefresh: true,
         toolbar: "#datagrid",
@@ -322,7 +311,6 @@
                     $('#id').val(result.id);
                     $('#khdm').val(result.khdm);
                     $('#khmc').val(result.khmc);
-                    $('#date').val(result.date);
                     $('#type').val(result.type);
                     $('#balance').val(result.balance);
                     $('#deptCode').val(result.deptCode);
@@ -355,8 +343,19 @@
             title: '店铺名称',
             width: '100'
         }, {
+            field: 'type',
+            title: '类型',
+            width: '80',
+            formatter: function (value, row, index) {
+                if (value == "PUBLIC") {
+                    return "公户";
+                } else {
+                    return "私户";
+                }
+            }
+        }, {
             field: 'balance',
-            title: '结余',
+            title: '期初结余',
             width: '100'
         }, {
             field: 'deptCode',

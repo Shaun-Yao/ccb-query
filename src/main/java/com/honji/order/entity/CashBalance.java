@@ -1,6 +1,7 @@
 package com.honji.order.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.honji.order.enums.ShopTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -25,10 +26,6 @@ public class CashBalance extends IdEntity {
     private String khmc;
 
     private Double balance;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
 
     /**
      * 部门编码
@@ -58,6 +55,6 @@ public class CashBalance extends IdEntity {
     /**
      * 1.公户 2.私户
      */
-    private Integer type;
+    private ShopTypeEnum type;
 
 }

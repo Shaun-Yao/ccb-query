@@ -7,6 +7,7 @@ import com.honji.order.entity.Authority;
 import com.honji.order.entity.Bank;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.DailyDeposit;
+import com.honji.order.enums.ShopTypeEnum;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DepositDTO;
 import com.honji.order.model.DepositVO;
@@ -79,7 +80,7 @@ public class DailyDepositController {
         QueryWrapper<CashBalance> shopQueryWrapper = new QueryWrapper<>();
         shopQueryWrapper.eq("khdm", shopCode);
         CashBalance cashBalance = cashBalanceService.getOne(shopQueryWrapper);
-        if (cashBalance.getType() == 1) {
+        if (cashBalance.getType() == ShopTypeEnum.PUBLIC) {
             QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
             queryWrapper.orderByAsc("type", "account");
             banks = bankService.list(queryWrapper);
@@ -92,28 +93,6 @@ public class DailyDepositController {
         model.addAttribute("shopCode", shopCode);
         model.addAttribute("banks", banks);
         return "daily_deposit";
-    }
-
-    @GetMapping("/index2")
-    public String index2(@RequestParam String shopCode, Model model) {
-
-        List<Bank> banks = null;
-        QueryWrapper<CashBalance> shopQueryWrapper = new QueryWrapper<>();
-        shopQueryWrapper.eq("khdm", shopCode);
-        CashBalance cashBalance = cashBalanceService.getOne(shopQueryWrapper);
-        if (cashBalance.getType() == 1) {
-            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
-            queryWrapper.orderByAsc("type", "account");
-            banks = bankService.list(queryWrapper);
-        } else {
-            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
-            queryWrapper.ne("type", "1");
-            banks = bankService.list(queryWrapper);
-        }
-
-        model.addAttribute("shopCode", shopCode);
-        model.addAttribute("banks", banks);
-        return "deposit";
     }
 
     @GetMapping("/toQuery")

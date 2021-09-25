@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.honji.order.entity.Bank;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.DailyDeposit;
+import com.honji.order.enums.ShopTypeEnum;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DepositDTO;
 import com.honji.order.service.ICashBalanceService;
@@ -30,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>
@@ -92,7 +94,7 @@ public class CashBalanceController {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("sheet1");
 
-        String columnNames[] = { "店铺代码", "店铺名称", "结余日期", "店铺类型", "结余", "部门代码",
+        String columnNames[] = { "店铺代码", "店铺名称", "店铺类型", "结余", "部门代码",
                 "充值到账科目编码", "充值未到账科目编码", "私户到账科目编码", "私户未到账科目编码"};// 列名
         CreationHelper creationHelper = workbook.getCreationHelper();
         CellStyle cellStyle = workbook.createCellStyle();
@@ -113,22 +115,20 @@ public class CashBalanceController {
             Row row = sheet.createRow(i + 1);
             row.createCell(0).setCellValue(balance.getKhdm());
             row.createCell(1).setCellValue(balance.getKhmc());
-            Cell dateCell = row.createCell(2);
-            dateCell.setCellValue(balance.getDate());
-            dateCell.setCellStyle(cellStyle);
-            row.createCell(3).setCellValue(balance.getType());
-            row.createCell(4).setCellValue(balance.getBalance());
-            row.createCell(5).setCellValue(balance.getDeptCode());
-            row.createCell(6).setCellValue(balance.getCzdzCode());
-            row.createCell(7).setCellValue(balance.getCzwdzCode());
-            row.createCell(8).setCellValue(balance.getShdzCode());
-            row.createCell(9).setCellValue(balance.getShwdzCode());
+            row.createCell(2).setCellValue(balance.getType().getDesc());
+            row.createCell(3).setCellValue(balance.getBalance());
+            row.createCell(4).setCellValue(balance.getDeptCode());
+            row.createCell(5).setCellValue(balance.getCzdzCode());
+            row.createCell(6).setCellValue(balance.getCzwdzCode());
+            row.createCell(7).setCellValue(balance.getShdzCode());
+            row.createCell(8).setCellValue(balance.getShwdzCode());
         }
 
         try {
             response.reset();
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("门店信息.xlsx", "utf-8"));
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(
+                    "门店信息".concat(LocalDate.now().toString()).concat(".xlsx"), "utf-8"));
             OutputStream out = response.getOutputStream();
             workbook.write(out);
             out.flush();
@@ -164,30 +164,41 @@ public class CashBalanceController {
                     break;
                 }
                 Cell nameCell = row.getCell(1);
-                Cell dateCell = row.getCell(2);
-                Cell typeCell = row.getCell(3);
-                Cell balanceCell = row.getCell(4);
-                Cell deptCodeCell = row.getCell(5);
-                Cell czdzCell = row.getCell(6);
-                Cell czwdzCell = row.getCell(7);
-                Cell shdzCell = row.getCell(8);
-                Cell shwdzCell = row.getCell(9);
+                Cell typeCell = row.getCell(2);
+                Cell balanceCell = row.getCell(3);
+                Cell deptCodeCell = row.getCell(4);
+                Cell czdzCell = row.getCell(5);
+                Cell czwdzCell = row.getCell(6);
+                Cell shdzCell = row.getCell(7);
+                Cell shwdzCell = row.getCell(8);
 
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String dateStr = String.valueOf(dateCell.getLocalDateTimeCellValue().toLocalDate()).trim();
-                LocalDate date = LocalDate.parse(dateStr, dtf);
-                String khdm = shopCodeCell.getStringCellValue().trim();
-                String khmc = nameCell.getStringCellValue().trim();
+                DataFormatter dataFormatter = new DataFormatter();
+                String khdm = dataFormatter.formatCellValue(shopCodeCell).trim();
+                String khmc = dataFormatter.formatCellValue(nameCell).trim();
                 double balance = balanceCell.getNumericCellValue();
-                String deptCode = deptCodeCell.getStringCellValue().trim();
-                String czdz = czdzCell.getStringCellValue().trim();
-                String czwdz = czwdzCell.getStringCellValue().trim();
-                String shdz = shdzCell.getStringCellValue().trim();
-                String shwdz = shwdzCell.getStringCellValue().trim();
-                int type = (int) typeCell.getNumericCellValue();
+                String deptCode = dataFormatter.formatCellValue(deptCodeCell).trim();
+                String czdz = null;
+                String czwdz = null;
+                String shdz = null;
+                String shwdz = null;
+                String type = typeCell.getStringCellValue();
+
+                if (czdzCell != null) {
+                    czdz = dataFormatter.formatCellValue(czdzCell).trim();
+                }
+                if (czwdzCell != null) {
+                    czwdz = dataFormatter.formatCellValue(czwdzCell).trim();
+                }
+                if (shdzCell != null) {
+                    shdz = dataFormatter.formatCellValue(shdzCell).trim();
+                }
+                if (shwdzCell != null) {
+                    shwdz = dataFormatter.formatCellValue(shwdzCell).trim();
+                }
+
 
                 CashBalance cashBalance = new CashBalance();
-                cashBalance.setKhdm(khdm).setKhmc(khmc).setDate(date).setType(type).setBalance(balance)
+                cashBalance.setKhdm(khdm).setKhmc(khmc).setType(ShopTypeEnum.findByDesc(type)).setBalance(balance)
                 .setDeptCode(deptCode).setCzdzCode(czdz).setCzwdzCode(czwdz).setShdzCode(shdz).setShwdzCode(shwdz);
                 list.add(cashBalance);
 

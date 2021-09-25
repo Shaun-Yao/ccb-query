@@ -11,13 +11,12 @@
     <link rel="stylesheet" href="/webjars/viewerjs/dist/viewer.min.css" />
 </head>
 <body>
-<!--
+
     <div class="pull-right">
         <h3>
-            <span th:text="${shopCode}">信息标签</span>
             <span id="balance"></span>
         </h3>
-    </div>-->
+    </div>
     <table id="table" class="modal-body"></table>
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
@@ -68,7 +67,7 @@
                         <div class="form-group">
                             <label for="amount" class="col-sm-2 control-label">存款额</label>
                             <div class="col-sm-6">
-                                <input type="number" min="0.01" max="99999.00" step="0.01" class="form-control" id="amount" name="amount" required >
+                                <input type="number" min="0.1" max="99999.00" step="0.01" class="form-control" id="amount" name="amount" required >
                             </div>
                         </div>
                         <div class="form-group">

@@ -32,7 +32,7 @@ public class CashBalanceServiceImpl extends ServiceImpl<CashBalanceMapper, CashB
 
     @Override
     public double calBalance(String shopCode) {
-        return cashBalanceMapper.calBalance2(shopCode);
+        return cashBalanceMapper.calBalance(shopCode);
     }
 
     @Override

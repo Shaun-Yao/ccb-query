@@ -27,7 +27,7 @@ public interface PrivateTerminalMapper extends BaseMapper<PrivateTerminal> {
             " or union_pay like '%' + #{search} + '%'",
             " or top_up like '%' + #{search} + '%'",
             "</if>",
-            " ORDER BY created_date desc ",
+            " ORDER BY khdm ",
             "</script>"})
     List<PrivateTerminal> selectForIndex(String search);
 }

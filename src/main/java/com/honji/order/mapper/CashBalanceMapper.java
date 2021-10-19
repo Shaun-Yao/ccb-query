@@ -18,15 +18,16 @@ public interface CashBalanceMapper extends BaseMapper<CashBalance> {
 
     //9.1号至今收款现金减去实际应存回现金等于实时结余
     @Select({"SELECT erp.total - balance.total as total FROM(\n" +
-            "-- 8.31 期初结余减去存款再减去现金差异等于实际应存回现金\n" +
-            "SELECT ISNULL(deposit.amount, 0) - ISNULL(cd.amount, 0) - cb.balance as total\n" +
+            "-- 存款加上现金差异减去期初结余(8.31)等于实际应存回现金\n" +
+            "SELECT ISNULL(deposit.amount, 0) + ISNULL(cd.amount, 0) - cb.balance as total\n" +
             "FROM cash_balance cb\n" +
             "LEFT JOIN \n" +
             "(SELECT shop_code, sum(amount) amount FROM deposit GROUP BY shop_code)\n" +
             "deposit ON cb.khdm = deposit.shop_code\n" +
             "LEFT JOIN \n" +
             "-- 现金差异\n" +
-            "(SELECT shop_code, sum(amount - actual_amount) amount FROM cash_difference GROUP BY shop_code)cd \n" +
+            "(SELECT shop_code, sum(amount - actual_amount) amount FROM cash_difference ",
+            " WHERE date >= '2021-09-01' GROUP BY shop_code)cd \n" +
             "ON cb.khdm = cd.shop_code\n" +
             "WHERE cb.khdm = '${shopCode}'\n" +
             ") balance\n" +

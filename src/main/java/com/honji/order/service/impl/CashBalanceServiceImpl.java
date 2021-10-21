@@ -6,6 +6,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.mapper.CashBalanceMapper;
+import com.honji.order.model.BalanceDTO;
+import com.honji.order.model.BalanceVO;
 import com.honji.order.model.DepositVO;
 import com.honji.order.service.ICashBalanceService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -45,5 +47,25 @@ public class CashBalanceServiceImpl extends ServiceImpl<CashBalanceMapper, CashB
         }
         List<CashBalance> balances = cashBalanceMapper.selectList(queryWrapper);
         return new PageInfo<>(balances);
+    }
+
+    @Override
+    public PageInfo<BalanceVO> query(BalanceDTO dto) {
+        PageHelper.startPage(dto.getOffset() / dto.getLimit() + 1, dto.getLimit());
+        List<BalanceVO> balances =  new ArrayList<>();
+        if (dto.getShopCodes() != null && dto.getShopCodes().size() > 0) {//店铺集合不为空才查询
+            balances =  cashBalanceMapper.query(dto);
+        }
+        return new PageInfo<>(balances);
+    }
+
+    @Override
+    public List<BalanceVO> listAll(BalanceDTO dto) {
+
+        List<BalanceVO> balances =  new ArrayList<>();
+        if (dto.getShopCodes() != null && dto.getShopCodes().size() > 0) {//店铺集合不为空才查询
+            balances = cashBalanceMapper.query(dto);
+        }
+        return balances;
     }
 }

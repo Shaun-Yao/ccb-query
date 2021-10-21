@@ -2,12 +2,16 @@ package com.honji.order.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.honji.order.entity.Authority;
 import com.honji.order.entity.Bank;
 import com.honji.order.entity.CashBalance;
 import com.honji.order.entity.DailyDeposit;
 import com.honji.order.enums.ShopTypeEnum;
+import com.honji.order.model.BalanceDTO;
+import com.honji.order.model.BalanceVO;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.DepositDTO;
+import com.honji.order.service.IAuthorityService;
 import com.honji.order.service.ICashBalanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +54,10 @@ public class CashBalanceController {
     private ICashBalanceService cashBalanceService;
 
 
+    @Autowired
+    private IAuthorityService authorityService;
+
+
 
     @GetMapping("/calculate")
     @ResponseBody
@@ -70,10 +78,25 @@ public class CashBalanceController {
         return cashBalance;
     }
 
+    @GetMapping("/list")
+    @ResponseBody
+    public DataGridResult list(String shopCode, int offset, int limit) {
+        return new DataGridResult(cashBalanceService.listByShopCode(shopCode, offset, limit));
+    }
+
+    @GetMapping("/to-query")
+    public String query(@RequestParam String jobNum, Model model) {
+        QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("job_num", jobNum);
+        List<Authority> authorities = authorityService.list(queryWrapper);
+        model.addAttribute("authorities", authorities);
+        return "balance-query";
+    }
+
     @GetMapping("/query")
     @ResponseBody
-    public DataGridResult query(String shopCode, int offset, int limit) {
-        return new DataGridResult(cashBalanceService.listByShopCode(shopCode, offset, limit));
+    public DataGridResult query(BalanceDTO balanceDTO) {
+        return new DataGridResult(cashBalanceService.query(balanceDTO));
     }
 
     @PostMapping("/save")
@@ -86,6 +109,45 @@ public class CashBalanceController {
     @ResponseBody
     public boolean remove(@RequestParam List<String> ids) {
         return cashBalanceService.removeByIds(ids);
+    }
+
+    @GetMapping("/exportBalance")
+    @ResponseBody
+    public void exportBalance(BalanceDTO dto, HttpServletResponse response) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("sheet1");
+
+        String columnNames[] = { "店铺代码", "店铺名称", "结余", "日期"};// 列名
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+
+        Row headRow = sheet.createRow(0);
+        for (int i = 0; i < columnNames.length; i++) {
+            headRow.createCell(i).setCellValue(columnNames[i]);
+        }
+        List<BalanceVO> balances = cashBalanceService.listAll(dto);
+        for (int i = 0; i < balances.size(); i++) {
+            BalanceVO balance = balances.get(i);
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(balance.getShopCode());
+            row.createCell(1).setCellValue(balance.getShopName());
+            row.createCell(2).setCellValue(balance.getTotal().doubleValue());
+            row.createCell(3).setCellValue(dto.getDate());
+        }
+
+        try {
+            response.reset();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(
+                    "门店现金结余".concat(dto.getDate()).concat(".xlsx"), "utf-8"));
+            OutputStream out = response.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @GetMapping("/export")

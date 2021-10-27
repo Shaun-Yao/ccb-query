@@ -168,7 +168,7 @@
             url: "/cash-balance/calculate?shopCode=" + $('#shopCode').val(),
             type: "GET",
             success: function(result){
-                $('#balance').text("结余：" + result + "元");
+                $('#balance').text("现金结余：" + result + "元");
             },
             error:function(xhr,state,errorThrown){
                 bootbox.alert("查询结余，请重新尝试！");

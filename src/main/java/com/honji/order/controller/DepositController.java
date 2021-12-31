@@ -80,12 +80,13 @@ public class DepositController {
         QueryWrapper<CashBalance> shopQueryWrapper = new QueryWrapper<>();
         shopQueryWrapper.eq("khdm", shopCode);
         CashBalance cashBalance = cashBalanceService.getOne(shopQueryWrapper);
+        QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("enabled", 1);
         if (ShopTypeEnum.PUBLIC.equals(cashBalance.getType())) {//公户门店可以存到所有分店账号
-            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
+
             queryWrapper.orderByAsc("type", "account");
             banks = bankService.list(queryWrapper);
         } else {//私户门店没有分店账号
-            QueryWrapper<Bank> queryWrapper = new QueryWrapper<>();
             queryWrapper.ne("type", "1");
             banks = bankService.list(queryWrapper);
         }

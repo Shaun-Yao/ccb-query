@@ -38,7 +38,7 @@
     <table id="table" class="modal-body" > </table>
     <div id="datagrid" >
         <button type="button" class="btn btn-success" id="add">新增</button>
-        <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <!--<button type="button" class="btn btn-danger" id="remove">删除</button>-->
     </div>
 
     <!-- 模态框（Modal） -->
@@ -83,6 +83,18 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">启用</label>
+                            <div class="col-sm-10">
+                                <label class="radio-inline">
+                                    <input type="radio" name="enabled" value="1"> 是
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="enabled" value="0"> 否
+                                </label>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -123,6 +135,7 @@
                 $('#form').resetForm();
                 $('#id').val('');
             }
+            $("input:radio[name=enabled]").get(0).checked=true;
             $('#myModal').modal('show');
         });
 
@@ -281,6 +294,13 @@
                     $('#name').val(result.name);
                     $('#code').val(result.code);
                     $('#type').val(result.type);
+                    // $("input:radio[name=enabled][value=" + result.enabled + "]")[0].checked=true;
+                    if(result.enabled == 0) {
+                        $("input:radio[name=enabled]").get(1).checked=true;
+                    } else {
+                        $("input:radio[name=enabled]").get(0).checked=true;
+                    }
+
                     $('#myModal').modal('show');
                 },
                 error:function(xhr,state,errorThrown){

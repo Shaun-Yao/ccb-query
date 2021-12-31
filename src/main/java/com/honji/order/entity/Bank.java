@@ -39,4 +39,10 @@ public class Bank extends IdEntity {
     private Integer type;
 
 
+    /**
+     * 0禁用 1启用
+     */
+    private Integer enabled;
+
+
 }

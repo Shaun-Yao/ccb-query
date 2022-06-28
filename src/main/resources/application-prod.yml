@@ -8,7 +8,7 @@ web:
 
 spring:
   datasource:
-    url: jdbc:sqlserver://10.10.10.155;databaseName=finance
+    url: jdbc:sqlserver://10.10.10.163;databaseName=finance
     username: sa
     password: 1qazxsw2~
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -43,5 +43,5 @@ pagehelper:
 logging:
   file: logs/ccb.log
   level:
-    com.honji.order.mapper: INFO
+    com.honji.order.mapper: debug
     root: INFO

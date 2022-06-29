@@ -17,7 +17,7 @@
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
     </div>
-
+    <input type="hidden" th:value="${jobNum}">
 
     <div class="modal" id="myModal">
         <div class="modal-dialog" style="width:90%;">
@@ -149,7 +149,7 @@
 
 
     $(function () {
-        $('#myModal').modal('show');
+        // $('#myModal').modal('show');
         $('input[type=date]').attr("min", "2021-09-01");
 
         var subjectSel = document.getElementById("subject");
@@ -180,7 +180,7 @@
 
 
     $('#table').bootstrapTable({
-        url: '/deposit/list?shopCode=' + $('#shopCode').val(),
+        url: '/sales-plan/list?jobNum=' + [[${jobNum}]],
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
@@ -202,32 +202,8 @@
             //console.log(row.id);
         },
         onDblClickRow: function (row, $element) {
-            $.ajax({
-                type: "GET",
-                url: "/deposit/get?id=" + row.id,
-                async: false,
-                success: function(data){
-
-                    $('#form').clearForm();
-                    $('#id').val(data.id);
-                    $('#amount').val(data.amount);
-                    $('#date').val(data.date);
-                    $('#saleDate').val(data.saleDate);
-                    $('#picture1').val(data.image);
-                    $("#bank").val(data.bank);
-                    $("#remark").val(data.remark);
-                    $uploaderFiles.empty();
-                    pictureSize = 0;
-                    if (data.image != null && data.image != '') {
-                        $uploaderFiles.append($(tmpl.replace('#url#', "/deposit/showImage?fileName=" + data.image)).attr('file-name', data.image));
-                        pictureSize = pictureSize + 1;
-                    }
-
-                    checkPhotoSize();
-
-                }
-            });
-            $('#myModal').modal('show');
+            window.location.href = '/sales-plan-details/index?jobNum=' + [[${jobNum}]]
+                + '&id=' + row.id;
         },
         columns: [ {
             field: '',
@@ -242,26 +218,22 @@
             title: 'ID',
             visible: false
         }, {
-            field: 'date',
-            title: '存款日期'
+            field: 'createDate',
+            title: '制表日期'
         }, {
-            field: 'saleDate',
-            title: '营业日期'
+            field: 'name',
+            title: '姓名'
         }, {
-            field: 'bankName',
-            title: '存款银行'
+            field: 'shopCode',
+            title: '店铺'
         }, {
-            field: 'amount',
-            title: '存款额'
-        }, {
-            field: 'remark',
-            title: '备注'
+            field: 'performDate',
+            title: '业绩日期'
         }]
     });
 
     $('#save').click(function() {
         if($('#form')[0].reportValidity()) {
-            console.log($('#form').serialize());
 
             $('#save').attr("disabled", true);//屏蔽提交按钮
             $.ajax({
@@ -282,7 +254,7 @@
     });
 
     $('#add').click(function () {
-
+        window.location.href = '/sales-plan-details/index?jobNum=' + [[${jobNum}]];
     });
 
     $('#remove').click(function () {

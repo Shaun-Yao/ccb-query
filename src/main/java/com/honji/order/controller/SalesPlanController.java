@@ -1,8 +1,11 @@
 package com.honji.order.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.honji.order.entity.SalesPlan;
+import com.honji.order.entity.SalesPlanDetails;
 import com.honji.order.model.DataGridResult;
+import com.honji.order.service.ISalesPlanDetailsService;
 import com.honji.order.service.ISalesPlanService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +33,10 @@ public class SalesPlanController {
 
     @Autowired
     private ISalesPlanService salesPlanService;
+
+
+    @Autowired
+    private ISalesPlanDetailsService salesPlanDetailsService;
 
 
     @GetMapping("/index")
@@ -62,6 +70,12 @@ public class SalesPlanController {
     @PostMapping("/remove")
     @ResponseBody
     public boolean remove(@RequestParam String id) {
+        QueryWrapper<SalesPlanDetails> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("plan_id", id);
+        List<SalesPlanDetails> detailsList = salesPlanDetailsService.list(queryWrapper);
+        if (detailsList.size() > 0) {//已经有方案不允许删除
+            return false;
+        }
         return salesPlanService.removeById(id);
     }
 

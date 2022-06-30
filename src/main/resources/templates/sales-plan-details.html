@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <form class="form-horizontal" id="sales-form" role="form" action="/cash-difference/add" method="post">
+    <form class="form-horizontal" id="sales-form" role="form" action="/sales-plan-details/add" method="post">
         <div class="modal-body">
             <input type="hidden" name="id" th:value="${salesPlan?.id}">
             <input type="hidden" name="jobNum" th:value="${jobNum}" >
@@ -32,8 +32,8 @@
             <div class="form-group">
                 <label for="area" class="col-sm-1 control-label">销售区域</label>
                 <div class="col-sm-2">
-                    <select id="area" name="area">
-                        <option>aaa</option>
+                    <select id="area" name="area" class="form-control">
+                        <option>粤东一区</option>
                     </select>
                 </div>
                 <label for="shopCode" class="col-sm-1 control-label">店铺</label>
@@ -51,29 +51,35 @@
             <div class="form-group">
                 <label for="performDate" class="col-sm-1 control-label">业绩分析时点</label>
                 <div class="col-sm-2">
-                    <input type="month" min="2021-06-30" class="form-control" id="performDate" name="performDate"
+                    <input type="month" class="form-control" id="performDate" name="performDate"
                            th:value="${salesPlan?.performDate}"  required>
                 </div>
+
+            </div>
+
+            <div class="form-group">
                 <label class="col-sm-1 control-label">当月业绩</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="amounts" name="amounts"
                            th:value="${salesPlan?.amounts}" readonly required>
                 </div>
-            </div>
-
-            <div class="form-group">
                 <label class="col-sm-1 control-label">同期业绩</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control" id="lastYearMonthAmounts" name="lastYearMonthAmounts"
                            th:value="${salesPlan?.lastYearMonthAmounts}" readonly required>
                 </div>
+
+            </div>
+
+            <div class="form-group">
+
                 <label class="col-sm-1 control-label">同期涨幅金额</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control" id="monthDiff" name="monthDiff"
                            th:value="${salesPlan?.monthDiff}" readonly required>
                 </div>
                 <label class="col-sm-1 control-label">同期涨幅</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control" id="monthPercent" name="monthPercent"
                            th:value="${salesPlan?.monthPercent}" readonly required>
                 </div>
@@ -81,24 +87,28 @@
 
             <div class="form-group">
                 <label class="col-sm-1 control-label">当年累计业绩</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control" id="totalAmounts" name="totalAmounts"
                            th:value="${salesPlan?.totalAmounts}"  readonly required>
                 </div>
                 <label  class="col-sm-1 control-label">同期累计金额</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control" id="lastYearTotalAmounts" name="lastYearTotalAmounts"
                            th:value="${salesPlan?.lastYearTotalAmounts}"  readonly required>
                 </div>
+
+            </div>
+            <div class="form-group">
+
                 <label  class="col-sm-1 control-label">同期累计涨幅金额</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control" id="yearDiff" name="yearDiff"
                            th:value="${salesPlan?.yearDiff}"  readonly required>
                 </div>
                 <label class="col-sm-1 control-label">同期累计涨幅</label>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <input type="text" class="form-control" id="yearPercent" name="yearPercent"
-                           th:value="${salesPlan?.yearPercent}"  readonly required>
+                           th:value="${salesPlan?.yearPercent}" readonly required>
                 </div>
             </div>
 
@@ -123,7 +133,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h3 class="modal-title" id="myModalLabel">原因分析及方案跟进</h3>
                 </div>
-                <form class="form-horizontal" id="form" role="form" action="/cash-difference/add" method="post">
+                <form class="form-horizontal" id="form" role="form" action="/sales-plan-details/add" method="post">
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id" >
                         <input type="hidden" id="planId" name="planId" th:value="${salesPlan != null} ? ${salesPlan.id} : ''">
@@ -131,14 +141,14 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">原因</label>
                             <div class="col-sm-8">
-                                <select name="reasonType" id="subject" class="form-control" required>
-                                    <option value="" selected="selected">Select subject</option>
+                                <select name="reasonType" id="reasonType" class="form-control" required>
+                                    <option value="" selected="selected">原因类型</option>
                                 </select>
-                                <select name="primaryReason" id="topic" class="form-control" required>
-                                    <option value="" selected="selected">Please select subject first</option>
+                                <select name="primaryReason" id="primaryReason" class="form-control" required>
+                                    <option value="" selected="selected">请先选择原因类型</option>
                                 </select>
-                                <select name="reason" id="chapter" class="form-control" required>
-                                    <option value="" selected="selected">Please select topic first</option>
+                                <select name="reason" id="reason" class="form-control" required>
+                                    <option value="" selected="selected">请先选择主要原因</option>
                                 </select>
                             </div>
                         </div>
@@ -172,14 +182,14 @@
                         <div class="form-group">
                             <label for="executor" class="col-sm-2 control-label">执行人</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="executor" name="executor" required >
+                                <input type="text" class="form-control" id="executor" name="executor" >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">时间节点</label>
                             <div class="col-sm-8">
-                                <input type="date" class="form-control" id="date" name="date" required >
+                                <input type="date" class="form-control" id="date" name="date" >
                             </div>
                         </div>
 
@@ -211,6 +221,30 @@
 </body>
 <script th:inline="javascript">
 
+    function getMaxMonth(date) {
+        var mm = date.getMonth()+1; //January is 0!
+        var yyyy = date.getFullYear();
+
+        if(mm<10){
+            mm='0'+mm;
+        }
+        return yyyy+'-' + mm;
+    }
+
+    function getMaxDate(date) {
+        var dd = date.getDate();
+        //月份是从0开始，所以先加1，再加1加到下个月
+        var mm = date.getMonth() + 2;
+        var yyyy = date.getFullYear();
+        if(dd<10){
+            dd='0'+dd;
+        }
+        if(mm<10){
+            mm='0'+mm;
+        }
+        return yyyy+'-' + mm+'-' + dd;
+    }
+
     var subjectObject = {
         "内部原因": {
             "人员问题": ["员工状态低迷与积极性差", "老员工销售技能差",
@@ -221,37 +255,49 @@
             "其他": ["其他"]
         },
         "外部原因": {
-            "PHP": ["Variables", "Strings", "Arrays"],
-            "SQL": ["SELECT", "UPDATE", "DELETE"]
+            "本店特殊情况": ["店铺翻新/装修，工期延误", "修路", "其他"],
+            "业态环境": ["人口流失", "商圈转移", "老城改造"],
+            "天气问题": ["天气问题"],
+            "疫情影响": ["疫情影响"],
+            "其他": ["其他"]
         }
     }
 
     $(function () {
+        $('#performDate').attr("min", "2022-01");
+        $('#performDate').attr("max", getMaxMonth(new Date()));
+
+        $('#date').attr("min", "2022-06-30");
+        $('#date').attr("max", getMaxDate(new Date()));
+
         $('#shopCode').selectpicker();
-        $('input[type=date]').attr("min", "2021-08-01");
 
-        $('#performDate').change(function () {
-
-            $.ajax({
-                type: "GET",
-                url: "/sales-plan/getPerformance?date=" + this.value + '&shopCode=Z59561',
-                async: false,
-                success: function(data){
-                    $('#amounts').val(data.amounts);
-                    $('#lastYearMonthAmounts').val(data.lastYearMonthAmounts);
-                    $('#monthDiff').val(data.monthDiff);
-                    $('#monthPercent').val(data.monthPercent);
-                    $('#totalAmounts').val(data.totalAmounts);
-                    $('#lastYearTotalAmounts').val(data.lastYearTotalAmounts);
-                    $('#yearDiff').val(data.yearDiff);
-                    $('#yearPercent').val(data.yearPercent);
-                }
-            });
+        $('#performDate, #shopCode').change(function () {
+            var performDate = $('#performDate').val();
+            var shopCode = $('#shopCode').val();
+            if(performDate.length > 0 && shopCode.length > 0) {
+                $.ajax({
+                    type: "GET",
+                    url: "/sales-plan/getPerformance?date=" + performDate + '&shopCode=' + shopCode,
+                    async: false,
+                    success: function(data){
+                        console.log(data);
+                        $('#amounts').val(data.amounts);
+                        $('#lastYearMonthAmounts').val(data.lastYearMonthAmounts);
+                        $('#monthDiff').val(data.monthDiff);
+                        $('#monthPercent').val(data.monthPercent);
+                        $('#totalAmounts').val(data.totalAmounts);
+                        $('#lastYearTotalAmounts').val(data.lastYearTotalAmounts);
+                        $('#yearDiff').val(data.yearDiff);
+                        $('#yearPercent').val(data.yearPercent);
+                    }
+                });
+            }
         });
 
-        var subjectSel = document.getElementById("subject");
-        var topicSel = document.getElementById("topic");
-        var chapterSel = document.getElementById("chapter");
+        var subjectSel = document.getElementById("reasonType");
+        var topicSel = document.getElementById("primaryReason");
+        var chapterSel = document.getElementById("reason");
         for (var x in subjectObject) {
             subjectSel.options[subjectSel.options.length] = new Option(x, x);
         }
@@ -304,11 +350,18 @@
                     $('#form').clearForm();
                     $('#id').val(data.id);
                     $('#planId').val(data.planId);
-                    $('#type').val(data.type);
-                    $('#number').val(data.shortNumber);
-                    $('#amount').val(data.amount);
-                    $('#actualAmount').val(data.actualAmount);
-                    $('#remark').val(data.remark);
+                    $('#reasonType').val(data.reasonType);
+                    $('#reasonType').change();//触发change事件
+                    $('#primaryReason').val(data.primaryReason);
+                    $('#primaryReason').change();//触发change事件
+                    $('#reason').val(data.reason);
+                    $('#convention').val(data.convention);
+                    $('#innovation').val(data.innovation);
+                    $('#feedback').val(data.feedback);
+                    $('#confirmation').val(data.confirmation);
+                    $('#executor').val(data.executor);
+                    $('#date').val(data.date);
+                    $('#result').val(data.result);
                 }
             });
             $('#myModal').modal('show');
@@ -345,6 +398,10 @@
 
     $('#save').click(function() {
         if($('#sales-form')[0].reportValidity()) {
+            if ($('#amounts').val().length == 0) {
+                alert('没有业绩，请重新选择店铺或者日期');
+                return;
+            }
             $('#save').attr("disabled", true);//屏蔽提交按钮
             $.ajax({
                 type: "post",
@@ -353,6 +410,7 @@
                 success: function(data){
                     $('#planId').val(data);//保存成功返回id设置到子表
                     $('#save').attr("disabled", false);//提交成功后激活提交按钮
+                    bootbox.alert("保存成功!");
                 },
                 error: function(data){
                     $('#save').attr("disabled", false);
@@ -403,7 +461,7 @@
                 if(result) {
                     $.ajax({
                         type: "POST",
-                        url: "/cash-difference/remove",
+                        url: "/sales-plan-details/remove",
                         traditional: true,
                         data: {
                             id: id

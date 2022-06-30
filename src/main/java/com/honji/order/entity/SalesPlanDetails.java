@@ -1,12 +1,8 @@
 package com.honji.order.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
 
 /**
  * <p>
@@ -73,9 +69,9 @@ public class SalesPlanDetails extends IdEntity {
     /**
      * 时间节点
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+//    @DateTimeFormat(pattern = "yyyy-MM-dd")
+//    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String date;
 
 
     /**

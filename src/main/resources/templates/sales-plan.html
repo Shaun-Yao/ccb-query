@@ -268,12 +268,15 @@
                 if(result) {
                     $.ajax({
                         type: "POST",
-                        url: "/deposit/remove",
+                        url: "/sales-plan/remove",
                         traditional: true,
                         data: {
                             id: id
                         },
-                        success: function(data){
+                        success: function(result){
+                            if (!result) {
+                                alert("请先删除与此记录关联的原因分析及方案中跟进");
+                            }
                             $('#table').bootstrapTable('refresh');
                         },
                         error:function(xhr,state,errorThrown){

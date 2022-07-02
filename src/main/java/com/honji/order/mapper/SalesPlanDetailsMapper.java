@@ -19,7 +19,7 @@ public interface SalesPlanDetailsMapper extends BaseMapper<SalesPlanDetails> {
 
     @Select({"<script>",
             "SELECT * FROM sales_plan_details where plan_id = '${planId}'",
-            " ORDER BY date ",
+//            " ORDER BY date ",
             "</script>"})
     List<SalesPlanDetails> selectForIndex(String planId);
 }

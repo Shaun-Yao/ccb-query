@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.SalesPlan;
 import com.honji.order.mapper.SalesPlanMapper;
 import com.honji.order.service.ISalesPlanService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,13 @@ public class SalesPlanServiceImpl extends ServiceImpl<SalesPlanMapper, SalesPlan
 
     @Override
     public PageInfo<SalesPlan> listForIndex(String jobNum, int offset, int limit) {
+
+        String result = salesPlanMapper.selectManager(jobNum);//查询是否大区经理
         PageHelper.startPage(offset / limit + 1, limit);
+        if (StringUtils.isNotEmpty(result)) {
+            return new PageInfo<>(salesPlanMapper.selectForManager(jobNum));
+        }
+
         return new PageInfo<>(salesPlanMapper.selectForIndex(jobNum));
     }
 }

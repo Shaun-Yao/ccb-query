@@ -13,7 +13,7 @@
 
     <form class="form-horizontal" id="sales-form" role="form" action="/sales-plan-details/add" method="post">
         <div class="modal-body">
-            <input type="hidden" name="id" th:value="${salesPlan?.id}">
+            <input type="hidden" id="id" name="id" th:value="${salesPlan?.id}">
             <input type="hidden" name="jobNum" th:value="${jobNum}" >
 
             <div class="form-group">
@@ -133,79 +133,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h3 class="modal-title" id="myModalLabel">原因分析及方案跟进</h3>
                 </div>
-                <form class="form-horizontal" id="form" role="form" action="/sales-plan-details/add" method="post">
-                    <div class="modal-body">
-                        <input type="hidden" id="id" name="id" >
-                        <input type="hidden" id="planId" name="planId" th:value="${salesPlan != null} ? ${salesPlan.id} : ''">
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">原因</label>
-                            <div class="col-sm-8">
-                                <select name="reasonType" id="reasonType" class="form-control" required>
-                                    <option value="" selected="selected">原因类型</option>
-                                </select>
-                                <select name="primaryReason" id="primaryReason" class="form-control" required>
-                                    <option value="" selected="selected">请先选择原因类型</option>
-                                </select>
-                                <select name="reason" id="reason" class="form-control" required>
-                                    <option value="" selected="selected">请先选择主要原因</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="convention" class="col-sm-2 control-label">常规</label>
-                            <div class="col-sm-8">
-                                <textarea rows="3" cols="30" id="convention" name="convention"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="innovation" class="col-sm-2 control-label">创新</label>
-                            <div class="col-sm-8">
-                                <textarea rows="3" cols="30" id="innovation" name="innovation"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="feedback" class="col-sm-2 control-label">反馈</label>
-                            <div class="col-sm-8">
-                                <textarea rows="3" cols="30" id="feedback" name="feedback"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmation" class="col-sm-2 control-label">方案确定</label>
-                            <div class="col-sm-8">
-                                <textarea rows="3" cols="30" id="confirmation" name="confirmation"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="executor" class="col-sm-2 control-label">执行人</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="executor" name="executor" >
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="date" class="col-sm-2 control-label">时间节点</label>
-                            <div class="col-sm-8">
-                                <input type="date" class="form-control" id="date" name="date" >
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="result" class="col-sm-2 control-label">结果</label>
-                            <div class="col-sm-8">
-                                <textarea rows="3" cols="30" id="result" name="result"></textarea>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="button" id="saveDetails" class="btn btn-primary">提交更改</button>
-                    </div>
-                </form>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
     </div><!-- 模态框（Modal）end -->
@@ -231,37 +159,6 @@
         return yyyy+'-' + mm;
     }
 
-    function getMaxDate(date) {
-        var dd = date.getDate();
-        //月份是从0开始，所以先加1，再加1加到下个月
-        var mm = date.getMonth() + 2;
-        var yyyy = date.getFullYear();
-        if(dd<10){
-            dd='0'+dd;
-        }
-        if(mm<10){
-            mm='0'+mm;
-        }
-        return yyyy+'-' + mm+'-' + dd;
-    }
-
-    var subjectObject = {
-        "内部原因": {
-            "人员问题": ["员工状态低迷与积极性差", "老员工销售技能差",
-                "新员工经验技能不足", "招聘困难，长期缺编", "人员请长假，人手不足"],
-            "货品问题": ["结构缺陷", "质量问题"],
-            "客流下降": ["位置不佳", "形象老旧"],
-            "活动策略差异": ["活动策略差异"],
-            "其他": ["其他"]
-        },
-        "外部原因": {
-            "本店特殊情况": ["店铺翻新/装修，工期延误", "修路", "其他"],
-            "业态环境": ["人口流失", "商圈转移", "老城改造"],
-            "天气问题": ["天气问题"],
-            "疫情影响": ["疫情影响"],
-            "其他": ["其他"]
-        }
-    }
 
     $(function () {
         $('#performDate').attr("min", "2022-01");
@@ -342,7 +239,9 @@
             //console.log(row.id);
         },
         onDblClickRow: function (row, $element) {
-            $.ajax({
+            window.location.href = '/details-proposal/index?id=' + row.id
+                + '&planId=' + [[${planId}]] + '&jobNum=' + [[${jobNum}]];
+            /*$.ajax({
                 type: "GET",
                 url: "/sales-plan-details/get?id=" + row.id,
                 async: false,
@@ -364,7 +263,7 @@
                     $('#result').val(data.result);
                 }
             });
-            $('#myModal').modal('show');
+            //$('#myModal').modal('show');*/
         },
         columns: [ {
             field: '',
@@ -386,9 +285,6 @@
         }, {
             field: 'executor',
             title: '执行人'
-        }, {
-            field: 'date',
-            title: '时间节点'
         }]
     });
 
@@ -407,8 +303,8 @@
                 type: "post",
                 url: "/sales-plan/save",
                 data: $('#sales-form').serialize(),
-                success: function(data){
-                    $('#planId').val(data);//保存成功返回id设置到子表
+                success: function(result){
+                    $('#id').val(result);//保存成功返回id设置到子表
                     $('#save').attr("disabled", false);//提交成功后激活提交按钮
                     bootbox.alert("保存成功!");
                 },
@@ -441,13 +337,12 @@
     });
 
     $('#add').click(function () {
-        if ($('#planId').val().length == 0) {
+        var id = $('#id').val();
+        if (id.length == 0) {
             alert('请先保存业绩');
             return;
         }
-        $('#form').resetForm();
-        $('#id').val('');
-        $('#myModal').modal('show');
+        window.location.href = '/details-proposal/index?planId=' + id + '&jobNum=' + [[${jobNum}]];
     });
 
     $('#remove').click(function () {

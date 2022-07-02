@@ -56,22 +56,12 @@ public class SalesPlanDetails extends IdEntity {
      */
     private String feedback;
 
-    /**
-     * 方案确定
-     */
-    private String confirmation;
+
 
     /**
      * 执行人
      */
     private String executor;
-
-    /**
-     * 时间节点
-     */
-//    @DateTimeFormat(pattern = "yyyy-MM-dd")
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-    private String date;
 
 
     /**

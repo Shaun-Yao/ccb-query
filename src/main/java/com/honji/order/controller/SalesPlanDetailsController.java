@@ -46,7 +46,7 @@ public class SalesPlanDetailsController {
 
 
     @GetMapping("/index")
-    public String index(@RequestParam String jobNum,
+    public String index(@RequestParam(required = false) String jobNum,
                         @RequestParam(required = false) String id, Model model) {
         if (StringUtils.isNotEmpty(id)) {//有id为修改
             SalesPlan salesPlan = salesPlanService.getById(id);
@@ -78,8 +78,9 @@ public class SalesPlanDetailsController {
 
     @PostMapping("/save")
     @ResponseBody
-    public boolean save(@ModelAttribute SalesPlanDetails salesPlanDetails) {
-        return salesPlanDetailsService.saveOrUpdate(salesPlanDetails);
+    public String save(@ModelAttribute SalesPlanDetails salesPlanDetails) {
+        salesPlanDetailsService.saveOrUpdate(salesPlanDetails);
+        return salesPlanDetails.getId();
     }
 
 

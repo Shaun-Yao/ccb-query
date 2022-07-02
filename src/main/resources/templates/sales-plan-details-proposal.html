@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Hello, Bootstrap Table!</title>
+
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css" />
+</head>
+<body>
+
+    <form class="form-horizontal" id="details-form" role="form"  method="post">
+        <div class="modal-body">
+            <input type="hidden" name="id" th:value="${details?.id}">
+            <input type="hidden" id="planId" name="planId"
+                   th:value="${details != null} ? ${details.planId} : ${planId}">
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">原因</label>
+                <div class="col-sm-8">
+                    <select name="reasonType" id="reasonType" class="form-control" required>
+                        <option value="" selected="selected">原因类型</option>
+                    </select>
+                    <select name="primaryReason" id="primaryReason" class="form-control" required>
+                        <option value="" selected="selected">请先选择原因类型</option>
+                    </select>
+                    <select name="reason" id="reason" class="form-control" required>
+                        <option value="" selected="selected">请先选择主要原因</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="convention" class="col-sm-2 control-label">常规</label>
+                <div class="col-sm-8">
+                    <textarea rows="3" cols="30" id="convention" name="convention" th:text="${details?.convention}"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="innovation" class="col-sm-2 control-label">创新</label>
+                <div class="col-sm-8">
+                    <textarea rows="3" cols="30" id="innovation" name="innovation" th:text="${details?.innovation}"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="feedback" class="col-sm-2 control-label">反馈</label>
+                <div class="col-sm-8">
+                    <textarea rows="3" cols="30" id="feedback" name="feedback" th:text="${details?.feedback}"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="executor" class="col-sm-2 control-label">执行人</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="executor" name="executor"  th:value="${details?.executor}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="result" class="col-sm-2 control-label">结果</label>
+                <div class="col-sm-8">
+                    <textarea rows="3" cols="30" id="result" name="result" th:text="${details?.result}"></textarea>
+                </div>
+            </div>
+            <button type="button" id="back" class="btn btn-default" >返回</button>
+            <button type="button" id="save" class="btn btn-primary">提交更改</button>
+        </div>
+
+    </form>
+
+    <table id="table" class="modal-body"></table>
+    <div id="deposit" >
+        <button type="button" class="btn btn-success" id="add">新增</button>
+        <button type="button" class="btn btn-danger" id="remove">删除</button>
+    </div>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="myModalLabel">方案确定</h3>
+                </div>
+                <form class="form-horizontal" id="form" role="form" action="/sales-plan-details/add" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="id" name="id" >
+                        <input type="hidden" id="detailsId" name="detailsId" th:value="${details?.id}">
+
+                        <div class="form-group">
+                            <label for="confirmation" class="col-sm-2 control-label">方案确定</label>
+                            <div class="col-sm-8">
+                                <textarea rows="3" cols="30" id="confirmation" name="confirmation"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date" class="col-sm-2 control-label">时间节点</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="date" name="date" >
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="saveProposal" class="btn btn-primary">提交更改</button>
+                    </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div><!-- 模态框（Modal）end -->
+
+<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery-form/4.2.2/jquery.form.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/i18n/defaults-zh_CN.min.js"></script>
+</body>
+<script th:inline="javascript">
+
+
+    function getMaxDate(date) {
+        var dd = date.getDate();
+        //月份是从0开始，所以先加1，再加1加到下个月
+        var mm = date.getMonth() + 2;
+        var yyyy = date.getFullYear();
+        if(dd<10){
+            dd='0'+dd;
+        }
+        if(mm<10){
+            mm='0'+mm;
+        }
+        return yyyy+'-' + mm+'-' + dd;
+    }
+
+    var subjectObject = {
+        "内部原因": {
+            "人员问题": ["员工状态低迷与积极性差", "老员工销售技能差",
+                "新员工经验技能不足", "招聘困难，长期缺编", "人员请长假，人手不足"],
+            "货品问题": ["结构缺陷", "质量问题"],
+            "客流下降": ["位置不佳", "形象老旧"],
+            "活动策略差异": ["活动策略差异"],
+            "其他": ["其他"]
+        },
+        "外部原因": {
+            "本店特殊情况": ["店铺翻新/装修，工期延误", "修路", "其他"],
+            "业态环境": ["人口流失", "商圈转移", "老城改造"],
+            "天气问题": ["天气问题"],
+            "疫情影响": ["疫情影响"],
+            "其他": ["其他"]
+        }
+    }
+
+    $(function () {
+
+        $('#date').attr("min", "2022-06-30");
+        $('#date').attr("max", getMaxDate(new Date()));
+
+        var subjectSel = document.getElementById("reasonType");
+        var topicSel = document.getElementById("primaryReason");
+        var chapterSel = document.getElementById("reason");
+        for (var x in subjectObject) {
+            subjectSel.options[subjectSel.options.length] = new Option(x, x);
+        }
+        subjectSel.onchange = function() {
+            //empty Chapters- and Topics- dropdowns
+            chapterSel.length = 1;
+            topicSel.length = 1;
+            //display correct values
+            for (var y in subjectObject[this.value]) {
+                topicSel.options[topicSel.options.length] = new Option(y, y);
+            }
+        }
+        topicSel.onchange = function() {
+            //empty Chapters dropdown
+            chapterSel.length = 1;
+            //display correct values
+            var z = subjectObject[subjectSel.value][this.value];
+            for (var i = 0; i < z.length; i++) {
+                chapterSel.options[chapterSel.options.length] = new Option(z[i], z[i]);
+            }
+        }
+
+        var details = [[${details}]];
+        if ([[${details}]] != null) {
+            $('#reasonType').val(details.reasonType);
+            $('#reasonType').change();
+            $('#primaryReason').val(details.primaryReason);
+            $('#primaryReason').change();
+            $('#reason').val(details.reason);
+        }
+        
+    });
+
+
+    $('#table').bootstrapTable({
+        url: '/details-proposal/list?detailsId=' + [[${details?.id}]],
+        pagination: true,
+        sidePagination: "server",
+        locale: 'zh-CN',
+        toolbar: "#deposit",
+        clickToSelect: true,
+        singleSelect: true,
+        sortable: true,
+        smartDisplay: false,
+        pageNumber: 1,     //初始化加载第一页，默认第一页
+        pageSize: 10,      //每页的记录行数（*）
+        queryParams: function (params) {
+
+            return params;
+        },
+        onClickRow: function (row, $element) {
+            //console.log(row.id);
+        },
+        onDblClickRow: function (row, $element) {
+            $.ajax({
+                type: "GET",
+                url: "/details-proposal/get?id=" + row.id,
+                async: false,
+                success: function(data){
+                    $('#form').clearForm();
+                    $('#id').val(data.id);
+                    $('#confirmation').val(data.confirmation);
+                    $('#date').val(data.date);
+                }
+            });
+            $('#myModal').modal('show');
+        },
+        columns: [ {
+            field: '',
+            checkbox: true, // 显示一个勾选框
+            align: 'center'
+        },{
+            field: 'id',
+            title: 'ID',
+            visible: false
+        }, {
+            field: 'confirmation',
+            title: '方案确定'
+        }, {
+            field: 'date',
+            title: '时间节点'
+        }]
+    });
+
+    $('#back').click(function() {
+        window.location.href = '/sales-plan-details/index?id=' + [[${planId}]]
+        + '&jobNum=' + [[${jobNum}]];
+    });
+
+    $('#save').click(function() {
+        if($('#details-form')[0].reportValidity()) {
+
+            $('#save').attr("disabled", true);//屏蔽提交按钮
+            $.ajax({
+                type: "post",
+                url: "/sales-plan-details/save",
+                data: $('#details-form').serialize(),
+                success: function(result){
+                    $('#detailsId').val(result);//保存成功返回id设置到子表
+                    $('#save').attr("disabled", false);//提交成功后激活提交按钮
+                    bootbox.alert("保存成功!");
+                },
+                error: function(data){
+                    $('#save').attr("disabled", false);
+                    bootbox.alert("保存失败，请稍后再试！");
+                }
+            });
+        }
+    });
+
+    $('#saveProposal').click(function() {
+        if($('#form')[0].reportValidity()) {
+            $('#saveProposal').attr("disabled", true);//屏蔽提交按钮
+            $.ajax({
+                type: "post",
+                url: "/details-proposal/save",
+                data: $('#form').serialize(),
+                success: function(data){
+                    $('#myModal').modal('hide');
+                    $('#table').bootstrapTable('refresh');
+                    $('#saveProposal').attr("disabled", false);//提交成功后激活提交按钮
+                },
+                error: function(data){
+                    $('#saveProposal').attr("disabled", false);
+                    bootbox.alert("保存失败，请稍后再试！");
+                }
+            });
+        }
+    });
+
+    $('#add').click(function () {
+        if ($('#detailsId').val().length == 0) {
+            alert('请先保存原因');
+            return;
+        }
+        $('#form').resetForm();
+        $('#id').val('');//弹出框方案id
+        $('#myModal').modal('show');
+    });
+
+    $('#remove').click(function () {
+        if($('#table').bootstrapTable('getSelections').length == 0) {
+            return;
+        }
+
+        var id = $('#table').bootstrapTable('getSelections')[0].id;
+        bootbox.confirm("确认删除？",
+            function(result){
+                if(result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/sales-plan-details/remove",
+                        traditional: true,
+                        data: {
+                            id: id
+                        },
+                        success: function(data){
+                            $('#table').bootstrapTable('refresh');
+                        },
+                        error:function(xhr,state,errorThrown){
+                            alert("删除失败，请关闭网页重新尝试！");
+                        }
+                    });
+                }
+            })
+    });
+</script>
+</html>

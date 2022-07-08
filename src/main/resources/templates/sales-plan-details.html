@@ -14,7 +14,7 @@
     <form class="form-horizontal" id="sales-form" role="form" action="/sales-plan-details/add" method="post">
         <div class="modal-body">
             <input type="hidden" id="id" name="id" th:value="${salesPlan?.id}">
-            <input type="hidden" name="jobNum" th:value="${jobNum}" >
+            <input type="hidden" name="jobNum" th:value="${salesPlan !=null}? ${salesPlan.jobNum} : ${jobNum}" >
 
             <div class="form-group">
                 <label  class="col-sm-1 control-label">制表人</label>
@@ -32,18 +32,21 @@
             <div class="form-group">
                 <label for="area" class="col-sm-1 control-label">销售区域</label>
                 <div class="col-sm-2">
-                    <select id="area" name="area" class="form-control">
-                        <option>粤东一区</option>
+                    <select id="area" name="area" class="form-control" required>
+                        <option th:each="area : ${areas}"th:value="${area.code}" th:text="${area.name}"
+                                th:selected="(${salesPlan !=null}? ${salesPlan.area} == *{area.code} : false)" >
+                        </option>
                     </select>
                 </div>
                 <label for="shopCode" class="col-sm-1 control-label">店铺</label>
                 <div class="col-sm-2">
-                    <select class="form-control" name="shopCode" id="shopCode" required
-                            data-live-search="true" data-actions-box="true"
-                            data-selected-text-format="count">
-                        <option th:each="shop : ${shops}"th:value="${shop.khdm}" th:text="${shop.khmc}"
-                                th:selected="(${salesPlan !=null}? ${salesPlan.shopCode} == *{shop.khdm} : false)" >
-                        </option>
+                    <select class="form-control" name="shopCode" id="shopCode"
+                           data-live-search="true" data-actions-box="true"
+                            data-selected-text-format="count" required>
+                    <!--<select id="shopCode" name="shopCode" class="form-control" required>-->
+<!--                        <option th:each="shop : ${shops}"th:value="${shop.khdm}" th:text="${shop.khmc}"-->
+<!--                                th:selected="(${salesPlan !=null}? ${salesPlan.shopCode} == *{shop.khdm} : false)" >-->
+<!--                        </option>-->
                     </select>
                 </div>
             </div>
@@ -125,18 +128,6 @@
     </div>
 
 
-    <!-- 模态框（Modal） -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3 class="modal-title" id="myModalLabel">原因分析及方案跟进</h3>
-                </div>
-
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
-    </div><!-- 模态框（Modal）end -->
 
 <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
 <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -163,11 +154,37 @@
     $(function () {
         $('#performDate').attr("min", "2022-01");
         $('#performDate').attr("max", getMaxMonth(new Date()));
-
-        $('#date').attr("min", "2022-06-30");
-        $('#date').attr("max", getMaxDate(new Date()));
-
         $('#shopCode').selectpicker();
+        let plan = [[${salesPlan}]];
+        if (plan != null && plan.jobNum != [[${jobNum}]]) {
+            $('#save, #add, #remove').hide();
+        }
+
+        $('#area').change(function () {
+            $('#shopCode').empty();
+            $.ajax({
+                type: "GET",
+                url: "/sales-plan/listShops?area=" + $(this).val(),
+                success: function(data){
+                    for (const i in data) {
+                        // console.log(data[i]);
+                        var option = new Option(data[i].name, data[i].code);
+                        $('#shopCode').append(option);
+
+                        // $(this).append(new Option(data[i].name, data[i].code));
+                    }
+                    $('#shopCode').selectpicker('refresh');
+                    let salesPlan = [[${salesPlan}]];
+                    if (salesPlan != null) {
+                        $('#shopCode').selectpicker('val', salesPlan.shopCode);
+                    }
+                }
+            });
+        });
+
+        //这段代码需要在area change事件之后
+        $('#area').change();//大区触发change事件让店铺自动加载数据
+
 
         $('#performDate, #shopCode').change(function () {
             var performDate = $('#performDate').val();
@@ -178,7 +195,6 @@
                     url: "/sales-plan/getPerformance?date=" + performDate + '&shopCode=' + shopCode,
                     async: false,
                     success: function(data){
-                        console.log(data);
                         $('#amounts').val(data.amounts);
                         $('#lastYearMonthAmounts').val(data.lastYearMonthAmounts);
                         $('#monthDiff').val(data.monthDiff);
@@ -192,30 +208,6 @@
             }
         });
 
-        var subjectSel = document.getElementById("reasonType");
-        var topicSel = document.getElementById("primaryReason");
-        var chapterSel = document.getElementById("reason");
-        for (var x in subjectObject) {
-            subjectSel.options[subjectSel.options.length] = new Option(x, x);
-        }
-        subjectSel.onchange = function() {
-            //empty Chapters- and Topics- dropdowns
-            chapterSel.length = 1;
-            topicSel.length = 1;
-            //display correct values
-            for (var y in subjectObject[this.value]) {
-                topicSel.options[topicSel.options.length] = new Option(y, y);
-            }
-        }
-        topicSel.onchange = function() {
-            //empty Chapters dropdown
-            chapterSel.length = 1;
-            //display correct values
-            var z = subjectObject[subjectSel.value][this.value];
-            for (var i = 0; i < z.length; i++) {
-                chapterSel.options[chapterSel.options.length] = new Option(z[i], z[i]);
-            }
-        }
     });
 
 
@@ -295,7 +287,7 @@
     $('#save').click(function() {
         if($('#sales-form')[0].reportValidity()) {
             if ($('#amounts').val().length == 0) {
-                alert('没有业绩，请重新选择店铺或者日期');
+                bootbox.alert('没有业绩，请重新选择店铺或者日期');
                 return;
             }
             $('#save').attr("disabled", true);//屏蔽提交按钮
@@ -339,7 +331,7 @@
     $('#add').click(function () {
         var id = $('#id').val();
         if (id.length == 0) {
-            alert('请先保存业绩');
+            bootbox.alert('请先保存业绩');
             return;
         }
         window.location.href = '/details-proposal/index?planId=' + id + '&jobNum=' + [[${jobNum}]];
@@ -361,11 +353,14 @@
                         data: {
                             id: id
                         },
-                        success: function(data){
+                        success: function(result){
+                            if (!result) {
+                                alert("请先删除方案，或者已经有了反馈不允许删除！");
+                            }
                             $('#table').bootstrapTable('refresh');
                         },
                         error:function(xhr,state,errorThrown){
-                            alert("删除失败，请关闭网页重新尝试！");
+                            bootbox.alert("删除失败，请关闭网页重新尝试！");
                         }
                     });
                 }

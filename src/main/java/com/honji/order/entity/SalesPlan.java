@@ -47,7 +47,7 @@ public class SalesPlan extends IdEntity {
     /**
      * 店铺编码
      */
-    private String ShopCode;
+    private String shopCode;
 
 
 
@@ -82,7 +82,7 @@ public class SalesPlan extends IdEntity {
 
     private BigDecimal monthDiff;
     private BigDecimal yearDiff;
-    private BigDecimal monthPercent;
-    private BigDecimal yearPercent;
+    private String monthPercent;
+    private String yearPercent;
 
 }

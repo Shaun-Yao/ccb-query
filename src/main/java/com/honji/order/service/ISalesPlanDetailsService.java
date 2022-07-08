@@ -16,4 +16,5 @@ public interface ISalesPlanDetailsService extends IService<SalesPlanDetails> {
 
 
     PageInfo<SalesPlanDetails> listForIndex(String planId, int offset, int limit);
+    void saveFeedback(String id, String feedback);
 }

@@ -33,22 +33,23 @@
             </div>
 
             <div class="form-group">
-                <label for="convention" class="col-sm-2 control-label">常规</label>
+                <label for="convention" class="col-sm-2 control-label">常规方案</label>
                 <div class="col-sm-8">
                     <textarea rows="3" cols="30" id="convention" name="convention" th:text="${details?.convention}"></textarea>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="innovation" class="col-sm-2 control-label">创新</label>
+                <label for="innovation" class="col-sm-2 control-label">创新方案</label>
                 <div class="col-sm-8">
                     <textarea rows="3" cols="30" id="innovation" name="innovation" th:text="${details?.innovation}"></textarea>
                 </div>
             </div>
             <div class="form-group">
-                <label for="feedback" class="col-sm-2 control-label">反馈</label>
+                <label for="feedback" class="col-sm-2 control-label">大区经理反馈</label>
                 <div class="col-sm-8">
-                    <textarea rows="3" cols="30" id="feedback" name="feedback" th:text="${details?.feedback}"></textarea>
+                    <textarea rows="3" cols="30" id="feedback" name="feedback"
+                              readonly th:text="${details?.feedback}"></textarea>
                 </div>
             </div>
 
@@ -66,7 +67,9 @@
                 </div>
             </div>
             <button type="button" id="back" class="btn btn-default" >返回</button>
-            <button type="button" id="save" class="btn btn-primary">提交更改</button>
+            <button type="button" id="save" class="btn btn-primary">提交</button>
+            <button type="button" id="saveAndNotify" class="btn btn-info">提交并通知大区经理</button>
+            <button type="button" id="saveFeedback" class="btn btn-info" style="display: none;">提交反馈</button>
         </div>
 
     </form>
@@ -108,7 +111,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="button" id="saveProposal" class="btn btn-primary">提交更改</button>
+                        <button type="button" id="saveProposal" class="btn btn-primary">提交</button>
                     </div>
                 </form>
             </div><!-- /.modal-content -->
@@ -159,10 +162,27 @@
         }
     }
 
+
     $(function () {
 
         $('#date').attr("min", "2022-06-30");
         $('#date').attr("max", getMaxDate(new Date()));
+        let details = [[${details}]];
+        if (details != null && details.feedback.length == 0) {//没有反馈不能添加执行人，反馈，不能操作方案
+            $("#executor").prop("readonly", true);
+            $("#result").prop("readonly", true);
+            $('#add, #remove').hide();
+        }
+
+        if (details != null && ![[${isCreator}]]) {//非创建人隐藏按钮
+            $('#save, #saveAndNotify, #add, #remove, #saveProposal').hide();
+        }
+
+        if ([[${enableFeedback}]]) {//开启意见反馈编辑
+            $("#feedback").prop("readonly", false);
+            $('#saveFeedback').show();
+        }
+
 
         var subjectSel = document.getElementById("reasonType");
         var topicSel = document.getElementById("primaryReason");
@@ -189,7 +209,6 @@
             }
         }
 
-        var details = [[${details}]];
         if ([[${details}]] != null) {
             $('#reasonType').val(details.reasonType);
             $('#reasonType').change();
@@ -202,7 +221,7 @@
 
 
     $('#table').bootstrapTable({
-        url: '/details-proposal/list?detailsId=' + [[${details?.id}]],
+        url: '/details-proposal/list?detailsId=' + $('#detailsId').val(),
         pagination: true,
         sidePagination: "server",
         locale: 'zh-CN',
@@ -256,15 +275,19 @@
         + '&jobNum=' + [[${jobNum}]];
     });
 
-    $('#save').click(function() {
+    $('#save, #saveAndNotify').click(function() {
         if($('#details-form')[0].reportValidity()) {
-
+            let wantToNotify = false;
+            if ($(this).prop('id') == 'saveAndNotify') {
+                wantToNotify = true;
+            }
             $('#save').attr("disabled", true);//屏蔽提交按钮
             $.ajax({
                 type: "post",
-                url: "/sales-plan-details/save",
+                url: "/sales-plan-details/save?wantToNotify=" + wantToNotify,
                 data: $('#details-form').serialize(),
                 success: function(result){
+                    $('#id').val(result);
                     $('#detailsId').val(result);//保存成功返回id设置到子表
                     $('#save').attr("disabled", false);//提交成功后激活提交按钮
                     bootbox.alert("保存成功!");
@@ -286,7 +309,10 @@
                 data: $('#form').serialize(),
                 success: function(data){
                     $('#myModal').modal('hide');
-                    $('#table').bootstrapTable('refresh');
+                    console.log('detailsid==' + $('#detailsId').val());
+                    $('#table').bootstrapTable('refresh', {
+                        url: '/details-proposal/list?detailsId=' + $('#detailsId').val()
+                    });
                     $('#saveProposal').attr("disabled", false);//提交成功后激活提交按钮
                 },
                 error: function(data){
@@ -295,6 +321,28 @@
                 }
             });
         }
+    });
+
+    $('#saveFeedback').click(function() {
+        let feedback = $('#feedback').val();
+        if (feedback.length == 0) {
+            bootbox.alert("请填写反馈内容！");
+            return;
+        }
+        $(this).prop("disabled", true);//屏蔽提交按钮
+        $.ajax({
+            type: "post",
+            url: "/sales-plan-details/saveFeedback?id=" + $('#detailsId').val() + "&feedback=" + $('#feedback').val(),
+            success: function(data){
+                bootbox.alert("提交成功！");
+                //这里使用$(this) 启用按钮无效，故使用id
+                $('#saveFeedback').prop("disabled", false);//提交成功后激活提交按钮
+            },
+            error: function(data){
+                $('#saveFeedback').prop("disabled", false);
+                bootbox.alert("提交失败，请稍后再试！");
+            }
+        });
     });
 
     $('#add').click(function () {
@@ -318,7 +366,7 @@
                 if(result) {
                     $.ajax({
                         type: "POST",
-                        url: "/sales-plan-details/remove",
+                        url: "/details-proposal/remove",
                         traditional: true,
                         data: {
                             id: id

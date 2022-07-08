@@ -4,6 +4,8 @@ package com.honji.order.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.honji.order.entity.SalesPlan;
 import com.honji.order.entity.SalesPlanDetails;
+import com.honji.order.entity.Shop;
+import com.honji.order.mapper.AreaMapper;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.service.ISalesPlanDetailsService;
 import com.honji.order.service.ISalesPlanService;
@@ -37,6 +39,9 @@ public class SalesPlanController {
 
     @Autowired
     private ISalesPlanDetailsService salesPlanDetailsService;
+
+    @Autowired
+    private AreaMapper areaMapper;
 
 
     @GetMapping("/index")
@@ -73,7 +78,7 @@ public class SalesPlanController {
         QueryWrapper<SalesPlanDetails> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("plan_id", id);
         List<SalesPlanDetails> detailsList = salesPlanDetailsService.list(queryWrapper);
-        if (detailsList.size() > 0) {//已经有方案不允许删除
+        if (detailsList.size() > 0) {//已经有原因不允许删除
             return false;
         }
         return salesPlanService.removeById(id);
@@ -85,6 +90,13 @@ public class SalesPlanController {
     public Map<String, Object> getPerformance(@RequestParam String date, @RequestParam String shopCode) {
 
         return salesPlanService.getPerformance(date, shopCode);
+    }
+
+    @GetMapping("/listShops")
+    @ResponseBody
+    public List<Shop> listShops(@RequestParam String area) {
+
+        return areaMapper.listShops(area);
     }
 
 

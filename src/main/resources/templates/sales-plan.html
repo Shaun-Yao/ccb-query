@@ -17,89 +17,7 @@
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
     </div>
-    <input type="hidden" th:value="${jobNum}">
 
-    <div class="modal" id="myModal">
-        <div class="modal-dialog" style="width:90%;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">浪漫直营店业绩下降分析及行动方案跟进表</h4>
-                </div>
-
-                <form class="form-horizontal" id="form" role="form" action="/deposit/add" method="post">
-                    <div class="modal-body">
-                        <input type="hidden" id="id" name="id" >
-                        <!--                        <input type="text"  name="aa" value="aa" >-->
-                        <!--                        <input type="hidden" id="shopCode" name="shopCode" th:value="${shopCode}" >-->
-                        <div class="form-group">
-                            <label for="date" class="col-sm-1 control-label">存款日期</label>
-                            <div class="col-sm-2">
-                                <input type="text"  class="form-control" id="date" name="date" required>
-                            </div>
-                            <label for="aa" class="col-sm-2 control-label">存款日期</label>
-                            <div class="col-sm-2">
-                                <input type="text"  class="form-control" id="aa" name="date" required>
-                            </div>
-                            <label for="bb" class="col-sm-2 control-label">存款日期</label>
-                            <div class="col-sm-2">
-                                <input type="text"  class="form-control" id="bb" name="date" required>
-                            </div>
-
-                        </div>
-
-
-                        <table class="table table-bordered">
-                            <caption>边框表格布局</caption>
-                            <thead>
-                            <tr>
-                                <th>原因分析</th>
-                                <th>常规</th>
-                                <th>创新</th>
-                                <th>反馈</th>
-                                <th>方案确定</th>
-                                <th>执行人</th>
-                                <th>时间节点</th>
-                                <th>结果</th>
-                                <th>添加</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr id="clo">
-                                <td><select name="subject" id="subject">
-                                    <option value="" selected="selected">Select subject</option>
-                                </select>
-                                    <br><br>
-                                    <select name="topic" id="topic">
-                                        <option value="" selected="selected">Please select subject first</option>
-                                    </select>
-                                    <br><br>
-                                    <select name="chapter" id="chapter">
-                                        <option value="" selected="selected">Please select topic first</option>
-                                    </select></td>
-                                <td><textarea rows="3" cols="10"  name="details[0].convention" ></textarea></td>
-                                <td><textarea rows="3" cols="10"  name="details[0].innovation" ></textarea></td>
-                                <td><textarea rows="3" cols="10"  name="details[0].feedback" ></textarea></td>
-                                <td><textarea rows="3" cols="10"  name="details[0].feedback" ></textarea></td>
-                                <td><input type="text" name="b"></td>
-                                <td><input type="date" name="b"></td>
-                                <td><textarea rows="2" cols="10"  name="details[0].innovation" ></textarea></td>
-                                <td><button type="button" class="btn btn-primary" onclick="add_row()">添加</button></td>
-                            </tr>
-
-                            </tbody>
-                        </table>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="button" id="save" class="btn btn-primary">提交更改</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
 
 
 <script src="/webjars/jquery/3.1.1/jquery.min.js"></script><script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -110,72 +28,10 @@
 </body>
 <script th:inline="javascript">
 
-    var subjectObject = {
-        "内部原因": {
-            "人员问题": ["员工状态低迷与积极性差", "老员工销售技能差",
-                "新员工经验技能不足", "招聘困难，长期缺编", "人员请长假，人手不足"],
-            "货品问题": ["结构缺陷", "质量问题"],
-            "客流下降": ["位置不佳", "形象老旧"],
-            "活动策略差异": ["活动策略差异"],
-            "其他": ["其他"]
-        },
-        "外部原因": {
-            "PHP": ["Variables", "Strings", "Arrays"],
-            "SQL": ["SELECT", "UPDATE", "DELETE"]
-        }
-    }
-
-    //前面的序号1,2,3......
-    var i = 1;
-    $(".td").each(function(){
-        $(this).html(i++);
-    })
-
-    //添加一行
-    function add_row(){
-        console.log(112);
-        var $td = $("#clo").clone();       //增加一行,克隆第一个对象
-        $(".table").append($td);
-        var i = 1;
-        $(".td").each(function(){       //增加一行后重新更新序号1,2,3......
-            $(this).html(i++);
-        })
-        $("table tr:last").find(":input").val('');   //将尾行元素克隆来的保存的值清空
-    }
-    //删除一行
-    function del_row(){
-        $("table tr:not(:first):not(:first):last").remove();//移除最后一行,并且保留前两行
-    }
 
 
     $(function () {
-        // $('#myModal').modal('show');
-        $('input[type=date]').attr("min", "2021-09-01");
 
-        var subjectSel = document.getElementById("subject");
-        var topicSel = document.getElementById("topic");
-        var chapterSel = document.getElementById("chapter");
-        for (var x in subjectObject) {
-            subjectSel.options[subjectSel.options.length] = new Option(x, x);
-        }
-        subjectSel.onchange = function() {
-            //empty Chapters- and Topics- dropdowns
-            chapterSel.length = 1;
-            topicSel.length = 1;
-            //display correct values
-            for (var y in subjectObject[this.value]) {
-                topicSel.options[topicSel.options.length] = new Option(y, y);
-            }
-        }
-        topicSel.onchange = function() {
-            //empty Chapters dropdown
-            chapterSel.length = 1;
-            //display correct values
-            var z = subjectObject[subjectSel.value][this.value];
-            for (var i = 0; i < z.length; i++) {
-                chapterSel.options[chapterSel.options.length] = new Option(z[i], z[i]);
-            }
-        }
     });
 
 
@@ -232,26 +88,6 @@
         }]
     });
 
-    $('#save').click(function() {
-        if($('#form')[0].reportValidity()) {
-
-            $('#save').attr("disabled", true);//屏蔽提交按钮
-            $.ajax({
-                type: "post",
-                url: "/sales-plan/save",
-                data: $('#form').serialize(),
-                success: function(data){
-                    $('#myModal').modal('hide');
-                    $('#table').bootstrapTable('refresh');
-                    $('#save').attr("disabled", false);//提交成功后激活提交按钮
-                },
-                error: function(data){
-                    bootbox.alert("保存失败，请确认存款日期或者营业日期是否重复！");
-                    $('#save').attr("disabled", false);//提交失败后激活提交按钮
-                }
-            });
-        }
-    });
 
     $('#add').click(function () {
         window.location.href = '/sales-plan-details/index?jobNum=' + [[${jobNum}]];

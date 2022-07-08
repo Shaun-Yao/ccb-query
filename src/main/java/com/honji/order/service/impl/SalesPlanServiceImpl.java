@@ -35,7 +35,7 @@ public class SalesPlanServiceImpl extends ServiceImpl<SalesPlanMapper, SalesPlan
     @Override
     public PageInfo<SalesPlan> listForIndex(String jobNum, int offset, int limit) {
 
-        String result = salesPlanMapper.selectManager(jobNum);//查询是否大区经理
+        String result = salesPlanMapper.selectAManager(jobNum);//查询是否大区经理
         PageHelper.startPage(offset / limit + 1, limit);
         if (StringUtils.isNotEmpty(result)) {
             return new PageInfo<>(salesPlanMapper.selectForManager(jobNum));

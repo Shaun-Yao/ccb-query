@@ -2,6 +2,7 @@ package com.honji.order.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.honji.order.entity.SalesPlan;
+import com.honji.order.entity.vo.SalesPlanVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
@@ -46,18 +47,28 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
     Map<String, Object> selectPerformance(String date, String shopCode);
 
     @Select({"<script>",
-            "SELECT sales_plan.* FROM sales_plan ",
+            "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
+            "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
             "LEFT JOIN area on sales_plan.area = area.code ",
             "where area.job_num = '${jobNum}'",
-            " ORDER BY create_date desc ",
+            " ORDER BY perform_date desc ",
             "</script>"})
-    List<SalesPlan> selectForManager(String jobNum);
+    List<SalesPlanVO> selectForManager(String jobNum);
 
     @Select({"<script>",
-            "SELECT * FROM sales_plan where job_num = '${jobNum}'",
-            " ORDER BY create_date desc ",
+            "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
+            "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
+            "<if test='!isAdmin'>",//非管理员要加工号筛选
+            " where job_num = '${jobNum}'",
+            "</if>",
+            "<if test='!isAdmin'>",
+            " ORDER BY perform_date desc ",
+            "</if>",
+            "<if test='isAdmin'>",//管理员定制排序
+            " ORDER BY perform_date, month_diff desc ",
+            "</if>",
             "</script>"})
-    List<SalesPlan> selectForIndex(String jobNum);
+    List<SalesPlanVO> selectForIndex(String jobNum, boolean isAdmin);
 
     /**
      * 根据id查看此记录大区经理是否是此工号

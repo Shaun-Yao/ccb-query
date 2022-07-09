@@ -13,11 +13,13 @@
 
 
     <table id="table" class="modal-body"></table>
-    <div id="deposit" >
-        <button type="button" class="btn btn-success" id="add">新增</button>
-        <button type="button" class="btn btn-danger" id="remove">删除</button>
-    </div>
-
+    <form class="form-inline" id="export-form">
+        <div id="deposit">
+            <button type="button" class="btn btn-success" id="add">新增</button>
+            <button type="button" class="btn btn-danger" id="remove">删除</button>
+            <button type="button" class="btn btn-info" id="exportBtn">导出</button>
+        </div>
+    </form>
 
 
 <script src="/webjars/jquery/3.1.1/jquery.min.js"></script><script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -34,6 +36,21 @@
 
     });
 
+    $('#exportBtn').click(function () {
+        if($('#export-form')[0].reportValidity()) {
+            bootbox.confirm("确认导出？",
+                function (result) {
+                    if (result) {
+                        // var jobNum = $('#jobNum').val();
+                        // var shopCodes = $('#shopCodes').val();
+                        // var begin = $('#begin').val();
+                        // var end = $('#end').val();
+                        window.location.href = "/sales-plan/export";
+                    }
+                });
+        }
+
+    });
 
     $('#table').bootstrapTable({
         url: '/sales-plan/list?jobNum=' + [[${jobNum}]],
@@ -80,11 +97,17 @@
             field: 'name',
             title: '姓名'
         }, {
-            field: 'shopCode',
+            field: 'shopName',
             title: '店铺'
         }, {
             field: 'performDate',
             title: '业绩日期'
+        }, {
+            field: 'monthDiff',
+            title: '同期涨幅金额'
+        }, {
+            field: 'monthPercent',
+            title: '同期涨幅'
         }]
     });
 

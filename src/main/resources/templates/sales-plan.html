@@ -7,17 +7,44 @@
 
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
-
+    <link rel="stylesheet" href="/webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css" />
 </head>
 <body>
 
 
     <table id="table" class="modal-body"></table>
-    <form class="form-inline" id="export-form">
+    <form class="form-inline" id="form">
+<!--        <input type="hidden" id="jobNum" th:value="${jobNum}">-->
         <div id="deposit">
             <button type="button" class="btn btn-success" id="add">新增</button>
             <button type="button" class="btn btn-danger" id="remove">删除</button>
-            <button type="button" class="btn btn-info" id="exportBtn">导出</button>
+            <div class="form-group">
+                <label for="area" class="col-sm-2 control-label">销售区域</label>
+                <div class="col-sm-4">
+                    <select id="area" name="area" class="form-control">
+                        <option></option>
+                        <option th:each="area : ${areas}"th:value="${area.code}" th:text="${area.name}" >
+                        </option>
+                    </select>
+                </div>
+                <label for="shopCodes" class="col-sm-2 control-label">店铺</label>
+                <div class="col-sm-4">
+                    <select class="form-control" name="shopCodes" id="shopCodes" multiple
+                            data-live-search="true" data-actions-box="true"
+                            data-selected-text-format="count" >
+                    </select>
+                </div>
+                <!--<label for="feedbackState" class="col-sm-2 control-label">反馈状态</label>
+                <div class="col-sm-4">
+                    <select class="form-control" name="feedbackState" id="feedbackState">
+                        <option value="0">待反馈</option>
+                        <option value="1">已反馈</option>
+                    </select>
+                </div>-->
+                <button type="button" class="btn btn-success" id="search">查询</button>
+                <button type="button" class="btn btn-info" id="exportBtn">导出</button>
+            </div>
+
         </div>
     </form>
 
@@ -27,29 +54,65 @@
 <script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
 <script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
 <script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/i18n/defaults-zh_CN.min.js"></script>
 </body>
 <script th:inline="javascript">
 
 
 
     $(function () {
+        $('#shopCodes').selectpicker();
 
+        if ([[${isManager}]] || 'admin' == [[${jobNum}]]) {
+            $('#add, #remove').hide();
+        }
+
+        $('#area').change(function () {
+            $('#shopCodes').empty();
+            $('#shopCodes').selectpicker('refresh');
+            if ($(this).val().length == 0) {
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                url: "/sales-plan/listShops?area=" + $(this).val(),
+                success: function(data){
+                    for (const i in data) {
+                        var option = new Option(data[i].name, data[i].code);
+                        $('#shopCodes').append(option);
+
+                        // $(this).append(new Option(data[i].name, data[i].code));
+                    }
+                    $('#shopCodes').selectpicker('refresh');
+                }
+            });
+        });
+
+        //这段代码需要在area change事件之后
+        $('#area').change();//大区触发change事件让店铺自动加载数据
+    });
+
+    $('#search').click(function () {
+        console.log(2222);
+        if($('#form')[0].reportValidity()) {
+            $('#table').bootstrapTable('refresh');
+        }
     });
 
     $('#exportBtn').click(function () {
-        if($('#export-form')[0].reportValidity()) {
+        if($('#form')[0].reportValidity()) {
             bootbox.confirm("确认导出？",
                 function (result) {
                     if (result) {
                         // var jobNum = $('#jobNum').val();
-                        // var shopCodes = $('#shopCodes').val();
+                        var shopCodes = $('#shopCodes').val();
                         // var begin = $('#begin').val();
                         // var end = $('#end').val();
-                        window.location.href = "/sales-plan/export";
+                        window.location.href = "/sales-plan/export?jobNum=" + [[${jobNum}]] + "&shopCodes=" + shopCodes;
                     }
                 });
         }
-
     });
 
     $('#table').bootstrapTable({
@@ -62,9 +125,13 @@
         singleSelect: true,
         sortable: true,
         smartDisplay: false,
+        ajaxOptions:{
+            traditional:true
+        },
         pageNumber: 1,     //初始化加载第一页，默认第一页
         pageSize: 10,      //每页的记录行数（*）
         queryParams: function (params) {
+            params.shopCodes = $('#shopCodes').val();
             //导出全部数据没有传limit给后台, 把limit设置为全部数据
             if (typeof(params.limit) == "undefined") {
                 params.limit = this.totalRows;

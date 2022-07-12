@@ -2,17 +2,18 @@ package com.honji.order.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.honji.order.entity.DetailsProposal;
-import com.honji.order.entity.SalesPlan;
-import com.honji.order.entity.SalesPlanDetails;
-import com.honji.order.entity.Shop;
+import com.honji.order.entity.*;
 import com.honji.order.entity.vo.SalesPlanVO;
 import com.honji.order.mapper.AreaMapper;
+import com.honji.order.mapper.SalesPlanMapper;
 import com.honji.order.model.DataGridResult;
+import com.honji.order.model.SalesPlanDTO;
+import com.honji.order.service.IAreaService;
 import com.honji.order.service.IDetailsProposalService;
 import com.honji.order.service.ISalesPlanDetailsService;
 import com.honji.order.service.ISalesPlanService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -53,14 +54,24 @@ public class SalesPlanController {
 
     @Autowired
     private IDetailsProposalService detailsProposalService;
+    @Autowired
+    private IAreaService areaService;
 
     @Autowired
     private AreaMapper areaMapper;
 
+    @Autowired
+    private SalesPlanMapper salesPlanMapper;
+
 
     @GetMapping("/index")
     public String index(@RequestParam String jobNum, Model model) {
-
+        String manager = salesPlanMapper.selectAManager(jobNum);
+        if (StringUtils.isNotEmpty(manager)) {//
+            model.addAttribute("isManager", true);
+        }
+        List<Area> areas = areaService.list();
+        model.addAttribute("areas", areas);
         model.addAttribute("jobNum", jobNum);
         return "sales-plan";
     }
@@ -74,8 +85,8 @@ public class SalesPlanController {
 
     @GetMapping("/list")
     @ResponseBody
-    public DataGridResult list(@RequestParam String jobNum, @RequestParam int offset, @RequestParam int limit) {
-        return new DataGridResult(salesPlanService.listForIndex(jobNum, offset, limit));
+    public DataGridResult list(SalesPlanDTO salesPlanDTO) {
+        return new DataGridResult(salesPlanService.listForIndex(salesPlanDTO));
     }
 
     @PostMapping("/save")
@@ -115,7 +126,7 @@ public class SalesPlanController {
 
     @GetMapping("/export")
     @ResponseBody
-    public void export(HttpServletResponse response) {
+    public void export(SalesPlanDTO salesPlanDTO, HttpServletResponse response) {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -131,7 +142,7 @@ public class SalesPlanController {
         cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
 
 
-        List<SalesPlanVO> plans = salesPlanService.listForExport();
+        List<SalesPlanVO> plans = salesPlanService.listForExport(salesPlanDTO);
         for (int i = 0; i < plans.size(); i++) {
             SalesPlanVO plan = plans.get(i);
             String shopName = plan.getShopName();
@@ -171,13 +182,14 @@ public class SalesPlanController {
             detailsQueryWrapper.eq("plan_id", plan.getId());
             List<SalesPlanDetails> detailsList = salesPlanDetailsService.list(detailsQueryWrapper);
             int rowCount = 4;
+            Row detailsHeadRow = sheet.createRow( rowCount++);
+            for (int l = 0; l < detailsColumnNames.length; l++) {
+                detailsHeadRow.createCell(l).setCellValue(detailsColumnNames[l]);
+            }
             for (int k = 0; k < detailsList.size(); k++) {
 
                 SalesPlanDetails details = detailsList.get(k);
-                Row detailsHeadRow = sheet.createRow( rowCount++);
-                for (int l = 0; l < detailsColumnNames.length; l++) {
-                    detailsHeadRow.createCell(l).setCellValue(detailsColumnNames[l]);
-                }
+
                 Row detailsRow = sheet.createRow( rowCount++);
                 detailsRow.createCell(0).setCellValue(details.getReasonType());
                 detailsRow.createCell(1).setCellValue(details.getPrimaryReason());
@@ -195,12 +207,18 @@ public class SalesPlanController {
                 for (int m = 0; m < proposals.size(); m++) {
                     DetailsProposal proposal = proposals.get(m);
                     Row proposalRow = sheet.createRow( rowCount++);
-                    proposalRow.createCell(0).setCellValue("日期");
-                    Cell proposalDateCell = proposalRow.createCell(1);
-                    proposalDateCell.setCellValue(proposal.getDate());
-                    proposalDateCell.setCellStyle(cellStyle);
-                    proposalRow.createCell(2).setCellValue("方案");
-                    proposalRow.createCell(3).setCellValue(proposal.getConfirmation());
+                    proposalRow.createCell(0).setCellValue("开始日期");
+                    Cell beginDateCell = proposalRow.createCell(1);
+                    beginDateCell.setCellValue(proposal.getBeginDate());
+                    beginDateCell.setCellStyle(cellStyle);
+                    proposalRow.createCell(2).setCellValue("结束日期");
+                    Cell endDateCell = proposalRow.createCell(3);
+                    endDateCell.setCellValue(proposal.getBeginDate());
+                    endDateCell.setCellStyle(cellStyle);
+                    proposalRow.createCell(4).setCellValue("频率");
+                    proposalRow.createCell(5).setCellValue(proposal.getFrequency());
+                    proposalRow.createCell(6).setCellValue("方案");
+                    proposalRow.createCell(7).setCellValue(proposal.getConfirmation());
                 }
             }
 

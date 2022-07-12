@@ -19,7 +19,7 @@ public interface DetailsProposalMapper extends BaseMapper<DetailsProposal> {
 
     @Select({"<script>",
             "SELECT * FROM details_proposal where details_id = '${detailsId}'",
-            " ORDER BY date ",
+//            " ORDER BY date ",
             "</script>"})
     List<DetailsProposal> selectForIndex(String detailsId);
 }

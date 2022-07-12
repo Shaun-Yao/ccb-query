@@ -31,11 +31,23 @@ public class DetailsProposal extends IdEntity {
     private String confirmation;
 
     /**
-     * 时间节点
+     * 开始时间节点
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private String date;
+    private String beginDate;
 
+    /**
+     * 结束时间节点
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String endDate;
+
+
+    /**
+     * 频率
+     */
+    private String frequency;
 
 }

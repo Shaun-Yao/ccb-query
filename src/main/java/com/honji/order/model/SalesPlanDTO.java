@@ -22,7 +22,7 @@ public class SalesPlanDTO {
      * bootstrpa-table 传数组参数没有加上数组index，加上traditional:true 也无效
      */
     private List<String> shopCodes ;
-
+    private int feedbackState;
     boolean isAdmin = false;
 
     private int offset;

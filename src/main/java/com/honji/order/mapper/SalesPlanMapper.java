@@ -2,8 +2,8 @@ package com.honji.order.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.honji.order.entity.SalesPlan;
-import com.honji.order.entity.vo.SalesPlanVO;
 import com.honji.order.model.SalesPlanDTO;
+import com.honji.order.model.SalesPlanVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -51,29 +51,52 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
     @Select({"<script>",
             "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
             "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
-            "LEFT JOIN area on sales_plan.area = area.code ",
-            "where area.job_num = '${jobNum}'",
-            " ORDER BY perform_date desc ",
-            "</script>"})
-    List<SalesPlanVO> selectForManager(String jobNum);
-
-    @Select({"<script>",
-            "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
-            "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
+            " JOIN area on sales_plan.area = area.code ",
+            "<if test='salesPlanDTO.feedbackState != 0'>",//details start
+            " JOIN (SELECT plan_id FROM sales_plan_details WHERE plan_id ",
+            "<if test='salesPlanDTO.feedbackState == 1'>",
+            " in ",
+            "</if>",
+            "<if test='salesPlanDTO.feedbackState == 2'>",
+            " not in ",
+            "</if>",
+            "(SELECT plan_id FROM sales_plan_details WHERE state = 1 AND feedback = '' GROUP BY plan_id) ", "" +
+            "GROUP BY plan_id) details ",
+            " on sales_plan.id = details.plan_id",
+            "</if>",// details end
             "where 1 = 1 ",
+            "<if test='!salesPlanDTO.isAdmin'>",
+            " and area.job_num = '${salesPlanDTO.jobNum}'",
+            "</if>",
             "<if test='salesPlanDTO.shopCodes != null and salesPlanDTO.shopCodes.size() > 0'>",
             " and shop_code in ",
             "<foreach item='item' index='index' collection='salesPlanDTO.shopCodes' open='(' separator=',' close=')'> #{item} </foreach>",
             "</if>",
-            "<if test='!salesPlanDTO.isAdmin'>",//非管理员要加工号筛选
-            " and job_num = '${salesPlanDTO.jobNum}'",
-            "</if>",
-            "<if test='!salesPlanDTO.isAdmin'>",
             " ORDER BY perform_date desc ",
+            "</script>"})
+    List<SalesPlanVO> selectForManager(@Param("salesPlanDTO")SalesPlanDTO salesPlanDTO);
+
+    @Select({"<script>",
+            "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
+            "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
+            "<if test='salesPlanDTO.feedbackState != 0'>",//details start
+            " JOIN (SELECT plan_id FROM sales_plan_details WHERE plan_id ",
+            "<if test='salesPlanDTO.feedbackState == 1'>",
+            " in ",
             "</if>",
-            "<if test='salesPlanDTO.isAdmin'>",//管理员定制排序
-            " ORDER BY perform_date, month_diff desc ",
+            "<if test='salesPlanDTO.feedbackState == 2'>",
+            " not in ",
             "</if>",
+            "(SELECT plan_id FROM sales_plan_details WHERE state = 1 AND feedback = '' GROUP BY plan_id) ", "" +
+            "GROUP BY plan_id) details ",
+            " on sales_plan.id = details.plan_id",
+            "</if>",// details end
+            "where job_num = '${salesPlanDTO.jobNum}' ",
+            "<if test='salesPlanDTO.shopCodes != null and salesPlanDTO.shopCodes.size() > 0'>",
+            " and shop_code in ",
+            "<foreach item='item' index='index' collection='salesPlanDTO.shopCodes' open='(' separator=',' close=')'> #{item} </foreach>",
+            "</if>",
+            " ORDER BY perform_date desc ",
             "</script>"})
     List<SalesPlanVO> selectForIndex(@Param("salesPlanDTO")SalesPlanDTO salesPlanDTO);
 

@@ -35,9 +35,9 @@ public class SalesPlanDetailsServiceImpl extends ServiceImpl<SalesPlanDetailsMap
 
 
     @Override
-    public PageInfo<SalesPlanDetails> listForIndex(String planId, int offset, int limit) {
+    public PageInfo<SalesPlanDetails> listForIndex(String planId, boolean showAll, int offset, int limit) {
         PageHelper.startPage(offset / limit + 1, limit);
-        return new PageInfo<>(salesPlanDetailsMapper.selectForIndex(planId));
+        return new PageInfo<>(salesPlanDetailsMapper.selectForIndex(planId, showAll));
     }
 
     @Override

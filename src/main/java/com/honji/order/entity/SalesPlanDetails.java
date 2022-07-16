@@ -1,8 +1,10 @@
 package com.honji.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
@@ -40,15 +42,15 @@ public class SalesPlanDetails extends IdEntity {
     private String reason;
 
     /**
-     * 常规方案
+     * 方案类型：常规、创新
      */
-    private String convention;
+    private String proposalType;
 
 
     /**
-     * 创新方案
+     * 方案内容
      */
-    private String innovation;
+    private String proposal;
 
 
     /**
@@ -56,7 +58,30 @@ public class SalesPlanDetails extends IdEntity {
      */
     private String feedback;
 
+    /**
+     * 方案确定
+     */
+    private String confirmation;
 
+    /**
+     * 开始时间节点
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String beginDate;
+
+    /**
+     * 结束时间节点
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String endDate;
+
+
+    /**
+     * 频率
+     */
+    private String frequency;
 
     /**
      * 执行人
@@ -68,5 +93,10 @@ public class SalesPlanDetails extends IdEntity {
      * 结果
      */
     private String result;
+
+    /**
+     * 0: 暂存 1: 提交通知
+     */
+    private int state;
 
 }

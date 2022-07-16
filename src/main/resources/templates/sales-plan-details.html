@@ -128,6 +128,110 @@
     </div>
 
 
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="myModalLabel">原因分析及方案跟进</h3>
+                </div>
+                <form class="form-horizontal" id="form" role="form" action="/sales-plan-details/add" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="detailsId" name="id" >
+                        <input type="hidden" id="state" name="state" value="0" >
+                        <input type="hidden" id="planId" name="planId" th:value="${salesPlan?.id}">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">原因</label>
+                            <div class="col-sm-8">
+                                <select name="reasonType" id="reasonType" class="form-control" required>
+                                    <option value="" selected="selected">原因类型</option>
+                                </select>
+                                <select name="primaryReason" id="primaryReason" class="form-control" required>
+                                    <option value="" selected="selected">请先选择原因类型</option>
+                                </select>
+                                <select name="reason" id="reason" class="form-control" required>
+                                    <option value="" selected="selected">请先选择主要原因</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">方案类型</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="proposalType" value="常规" required> 常规
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="proposalType" value="创新" required> 创新
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="proposal" class="col-sm-2 control-label">方案</label>
+                            <div class="col-sm-8">
+                                <textarea rows="3" cols="40" id="proposal" name="proposal" required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="feedback" class="col-sm-2 control-label">大区经理反馈</label>
+                            <div class="col-sm-8">
+                                <textarea rows="3" cols="40" id="feedback" name="feedback" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmation" class="col-sm-2 control-label">方案确定</label>
+                            <div class="col-sm-8">
+                                <textarea rows="3" cols="40" id="confirmation" name="confirmation" readonly></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="beginDate" class="col-sm-2 control-label">开始日期</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="beginDate" name="beginDate" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate" class="col-sm-2 control-label">结束日期</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="endDate" name="endDate" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="frequency" class="col-sm-2 control-label">频率</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="frequency" name="frequency" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="executor" class="col-sm-2 control-label">执行人</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="executor" name="executor" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="result" class="col-sm-2 control-label">结果</label>
+                            <div class="col-sm-8">
+                                <textarea rows="3" cols="40" id="result" name="result" readonly></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="close" class="btn btn-danger">关闭</button>
+                        <button type="button" id="saveDetails" class="btn btn-info">暂存</button>
+                        <button type="button" id="saveDetailsAndNotify" class="btn btn-primary">提交并通知大区经理</button>
+                        <button type="button" id="saveFeedback" class="btn btn-success" style="display: none;">提交反馈</button>
+                    </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div><!-- 模态框（Modal）end -->
 
 <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
 <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -150,15 +254,145 @@
         return yyyy+'-' + mm;
     }
 
+    function getMaxDate(date) {
+        var dd = date.getDate();
+        //月份是从0开始，所以先加1，再加1加到下个月
+        var mm = date.getMonth() + 2;
+        var yyyy = date.getFullYear();
+        if(dd<10){
+            dd='0'+dd;
+        }
+        if(mm<10){
+            mm='0'+mm;
+        }
+        return yyyy+'-' + mm+'-' + dd;
+    }
+
+    var subjectObject = {
+        "内部原因": {
+            "人员问题": ["员工状态低迷与积极性差", "老员工销售技能差",
+                "新员工经验技能不足", "招聘困难，长期缺编", "人员请长假，人手不足"],
+            "货品问题": ["结构缺陷", "质量问题"],
+            "客流下降": ["位置不佳", "形象老旧"],
+            "活动策略差异": ["活动策略差异"],
+            "其他": ["其他"]
+        },
+        "外部原因": {
+            "本店特殊情况": ["店铺翻新/装修，工期延误", "修路", "其他"],
+            "业态环境": ["人口流失", "商圈转移", "老城改造"],
+            "天气问题": ["天气问题"],
+            "疫情影响": ["疫情影响"],
+            "其他": ["其他"]
+        }
+    }
+
 
     $(function () {
+        let showAll = true;
         $('#performDate').attr("min", "2022-01");
         $('#performDate').attr("max", getMaxMonth(new Date()));
+        $('#date').attr("min", "2022-06-30");
+        $('#date').attr("max", getMaxDate(new Date()));
+
         $('#shopCode').selectpicker();
         let plan = [[${salesPlan}]];
+        //没有业绩属于新建页面，隐藏添加，删除 原因按钮
         if (plan != null && plan.jobNum != [[${jobNum}]]) {
-            $('#save, #add, #remove').hide();
+            $('#save, #add, #remove, #saveDetails, #saveDetailsAndNotify').hide();
+            showAll = false;//非本人不显示全部原因，即只显示提交并通知的原因，不显示暂存的原因
         }
+
+        if ([[${enableFeedback}]]) {//开启意见反馈编辑
+            $("#feedback").prop("readonly", false);
+            $('#saveFeedback').show();
+        }
+
+        $('#table').bootstrapTable({
+            url: '/sales-plan-details/list?planId=' + [[${planId}]] + '&showAll=' + showAll,
+            pagination: true,
+            sidePagination: "server",
+            locale: 'zh-CN',
+            toolbar: "#deposit",
+            clickToSelect: true,
+            singleSelect: true,
+            sortable: true,
+            smartDisplay: false,
+            pageNumber: 1,     //初始化加载第一页，默认第一页
+            pageSize: 10,      //每页的记录行数（*）
+            queryParams: function (params) {
+
+                return params;
+            },
+            onClickRow: function (row, $element) {
+                //console.log(row.id);
+            },
+            onDblClickRow: function (row, $element) {
+
+                $.ajax({
+                    type: "GET",
+                    url: "/sales-plan-details/get?id=" + row.id,
+                    async: false,
+                    success: function(data){
+
+                        //没有反馈不能添加执行人，反馈，不能操作方案
+                        if (data.feedback.length > 0) {
+                            $("#confirmation").prop("readonly", false);
+                            $("#beginDate").prop("readonly", false);
+                            $("#endDate").prop("readonly", false);
+                            $("#frequency").prop("readonly", false);
+                            $("#executor").prop("readonly", false);
+                            $("#result").prop("readonly", false);
+                        }
+
+                        $('#form').clearForm();
+                        $('#detailsId').val(data.id);
+                        $('#planId').val(data.planId);
+                        $('#reasonType').val(data.reasonType);
+                        $('#reasonType').change();//触发change事件
+                        $('#primaryReason').val(data.primaryReason);
+                        $('#primaryReason').change();//触发change事件
+                        $('#reason').val(data.reason);
+                        $('#proposal').val(data.proposal);
+                        $("input:radio[name=proposalType][value=" + data.proposalType + "]")[0].checked=true;
+                        $('#feedback').val(data.feedback);
+                        $('#confirmation').val(data.confirmation);
+                        $('#executor').val(data.executor);
+                        $('#beginDate').val(data.beginDate);
+                        $('#endDate').val(data.endDate);
+                        $('#frequency').val(data.frequency);
+                        $('#result').val(data.result);
+                    }
+                });
+                $('#myModal').modal('show');
+            },
+            columns: [ {
+                field: '',
+                checkbox: true, // 显示一个勾选框
+                align: 'center'
+            },{
+                field: 'id',
+                title: 'ID',
+                visible: false
+            }, {
+                field: 'reasonType',
+                title: '原因类型'
+            }, {
+                field: 'primaryReason',
+                title: '原因'
+            }, {
+                field: 'reason',
+                title: '具体原因分析'
+            }, {
+                field: 'feedback',
+                title: '大区经理反馈'
+            }, {
+                field: 'executor',
+                title: '执行人'
+            }, {
+                field: 'result',
+                title: '结果'
+            }]
+        });
 
         $('#area').change(function () {
             $('#shopCode').empty();
@@ -208,83 +442,34 @@
             }
         });
 
+        var subjectSel = document.getElementById("reasonType");
+        var topicSel = document.getElementById("primaryReason");
+        var chapterSel = document.getElementById("reason");
+        for (var x in subjectObject) {
+            subjectSel.options[subjectSel.options.length] = new Option(x, x);
+        }
+        subjectSel.onchange = function() {
+            //empty Chapters- and Topics- dropdowns
+            chapterSel.length = 1;
+            topicSel.length = 1;
+            //display correct values
+            for (var y in subjectObject[this.value]) {
+                topicSel.options[topicSel.options.length] = new Option(y, y);
+            }
+        }
+        topicSel.onchange = function() {
+            //empty Chapters dropdown
+            chapterSel.length = 1;
+            //display correct values
+            var z = subjectObject[subjectSel.value][this.value];
+            for (var i = 0; i < z.length; i++) {
+                chapterSel.options[chapterSel.options.length] = new Option(z[i], z[i]);
+            }
+        }
     });
 
 
-    $('#table').bootstrapTable({
-        url: '/sales-plan-details/list?planId=' + [[${planId}]],
-        pagination: true,
-        sidePagination: "server",
-        locale: 'zh-CN',
-        toolbar: "#deposit",
-        clickToSelect: true,
-        singleSelect: true,
-        sortable: true,
-        smartDisplay: false,
-        pageNumber: 1,     //初始化加载第一页，默认第一页
-        pageSize: 10,      //每页的记录行数（*）
-        queryParams: function (params) {
 
-            return params;
-        },
-        onClickRow: function (row, $element) {
-            //console.log(row.id);
-        },
-        onDblClickRow: function (row, $element) {
-            window.location.href = '/details-proposal/index?id=' + row.id
-                + '&planId=' + [[${planId}]] + '&jobNum=' + [[${jobNum}]];
-            /*$.ajax({
-                type: "GET",
-                url: "/sales-plan-details/get?id=" + row.id,
-                async: false,
-                success: function(data){
-                    $('#form').clearForm();
-                    $('#id').val(data.id);
-                    $('#planId').val(data.planId);
-                    $('#reasonType').val(data.reasonType);
-                    $('#reasonType').change();//触发change事件
-                    $('#primaryReason').val(data.primaryReason);
-                    $('#primaryReason').change();//触发change事件
-                    $('#reason').val(data.reason);
-                    $('#convention').val(data.convention);
-                    $('#innovation').val(data.innovation);
-                    $('#feedback').val(data.feedback);
-                    $('#confirmation').val(data.confirmation);
-                    $('#executor').val(data.executor);
-                    $('#date').val(data.date);
-                    $('#result').val(data.result);
-                }
-            });
-            //$('#myModal').modal('show');*/
-        },
-        columns: [ {
-            field: '',
-            checkbox: true, // 显示一个勾选框
-            align: 'center'
-        },{
-            field: 'id',
-            title: 'ID',
-            visible: false
-        }, {
-            field: 'reasonType',
-            title: '原因类型'
-        }, {
-            field: 'primaryReason',
-            title: '原因'
-        }, {
-            field: 'reason',
-            title: '具体原因分析'
-        }, {
-            field: 'feedback',
-            title: '反馈'
-        }, {
-            field: 'executor',
-            title: '执行人'
-        }, {
-            field: 'result',
-            title: '结果'
-        }]
-    });
 
     $('#back').click(function() {
         window.location.href = '/sales-plan/index?jobNum=' + [[${jobNum}]];
@@ -303,6 +488,7 @@
                 data: $('#sales-form').serialize(),
                 success: function(result){
                     $('#id').val(result);//保存成功返回id设置到子表
+                    $('#planId').val(result);
                     $('#save').attr("disabled", false);//提交成功后激活提交按钮
                     bootbox.alert("保存成功!");
                 },
@@ -314,33 +500,69 @@
         }
     });
 
-    $('#saveDetails').click(function() {
+    $('#saveDetails, #saveDetailsAndNotify').click(function() {
         if($('#form')[0].reportValidity()) {
-            $('#saveDetails').attr("disabled", true);//屏蔽提交按钮
+            let wantToNotify = false;
+            if ($(this).prop('id') == 'saveDetailsAndNotify') {
+                $('#state').val(1);
+                wantToNotify = true;
+            }
+            $('#saveDetails, #saveDetailsAndNotify').attr("disabled", true);//屏蔽提交按钮
             $.ajax({
                 type: "post",
-                url: "/sales-plan-details/save",
+                url: "/sales-plan-details/save?wantToNotify=" + wantToNotify,
                 data: $('#form').serialize(),
                 success: function(data){
                     $('#myModal').modal('hide');
                     $('#table').bootstrapTable('refresh');
-                    $('#saveDetails').attr("disabled", false);//提交成功后激活提交按钮
+                    $('#saveDetails, #saveDetailsAndNotify').attr("disabled", false);//提交成功后激活提交按钮
                 },
                 error: function(data){
-                    $('#saveDetails').attr("disabled", false);
+                    $('#saveDetails, #saveDetailsAndNotify').attr("disabled", false);
                     bootbox.alert("保存失败，请稍后再试！");
                 }
             });
         }
     });
 
+
+    $('#saveFeedback').click(function() {
+        let feedback = $('#feedback').val();
+        if (feedback.length == 0) {
+            bootbox.alert("请填写反馈内容！");
+            return;
+        }
+        $(this).prop("disabled", true);//屏蔽提交按钮
+        $.ajax({
+            type: "post",
+            url: "/sales-plan-details/saveFeedback?id=" + $('#detailsId').val() + "&feedback=" + $('#feedback').val(),
+            success: function(data){
+                $('#myModal').modal('hide');
+                //这里使用$(this) 启用按钮无效，故使用id
+                $('#saveFeedback').prop("disabled", false);//提交成功后激活提交按钮
+            },
+            error: function(data){
+                $('#saveFeedback').prop("disabled", false);
+                bootbox.alert("提交失败，请稍后再试！");
+            }
+        });
+    });
+
     $('#add').click(function () {
-        var id = $('#id').val();
+        let id = $('#id').val();
         if (id.length == 0) {
             bootbox.alert('请先保存业绩');
             return;
         }
-        window.location.href = '/details-proposal/index?planId=' + id + '&jobNum=' + [[${jobNum}]];
+        $('#form').resetForm();
+        //新建部分字段不允许填写
+        $("#confirmation").prop("readonly", true);
+        $("#beginDate").prop("readonly", true);
+        $("#endDate").prop("readonly", true);
+        $("#frequency").prop("readonly", true);
+        $("#executor").prop("readonly", true);
+        $("#result").prop("readonly", true);
+        $('#myModal').modal('show');
     });
 
     $('#remove').click(function () {
@@ -348,7 +570,13 @@
             return;
         }
 
-        var id = $('#table').bootstrapTable('getSelections')[0].id;
+        let id = $('#table').bootstrapTable('getSelections')[0].id;
+        let feedback = $('#table').bootstrapTable('getSelections')[0].feedback;
+        if (feedback.length > 0) {
+            bootbox.alert("已有反馈内容，不允许删除！");
+            return;
+        }
+
         bootbox.confirm("确认删除？",
             function(result){
                 if(result) {

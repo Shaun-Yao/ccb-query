@@ -1,4 +1,4 @@
-package com.honji.order.entity.vo;
+package com.honji.order.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.honji.order.entity.IdEntity;

@@ -54,6 +54,15 @@ public class SalesPlanDetailsController {
     @GetMapping("/index")
     public String index(@RequestParam(required = false) String jobNum,
                         @RequestParam(required = false) String id, Model model) {
+        boolean enableFeedback = false;//是否开启编辑反馈意见
+        if(StringUtils.isNotEmpty(id)) {
+            int result = salesPlanMapper.belongTo(id, jobNum);
+            if (result > 0) {//如果有记录则查看人与此salesplan所属大区经理相同，可以编辑反馈意见
+                enableFeedback = true;
+            }
+        }
+        model.addAttribute("enableFeedback", enableFeedback);
+
         if (StringUtils.isNotEmpty(id)) {//有id为修改
             SalesPlan salesPlan = salesPlanService.getById(id);
             model.addAttribute("salesPlan", salesPlan);
@@ -78,8 +87,9 @@ public class SalesPlanDetailsController {
 
     @GetMapping("/list")
     @ResponseBody
-    public DataGridResult list(@RequestParam String planId, @RequestParam int offset, @RequestParam int limit) {
-        return new DataGridResult(salesPlanDetailsService.listForIndex(planId, offset, limit));
+    public DataGridResult list(@RequestParam String planId, @RequestParam boolean showAll,
+                               @RequestParam int offset, @RequestParam int limit) {
+        return new DataGridResult(salesPlanDetailsService.listForIndex(planId, showAll, offset, limit));
     }
 
     @PostMapping("/save")

@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.honji.order.entity.SalesPlan;
-import com.honji.order.entity.vo.SalesPlanVO;
 import com.honji.order.mapper.SalesPlanMapper;
 import com.honji.order.model.SalesPlanDTO;
+import com.honji.order.model.SalesPlanVO;
 import com.honji.order.service.ISalesPlanService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +45,11 @@ public class SalesPlanServiceImpl extends ServiceImpl<SalesPlanMapper, SalesPlan
         PageHelper.startPage(offset / limit + 1, limit);
         if ("admin".equals(jobNum)) {//领导查看数据
             salesPlanDTO.setAdmin(true);
+            return new PageInfo<>(salesPlanMapper.selectForManager(salesPlanDTO));
         }
 
         if (StringUtils.isNotEmpty(result)) {//大区经理查看数据
-            return new PageInfo<>(salesPlanMapper.selectForManager(jobNum));
+            return new PageInfo<>(salesPlanMapper.selectForManager(salesPlanDTO));
         }
         return new PageInfo<>(salesPlanMapper.selectForIndex(salesPlanDTO));
     }

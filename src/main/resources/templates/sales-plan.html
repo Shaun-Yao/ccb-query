@@ -34,13 +34,14 @@
                             data-selected-text-format="count" >
                     </select>
                 </div>
-                <!--<label for="feedbackState" class="col-sm-2 control-label">反馈状态</label>
+                <label for="feedbackState" class="col-sm-2 control-label">反馈状态</label>
                 <div class="col-sm-4">
                     <select class="form-control" name="feedbackState" id="feedbackState">
-                        <option value="0">待反馈</option>
-                        <option value="1">已反馈</option>
+                        <option value="0">全部</option>
+                        <option value="1">待反馈</option>
+                        <option value="2">已反馈</option>
                     </select>
-                </div>-->
+                </div>
                 <button type="button" class="btn btn-success" id="search">查询</button>
                 <button type="button" class="btn btn-info" id="exportBtn">导出</button>
             </div>
@@ -94,7 +95,6 @@
     });
 
     $('#search').click(function () {
-        console.log(2222);
         if($('#form')[0].reportValidity()) {
             $('#table').bootstrapTable('refresh');
         }
@@ -132,6 +132,7 @@
         pageSize: 10,      //每页的记录行数（*）
         queryParams: function (params) {
             params.shopCodes = $('#shopCodes').val();
+            params.feedbackState = $('#feedbackState').val();
             //导出全部数据没有传limit给后台, 把limit设置为全部数据
             if (typeof(params.limit) == "undefined") {
                 params.limit = this.totalRows;

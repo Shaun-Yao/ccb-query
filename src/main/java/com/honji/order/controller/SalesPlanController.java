@@ -3,11 +3,11 @@ package com.honji.order.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.honji.order.entity.*;
-import com.honji.order.entity.vo.SalesPlanVO;
 import com.honji.order.mapper.AreaMapper;
 import com.honji.order.mapper.SalesPlanMapper;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.SalesPlanDTO;
+import com.honji.order.model.SalesPlanVO;
 import com.honji.order.service.IAreaService;
 import com.honji.order.service.IDetailsProposalService;
 import com.honji.order.service.ISalesPlanDetailsService;
@@ -86,6 +86,7 @@ public class SalesPlanController {
     @GetMapping("/list")
     @ResponseBody
     public DataGridResult list(SalesPlanDTO salesPlanDTO) {
+        System.out.println("getFeedbackState==" + salesPlanDTO.getFeedbackState());
         return new DataGridResult(salesPlanService.listForIndex(salesPlanDTO));
     }
 
@@ -194,8 +195,8 @@ public class SalesPlanController {
                 detailsRow.createCell(0).setCellValue(details.getReasonType());
                 detailsRow.createCell(1).setCellValue(details.getPrimaryReason());
                 detailsRow.createCell(2).setCellValue(details.getReason());
-                detailsRow.createCell(3).setCellValue(details.getConvention());
-                detailsRow.createCell(4).setCellValue(details.getInnovation());
+                detailsRow.createCell(3).setCellValue(details.getProposal());
+                detailsRow.createCell(4).setCellValue(details.getProposal());
                 detailsRow.createCell(5).setCellValue(details.getFeedback());
                 detailsRow.createCell(6).setCellValue(details.getExecutor());
                 detailsRow.createCell(7).setCellValue(details.getResult());

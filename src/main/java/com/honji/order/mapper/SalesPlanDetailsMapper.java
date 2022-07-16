@@ -19,7 +19,10 @@ public interface SalesPlanDetailsMapper extends BaseMapper<SalesPlanDetails> {
 
     @Select({"<script>",
             "SELECT * FROM sales_plan_details where plan_id = '${planId}'",
+            "<if test='!showAll'>",//不显示全部，则过滤暂存
+            " and state = 1 ",
+            "</if>",
 //            " ORDER BY date ",
             "</script>"})
-    List<SalesPlanDetails> selectForIndex(String planId);
+    List<SalesPlanDetails> selectForIndex(String planId, boolean showAll);
 }

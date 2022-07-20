@@ -35,9 +35,9 @@ public class SalesPlanDetailsServiceImpl extends ServiceImpl<SalesPlanDetailsMap
 
 
     @Override
-    public PageInfo<SalesPlanDetails> listForIndex(String planId, boolean showAll, int offset, int limit) {
+    public PageInfo<SalesPlanDetails> listForIndex(String planId, int offset, int limit) {
         PageHelper.startPage(offset / limit + 1, limit);
-        return new PageInfo<>(salesPlanDetailsMapper.selectForIndex(planId, showAll));
+        return new PageInfo<>(salesPlanDetailsMapper.selectForIndex(planId));
     }
 
     @Override
@@ -49,6 +49,6 @@ public class SalesPlanDetailsServiceImpl extends ServiceImpl<SalesPlanDetailsMap
         updateWrapper.eq("id", id);
         updateWrapper.set("feedback", feedback);
         salesPlanDetailsService.update(updateWrapper);
-        salesPlanMapper.notify(salesPlan.getJobNum(), "您的业绩下降原因已经反馈，请查看！");
+        salesPlanMapper.notify(salesPlan.getJobNum(), "您的业绩下降原因已经反馈，请查看！", "");
     }
 }

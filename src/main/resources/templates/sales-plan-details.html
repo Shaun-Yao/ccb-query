@@ -15,7 +15,7 @@
         <div class="modal-body">
             <input type="hidden" id="id" name="id" th:value="${salesPlan?.id}">
             <input type="hidden" name="jobNum" th:value="${salesPlan !=null}? ${salesPlan.jobNum} : ${jobNum}" >
-
+            <input type="hidden" id="state" name="state" th:value="${salesPlan !=null}? ${salesPlan.state} : 0" >
             <div class="form-group">
                 <label  class="col-sm-1 control-label">制表人</label>
                 <div class="col-sm-2">
@@ -125,6 +125,7 @@
     <div id="deposit" >
         <button type="button" class="btn btn-success" id="add">新增</button>
         <button type="button" class="btn btn-danger" id="remove">删除</button>
+        <button type="button" id="saveDetailsAndNotify" class="btn btn-primary">提交并通知大区经理</button>
     </div>
 
 
@@ -139,7 +140,6 @@
                 <form class="form-horizontal" id="form" role="form" action="/sales-plan-details/add" method="post">
                     <div class="modal-body">
                         <input type="hidden" id="detailsId" name="id" >
-                        <input type="hidden" id="state" name="state" value="0" >
                         <input type="hidden" id="planId" name="planId" th:value="${salesPlan?.id}">
 
                         <div class="form-group">
@@ -156,7 +156,7 @@
                                 </select>
                             </div>
                         </div>
-
+<!--
                         <div class="form-group">
                             <label class="col-sm-2 control-label">方案类型</label>
                             <label class="radio-inline">
@@ -166,25 +166,39 @@
                                 <input type="radio" name="proposalType" value="创新" required> 创新
                             </label>
                         </div>
+-->
+                        <div class="form-group">
+                            <label for="proposalType" class="col-sm-2 control-label">方案类型</label>
+                            <div class="col-sm-8">
+                                <select name="proposalType" id="proposalType" class="form-control" required>
+                                    <option value="常规" >常规</option>
+                                    <option value="创新" >创新</option>
+                                </select>
+                            </div>
+                        </div>
 
                         <div class="form-group">
                             <label for="proposal" class="col-sm-2 control-label">方案</label>
                             <div class="col-sm-8">
-                                <textarea rows="3" cols="40" id="proposal" name="proposal" required></textarea>
+                                <textarea rows="3" cols="50" id="proposal" name="proposal" required></textarea>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="feedback" class="col-sm-2 control-label">大区经理反馈</label>
                             <div class="col-sm-8">
-                                <textarea rows="3" cols="40" id="feedback" name="feedback" readonly></textarea>
+                                <textarea rows="3" cols="50" id="feedback" name="feedback" readonly></textarea>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="confirmation" class="col-sm-2 control-label">方案确定</label>
                             <div class="col-sm-8">
-                                <textarea rows="3" cols="40" id="confirmation" name="confirmation" readonly></textarea>
+                                <textarea rows="3" cols="50" id="confirmation" name="confirmation" readonly></textarea>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-8 control-label" style="color: red">开始日期和结束日期可以二选一</label>
                         </div>
 
                         <div class="form-group">
@@ -201,31 +215,33 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="col-sm-8 control-label" style="color: red">如果已经填写了日期，频率一般不需再填写</label>
+                        </div>
+                        <div class="form-group">
                             <label for="frequency" class="col-sm-2 control-label">频率</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="frequency" name="frequency" readonly>
+                                <input type="text" class="form-control" maxlength="20" id="frequency" name="frequency" readonly>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="executor" class="col-sm-2 control-label">执行人</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="executor" name="executor" readonly>
+                                <input type="text" class="form-control" maxlength="10" id="executor" name="executor" readonly>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="result" class="col-sm-2 control-label">结果</label>
                             <div class="col-sm-8">
-                                <textarea rows="3" cols="40" id="result" name="result" readonly></textarea>
+                                <textarea rows="3" cols="50" id="result" name="result" readonly></textarea>
                             </div>
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="close" class="btn btn-danger">关闭</button>
-                        <button type="button" id="saveDetails" class="btn btn-info">暂存</button>
-                        <button type="button" id="saveDetailsAndNotify" class="btn btn-primary">提交并通知大区经理</button>
+                        <button type="button" id="close" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                        <button type="button" id="saveDetails" class="btn btn-info">提交保存</button>
                         <button type="button" id="saveFeedback" class="btn btn-success" style="display: none;">提交反馈</button>
                     </div>
                 </form>
@@ -245,7 +261,7 @@
 <script th:inline="javascript">
 
     function getMaxMonth(date) {
-        var mm = date.getMonth()+1; //January is 0!
+        var mm = date.getMonth() + 1; //January is 0!
         var yyyy = date.getFullYear();
 
         if(mm<10){
@@ -268,6 +284,14 @@
         return yyyy+'-' + mm+'-' + dd;
     }
 
+    function subContent(content) {
+        if (content.length > 10) {
+            return content.substr(0, 10) + '......';
+        } else {
+            return content.substr(0, 10);
+        }
+    }
+
     var subjectObject = {
         "内部原因": {
             "人员问题": ["员工状态低迷与积极性差", "老员工销售技能差",
@@ -286,20 +310,42 @@
         }
     }
 
+    function feedbackChangeSetting(hasFeedback) {
+        $('#reasonType').prop('disabled', hasFeedback);
+        $('#primaryReason').prop('disabled', hasFeedback);
+        $('#reason').prop('disabled', hasFeedback);
+        $('#proposalType').prop('disabled', hasFeedback);
+        // $(':radio:not(:checked)').attr('disabled', hasFeedback);
+        $("#proposal").prop("readonly", hasFeedback);
+
+        $("#confirmation").prop("readonly", !hasFeedback);
+        $("#beginDate").prop("readonly", !hasFeedback);
+        $("#endDate").prop("readonly", !hasFeedback);
+        $("#frequency").prop("readonly", !hasFeedback);
+        $("#executor").prop("readonly", !hasFeedback);
+        $("#result").prop("readonly", !hasFeedback);
+    }
 
     $(function () {
-        let showAll = true;
-        $('#performDate').attr("min", "2022-01");
+        // let showAll = true;
+        $('#performDate').attr("min", "2022-06");
         $('#performDate').attr("max", getMaxMonth(new Date()));
-        $('#date').attr("min", "2022-06-30");
-        $('#date').attr("max", getMaxDate(new Date()));
+        $('#beginDate, #endDate').attr("min", "2022-06-01");
+        $('#beginDate, #endDate').attr("max", getMaxDate(new Date()));
 
         $('#shopCode').selectpicker();
         let plan = [[${salesPlan}]];
         //没有业绩属于新建页面，隐藏添加，删除 原因按钮
         if (plan != null && plan.jobNum != [[${jobNum}]]) {
             $('#save, #add, #remove, #saveDetails, #saveDetailsAndNotify').hide();
-            showAll = false;//非本人不显示全部原因，即只显示提交并通知的原因，不显示暂存的原因
+            // showAll = false;//非本人不显示全部原因，即只显示提交并通知的原因，不显示暂存的原因
+        }
+
+        if (plan != null && plan.state == 1) {//已经提交通知不允许再修改
+            $('#area').prop('disabled', true);
+            $('#shopCode').prop('disabled', true);
+            $('#performDate').prop('disabled', true);
+            $('#save').prop('disabled', true);
         }
 
         if ([[${enableFeedback}]]) {//开启意见反馈编辑
@@ -307,8 +353,9 @@
             $('#saveFeedback').show();
         }
 
+
         $('#table').bootstrapTable({
-            url: '/sales-plan-details/list?planId=' + [[${planId}]] + '&showAll=' + showAll,
+            url: '/sales-plan-details/list?planId=' + [[${planId}]],
             pagination: true,
             sidePagination: "server",
             locale: 'zh-CN',
@@ -334,14 +381,19 @@
                     async: false,
                     success: function(data){
 
-                        //没有反馈不能添加执行人，反馈，不能操作方案
+                        //有反馈可以操作
                         if (data.feedback.length > 0) {
-                            $("#confirmation").prop("readonly", false);
-                            $("#beginDate").prop("readonly", false);
-                            $("#endDate").prop("readonly", false);
-                            $("#frequency").prop("readonly", false);
-                            $("#executor").prop("readonly", false);
-                            $("#result").prop("readonly", false);
+                            feedbackChangeSetting(true);
+                        } else {
+                            feedbackChangeSetting(false);
+                        }
+
+                        if (data.confirmation.length > 0) {//已确定方案不允许修改反馈内容
+                            $('#feedback').prop('disabled', true);
+                            $('#saveFeedback').prop('disabled', true);
+                        } else {
+                            $('#feedback').prop('disabled', false);
+                            $('#saveFeedback').prop('disabled', false);
                         }
 
                         $('#form').clearForm();
@@ -353,7 +405,8 @@
                         $('#primaryReason').change();//触发change事件
                         $('#reason').val(data.reason);
                         $('#proposal').val(data.proposal);
-                        $("input:radio[name=proposalType][value=" + data.proposalType + "]")[0].checked=true;
+                        $('#proposalType').val(data.proposalType);
+                        // $("input:radio[name=proposalType][value=" + data.proposalType + "]")[0].checked=true;
                         $('#feedback').val(data.feedback);
                         $('#confirmation').val(data.confirmation);
                         $('#executor').val(data.executor);
@@ -361,6 +414,7 @@
                         $('#endDate').val(data.endDate);
                         $('#frequency').val(data.frequency);
                         $('#result').val(data.result);
+
                     }
                 });
                 $('#myModal').modal('show');
@@ -383,14 +437,26 @@
                 field: 'reason',
                 title: '具体原因分析'
             }, {
+                field: 'proposal',
+                title: '方案',
+                formatter: function (value, row, index) {
+                    return subContent(value);
+                }
+            }, {
                 field: 'feedback',
-                title: '大区经理反馈'
+                title: '大区经理反馈',
+                formatter: function (value, row, index) {
+                    return subContent(value);
+                }
             }, {
                 field: 'executor',
                 title: '执行人'
             }, {
                 field: 'result',
-                title: '结果'
+                title: '结果',
+                formatter: function (value, row, index) {
+                    return subContent(value);
+                }
             }]
         });
 
@@ -469,8 +535,6 @@
     });
 
 
-
-
     $('#back').click(function() {
         window.location.href = '/sales-plan/index?jobNum=' + [[${jobNum}]];
     });
@@ -500,25 +564,98 @@
         }
     });
 
-    $('#saveDetails, #saveDetailsAndNotify').click(function() {
-        if($('#form')[0].reportValidity()) {
-            let wantToNotify = false;
-            if ($(this).prop('id') == 'saveDetailsAndNotify') {
-                $('#state').val(1);
-                wantToNotify = true;
+    $('#saveDetailsAndNotify').click(function() {
+        if($('#table').bootstrapTable('getData').length == 0) {
+            bootbox.alert("没有记录，无需通知！");
+            return;
+        }
+
+        bootbox.confirm("确认通知大区经理反馈？",
+            function(result){
+                if(result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/sales-plan-details/notify",
+                        traditional: true,
+                        data: {
+                            planId: $('#id').val()
+                        },
+                        success: function(result){
+                            if (result > 0) {
+                                bootbox.alert("通知成功！");
+                            } else {
+                                bootbox.alert("通知失败！");
+                            }
+                        },
+                        error:function(xhr,state,errorThrown){
+                            bootbox.alert("通知失败，请关闭网页重新尝试！");
+                        }
+                    });
+                }
+            })
+    });
+
+
+    $('#saveDetails').click(function() {
+        let confirmationLength = $('#confirmation').val().length;
+        let beginDateLength = $('#beginDate').val().length;
+        let endDateLength = $('#endDate').val().length;
+        let executorLength = $('#executor').val().length;
+        let frequencyLength = $('#frequency').val().length;
+        //如时间或者频率一旦有信息，那么“方案确定”及”执行人“就必须得有信息才能保存
+        if(confirmationLength > 0 || beginDateLength > 0
+            || endDateLength > 0 || executorLength > 0 || frequencyLength > 0) {
+            if (confirmationLength == 0 ) {
+                bootbox.alert("请填写方案确定！");
+                return;
             }
-            $('#saveDetails, #saveDetailsAndNotify').attr("disabled", true);//屏蔽提交按钮
+
+            if (beginDateLength == 0 && endDateLength == 0 && frequencyLength ==0 ) {
+                bootbox.alert("日期和频率至少填写一个！");
+                return;
+            }
+
+            if (executorLength == 0 ) {
+                bootbox.alert("请填写执行人！");
+                return;
+            }
+        }
+
+        /*if($('#beginDate').val().length > 0 || $('#beginDate').val().length > 0
+            || $('#frequency').val().length > 0) {
+            if ($('#executor').val().length == 0 ) {
+                bootbox.alert("请先填写执行人！");
+                return;
+            }
+        }
+
+        if($('#executor').val().length > 0) {
+            if ($('#beginDate').val().length == 0 && $('#beginDate').val().length == 0
+                && $('#frequency').val().length == 0) {
+                bootbox.alert("请先填写日期或者频率！");
+                return;
+            }
+        }
+*/
+        //提交的时候去掉disabled才能取到值
+        $('#form').find(':disabled').removeAttr('disabled');
+
+        if($('#form')[0].reportValidity()) {
+            
+            $(this).attr("disabled", true);//屏蔽提交按钮
             $.ajax({
                 type: "post",
-                url: "/sales-plan-details/save?wantToNotify=" + wantToNotify,
+                url: "/sales-plan-details/save?wantToNotify=false",
                 data: $('#form').serialize(),
                 success: function(data){
                     $('#myModal').modal('hide');
-                    $('#table').bootstrapTable('refresh');
-                    $('#saveDetails, #saveDetailsAndNotify').attr("disabled", false);//提交成功后激活提交按钮
+                    $('#table').bootstrapTable('refresh', {
+                        url: '/sales-plan-details/list?planId=' + $('#planId').val()
+                    });
+                    $('#saveDetails').attr("disabled", false);//提交成功后激活提交按钮
                 },
                 error: function(data){
-                    $('#saveDetails, #saveDetailsAndNotify').attr("disabled", false);
+                    $('#saveDetails').attr("disabled", false);
                     bootbox.alert("保存失败，请稍后再试！");
                 }
             });
@@ -538,7 +675,7 @@
             url: "/sales-plan-details/saveFeedback?id=" + $('#detailsId').val() + "&feedback=" + $('#feedback').val(),
             success: function(data){
                 $('#myModal').modal('hide');
-                //这里使用$(this) 启用按钮无效，故使用id
+                $('#table').bootstrapTable('refresh');
                 $('#saveFeedback').prop("disabled", false);//提交成功后激活提交按钮
             },
             error: function(data){
@@ -555,13 +692,9 @@
             return;
         }
         $('#form').resetForm();
+        $('#detailsId').val('');//弹出框方案id
         //新建部分字段不允许填写
-        $("#confirmation").prop("readonly", true);
-        $("#beginDate").prop("readonly", true);
-        $("#endDate").prop("readonly", true);
-        $("#frequency").prop("readonly", true);
-        $("#executor").prop("readonly", true);
-        $("#result").prop("readonly", true);
+        feedbackChangeSetting(false);
         $('#myModal').modal('show');
     });
 

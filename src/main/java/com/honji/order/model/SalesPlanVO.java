@@ -90,5 +90,5 @@ public class SalesPlanVO extends IdEntity {
     private BigDecimal yearDiff;
     private String monthPercent;
     private String yearPercent;
-
+    private int state;
 }

@@ -60,11 +60,11 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
             "<if test='salesPlanDTO.feedbackState == 2'>",
             " not in ",
             "</if>",
-            "(SELECT plan_id FROM sales_plan_details WHERE state = 1 AND feedback = '' GROUP BY plan_id) ", "" +
+            "(SELECT plan_id FROM sales_plan_details WHERE feedback = '' GROUP BY plan_id) ", "" +
             "GROUP BY plan_id) details ",
             " on sales_plan.id = details.plan_id",
             "</if>",// details end
-            "where 1 = 1 ",
+            "where state = 1 ",
             "<if test='!salesPlanDTO.isAdmin'>",
             " and area.job_num = '${salesPlanDTO.jobNum}'",
             "</if>",
@@ -87,7 +87,7 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
             "<if test='salesPlanDTO.feedbackState == 2'>",
             " not in ",
             "</if>",
-            "(SELECT plan_id FROM sales_plan_details WHERE state = 1 AND feedback = '' GROUP BY plan_id) ", "" +
+            "(SELECT plan_id FROM sales_plan_details WHERE feedback = '' GROUP BY plan_id) ", "" +
             "GROUP BY plan_id) details ",
             " on sales_plan.id = details.plan_id",
             "</if>",// details end
@@ -114,8 +114,9 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
 
     @Insert({"<script>",
             "INSERT INTO IP155.HonjiNav_plus.dbo.WeChat_SendMessage",
-            " (EmployeeNo, SendMessages, CreateDate) ",
-            " VALUES ('${jobNum}', '${message}', GETDATE()) ",
+            " (EmployeeNo,CreateDate,msgtype,agentid,title,descriptions,url,btntxt) ",
+            " VALUES ('${jobNum}', GETDATE(), 'textcard','1000030','浪漫春天直营业绩下降分析及方案跟进', '${message}', ",
+            " '${link}','点击查看更多信息') ",
             "</script>"})
-    int notify(String jobNum, String message);
+    int notify(String jobNum, String message, String link);
 }

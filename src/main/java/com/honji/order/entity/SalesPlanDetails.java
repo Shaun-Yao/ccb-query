@@ -97,6 +97,6 @@ public class SalesPlanDetails extends IdEntity {
     /**
      * 0: 暂存 1: 提交通知
      */
-    private int state;
+//    private int state;
 
 }

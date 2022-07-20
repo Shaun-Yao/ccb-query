@@ -85,4 +85,6 @@ public class SalesPlan extends IdEntity {
     private String monthPercent;
     private String yearPercent;
 
+    private int state;
+
 }

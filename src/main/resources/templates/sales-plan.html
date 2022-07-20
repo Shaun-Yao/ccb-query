@@ -176,7 +176,20 @@
         }, {
             field: 'monthPercent',
             title: '同期涨幅'
-        }]
+        }, {
+            field: 'state',
+            title: '状态',
+            formatter: function (value, row, index) {
+                if (value == '0') {
+                    return "未通知";
+                } else if (value == 1) {
+                    return "已通知";
+                } else {
+                    return "未知";
+                }
+            }
+        }
+        ]
     });
 
 

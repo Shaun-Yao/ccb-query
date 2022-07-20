@@ -134,8 +134,8 @@ public class SalesPlanController {
 
         String columnNames[] = { "制表人", "制表日期", "销售区域", "店铺编码", "店铺名称", "业绩分析时点",
                 "当月业绩", "同期业绩"};// 列名
-        String detailsColumnNames[] = { "原因类型", "主要原因", "原因分析", "常规方案", "创新方案", "大区经理反馈",
-                "执行人", "结果"};// 原因列名
+        String detailsColumnNames[] = { "原因类型", "主要原因", "原因分析", "方案类型", "方案", "大区经理反馈",
+                "方案确定", "开始日期", "结束日期", "频率", "执行人", "结果"};// 原因列名
 //        String proposalColumnNames[] = { "方案", "日期", "原因分析", "常规方案", "创新方案", "大区经理反馈",
 //                "执行人", "结果"};// 方案列名
         CreationHelper creationHelper = workbook.getCreationHelper();
@@ -166,19 +166,7 @@ public class SalesPlanController {
             row.createCell(5).setCellValue(plan.getPerformDate());
             row.createCell(6).setCellValue(plan.getAmounts().doubleValue());
             row.createCell(7).setCellValue(plan.getLastYearMonthAmounts().doubleValue());
-//            row.createCell(8).setCellValue(deposit.getCcbZs());
-//            row.createCell(9).setCellValue(deposit.getCcbBs());
-//            row.createCell(10).setCellValue(deposit.getAlipay());
-//            row.createCell(11).setCellValue(deposit.getWxpay());
-//            row.createCell(12).setCellValue(deposit.getSys());
-//            row.createCell(13).setCellValue(deposit.getMss());
-//            row.createCell(14).setCellValue(deposit.getBsPay());
-//            row.createCell(15).setCellValue(deposit.getMallCollection());
-//            row.createCell(16).setCellValue(deposit.getHeSheng());
-//            row.createCell(17).setCellValue(deposit.getCash());
-//            row.createCell(18).setCellValue(deposit.getMemberPoints());
-//            row.createCell(19).setCellValue(deposit.getCardConsumption());
-//            row.createCell(20).setCellValue(deposit.getGiftCertificate());
+
             QueryWrapper<SalesPlanDetails> detailsQueryWrapper = new QueryWrapper<>();
             detailsQueryWrapper.eq("plan_id", plan.getId());
             List<SalesPlanDetails> detailsList = salesPlanDetailsService.list(detailsQueryWrapper);
@@ -188,19 +176,29 @@ public class SalesPlanController {
                 detailsHeadRow.createCell(l).setCellValue(detailsColumnNames[l]);
             }
             for (int k = 0; k < detailsList.size(); k++) {
-
                 SalesPlanDetails details = detailsList.get(k);
 
                 Row detailsRow = sheet.createRow( rowCount++);
                 detailsRow.createCell(0).setCellValue(details.getReasonType());
                 detailsRow.createCell(1).setCellValue(details.getPrimaryReason());
                 detailsRow.createCell(2).setCellValue(details.getReason());
-                detailsRow.createCell(3).setCellValue(details.getProposal());
+                detailsRow.createCell(3).setCellValue(details.getProposalType());
                 detailsRow.createCell(4).setCellValue(details.getProposal());
                 detailsRow.createCell(5).setCellValue(details.getFeedback());
-                detailsRow.createCell(6).setCellValue(details.getExecutor());
-                detailsRow.createCell(7).setCellValue(details.getResult());
+                detailsRow.createCell(6).setCellValue(details.getConfirmation());
+//                detailsRow.createCell(5).setCellValue(details.getBeginDate());
+                Cell beginDateCell = detailsRow.createCell(7);
+                beginDateCell.setCellValue(details.getBeginDate());
+                beginDateCell.setCellStyle(cellStyle);
+                Cell endDateCell = detailsRow.createCell(8);
+                endDateCell.setCellValue(details.getEndDate());
+                endDateCell.setCellStyle(cellStyle);
+//                detailsRow.createCell(6).setCellValue(details.getEndDate());
+                detailsRow.createCell(9).setCellValue(details.getFrequency());
+                detailsRow.createCell(10).setCellValue(details.getExecutor());
+                detailsRow.createCell(11).setCellValue(details.getResult());
 
+/*
 
                 QueryWrapper<DetailsProposal> proposalQueryWrapper = new QueryWrapper<>();
                 proposalQueryWrapper.eq("details_id", details.getId());
@@ -220,7 +218,7 @@ public class SalesPlanController {
                     proposalRow.createCell(5).setCellValue(proposal.getFrequency());
                     proposalRow.createCell(6).setCellValue("方案");
                     proposalRow.createCell(7).setCellValue(proposal.getConfirmation());
-                }
+                }*/
             }
 
         }

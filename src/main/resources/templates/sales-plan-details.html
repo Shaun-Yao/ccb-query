@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Hello, Bootstrap Table!</title>
+    <title>浪漫春天直营门店业绩下降分析及方案跟进</title>
 
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
@@ -13,6 +13,12 @@
 
     <form class="form-horizontal" id="sales-form" role="form" action="/sales-plan-details/add" method="post">
         <div class="modal-body">
+            <div class="form-group">
+                <label  class="col-sm-4 control-label" style="color: red; font-size: large">第一步：先选择好销售区域，店铺，业绩分析时点，业绩会自动计算。</label>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label" style="color: red; font-size: large">第二步：点击”保存业绩“按钮。</label>
+            </div>
             <input type="hidden" id="id" name="id" th:value="${salesPlan?.id}">
             <input type="hidden" name="jobNum" th:value="${salesPlan !=null}? ${salesPlan.jobNum} : ${jobNum}" >
             <input type="hidden" id="state" name="state" th:value="${salesPlan !=null}? ${salesPlan.state} : 0" >
@@ -116,16 +122,31 @@
             </div>
 
             <button type="button" id="back" class="btn btn-default" >返回主页</button>
-            <button type="button" id="save" class="btn btn-primary">保存</button>
+            <button type="button" id="save" class="btn btn-primary">保存业绩</button>
         </div>
 
     </form>
 
     <table id="table" class="modal-body"></table>
     <div id="deposit" >
-        <button type="button" class="btn btn-success" id="add">新增</button>
-        <button type="button" class="btn btn-danger" id="remove">删除</button>
-        <button type="button" id="saveDetailsAndNotify" class="btn btn-primary">提交并通知大区经理</button>
+
+        <div class="form-group">
+            <label  class="col-sm-8 control-label" style="color: red; font-size: large">第三步：保存业绩成功后再点击”新增原因方案“。</label>
+        </div>
+        <div  class="col-sm-12">
+            <label  class="col-sm12 control-label" style="color: red; font-size: large">
+                注意：每个原因方案需单独新增填写。不要不要不要把多个原因方案标注123组合成一条记录。</label>
+        </div>
+        <div class="form-group">
+            <label  class="col-sm-12 control-label" style="color: red; font-size: large">第四步：所有原因方案新增完成后，点击”确认并通知大区经理反馈“，经理就会收到通知。</label>
+        </div>
+
+
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-danger" id="remove">删除</button>
+            <button type="button" id="saveDetailsAndNotify" class="btn btn-primary">确认并通知大区经理反馈</button>
+            <button type="button" class="btn btn-success" id="add">新增原因方案</button>
+        </div>
     </div>
 
 

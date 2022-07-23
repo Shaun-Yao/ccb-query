@@ -50,6 +50,13 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
 
     @Select({"<script>",
             "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
+            " JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
+            " WHERE id = '${id}'",
+            "</script>"})
+    SalesPlanVO selectOne(String id);
+
+    @Select({"<script>",
+            "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
             "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
             " JOIN area on sales_plan.area = area.code ",
             "<if test='salesPlanDTO.feedbackState != 0'>",//details start

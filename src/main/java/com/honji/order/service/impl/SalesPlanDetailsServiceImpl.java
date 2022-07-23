@@ -4,13 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.honji.order.entity.SalesPlan;
 import com.honji.order.entity.SalesPlanDetails;
 import com.honji.order.mapper.SalesPlanDetailsMapper;
 import com.honji.order.mapper.SalesPlanMapper;
+import com.honji.order.model.SalesPlanVO;
 import com.honji.order.service.ISalesPlanDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -33,6 +35,8 @@ public class SalesPlanDetailsServiceImpl extends ServiceImpl<SalesPlanDetailsMap
     @Autowired
     private ISalesPlanDetailsService salesPlanDetailsService;
 
+    @Autowired
+    private HttpServletRequest request;
 
     @Override
     public PageInfo<SalesPlanDetails> listForIndex(String planId, int offset, int limit) {
@@ -44,11 +48,19 @@ public class SalesPlanDetailsServiceImpl extends ServiceImpl<SalesPlanDetailsMap
     //@Transactional 两个数据库无法启动分布式事务
     public void saveFeedback(String id, String feedback) {
         SalesPlanDetails details = salesPlanDetailsMapper.selectById(id);
-        SalesPlan salesPlan = salesPlanMapper.selectById(details.getPlanId());
+        SalesPlanVO salesPlan = salesPlanMapper.selectOne(details.getPlanId());
         UpdateWrapper<SalesPlanDetails> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", id);
         updateWrapper.set("feedback", feedback);
         salesPlanDetailsService.update(updateWrapper);
-        salesPlanMapper.notify(salesPlan.getJobNum(), "您的业绩下降原因已经反馈，请查看！", "");
+
+        String jobNum = salesPlan.getJobNum();
+        String link = request.getScheme() +"://" + request.getServerName()
+                + ":" +request.getServerPort()
+                + "/sales-plan-details/index?jobNum="
+                .concat(jobNum).concat("&id=").concat(salesPlan.getId());
+        String message = salesPlan.getShopCode().concat(salesPlan.getShopName()).concat("(").concat(salesPlan.getPerformDate())
+                .concat(")业绩下降原因（").concat(details.getReason()).concat("）已经有反馈，请查看！");
+        salesPlanMapper.notify(jobNum, message, link);
     }
 }

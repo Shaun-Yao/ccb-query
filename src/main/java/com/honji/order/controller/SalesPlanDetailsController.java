@@ -9,6 +9,7 @@ import com.honji.order.entity.SalesPlan;
 import com.honji.order.entity.SalesPlanDetails;
 import com.honji.order.mapper.SalesPlanMapper;
 import com.honji.order.model.DataGridResult;
+import com.honji.order.model.SalesPlanVO;
 import com.honji.order.service.IAreaService;
 import com.honji.order.service.IDetailsProposalService;
 import com.honji.order.service.ISalesPlanDetailsService;
@@ -119,7 +120,7 @@ public class SalesPlanDetailsController {
     @PostMapping("/notify")
     @ResponseBody
     public int notify(@RequestParam String planId) {
-        SalesPlan salesPlan = salesPlanMapper.selectById(planId);
+        SalesPlanVO salesPlan = salesPlanMapper.selectOne(planId);
         UpdateWrapper<SalesPlan> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", planId);
         updateWrapper.set("state", 1);
@@ -132,8 +133,8 @@ public class SalesPlanDetailsController {
                 .concat(jobNum).concat("&id=").concat(salesPlan.getId());
 //        String link = "http://localhost:9006/sales-plan-details/index?jobNum="
 //                .concat(jobNum).concat("&id=").concat(salesPlan.getId());
-        String message = salesPlan.getShopCode().concat("(").concat(salesPlan.getPerformDate())
-                            .concat(")业绩下降原因上报，请查看！");
+        String message = salesPlan.getShopCode().concat(salesPlan.getShopName())
+                .concat("(").concat(salesPlan.getPerformDate()).concat(")业绩下降原因上报，请查看！");
         return salesPlanMapper.notify(jobNum, message, link);
     }
 

@@ -61,7 +61,7 @@
                 <label for="performDate" class="col-sm-1 control-label">业绩分析时点</label>
                 <div class="col-sm-2">
                     <input type="month" class="form-control" id="performDate" name="performDate"
-                           th:value="${salesPlan?.performDate}"  required>
+                           th:value="${salesPlan !=null}? ${salesPlan.performDate} : ${month}" readonly required>
                 </div>
 
             </div>
@@ -201,14 +201,14 @@
                         <div class="form-group">
                             <label for="proposal" class="col-sm-2 control-label">方案</label>
                             <div class="col-sm-8">
-                                <textarea rows="3" cols="50" id="proposal" name="proposal" required></textarea>
+                                <textarea rows="5" cols="50" id="proposal" name="proposal" required></textarea>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="feedback" class="col-sm-2 control-label">大区经理反馈</label>
                             <div class="col-sm-8">
-                                <textarea rows="3" cols="50" id="feedback" name="feedback" readonly></textarea>
+                                <textarea rows="5" cols="50" id="feedback" name="feedback" readonly></textarea>
                             </div>
                         </div>
                         <div class="form-group">
@@ -487,9 +487,11 @@
                 type: "GET",
                 url: "/sales-plan/listShops?area=" + $(this).val(),
                 success: function(data){
+                    let emptyOption = new Option('', '');
+                    $('#shopCode').append(emptyOption);
                     for (const i in data) {
                         // console.log(data[i]);
-                        var option = new Option(data[i].name, data[i].code);
+                        let option = new Option(data[i].name, data[i].code);
                         $('#shopCode').append(option);
 
                         // $(this).append(new Option(data[i].name, data[i].code));
@@ -507,7 +509,7 @@
         $('#area').change();//大区触发change事件让店铺自动加载数据
 
 
-        $('#performDate, #shopCode').change(function () {
+        $('#shopCode').change(function () {
             var performDate = $('#performDate').val();
             var shopCode = $('#shopCode').val();
             if(performDate.length > 0 && shopCode.length > 0) {

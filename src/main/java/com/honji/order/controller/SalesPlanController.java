@@ -86,7 +86,6 @@ public class SalesPlanController {
     @GetMapping("/list")
     @ResponseBody
     public DataGridResult list(SalesPlanDTO salesPlanDTO) {
-        System.out.println("getFeedbackState==" + salesPlanDTO.getFeedbackState());
         return new DataGridResult(salesPlanService.listForIndex(salesPlanDTO));
     }
 

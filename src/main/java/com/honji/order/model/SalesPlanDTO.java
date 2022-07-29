@@ -24,9 +24,9 @@ public class SalesPlanDTO {
     private List<String> shopCodes ;
     private int feedbackState;
     boolean isAdmin = false;
+    boolean isManager = false;
 
     private int offset;
-
     private int limit;
 
 

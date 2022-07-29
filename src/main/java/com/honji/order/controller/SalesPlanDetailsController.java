@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -77,9 +78,14 @@ public class SalesPlanDetailsController {
             model.addAttribute("name", map.get("name"));
             model.addAttribute("createDate", LocalDate.now());
         }
+        //固定新建业绩月份为上个月
+        LocalDate date = LocalDate.now().minusMonths(1);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM");
+        String month = date.format(dtf);
         List<Area> areas = areaService.list();
         model.addAttribute("areas", areas);
         model.addAttribute("jobNum", jobNum);
+        model.addAttribute("month", month);
         return "sales-plan-details";
     }
 

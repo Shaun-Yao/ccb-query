@@ -79,13 +79,19 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
             " and shop_code in ",
             "<foreach item='item' index='index' collection='salesPlanDTO.shopCodes' open='(' separator=',' close=')'> #{item} </foreach>",
             "</if>",
+            "<if test='!salesPlanDTO.isAdmin'>",
             " ORDER BY perform_date desc ",
+            "</if>",
+            "<if test='salesPlanDTO.isAdmin'>",
+            " ORDER BY perform_date desc, convert(decimal(6, 2), SUBSTRING(month_percent, 1, 4)) ",
+            "</if>",
             "</script>"})
     List<SalesPlanVO> selectForManager(@Param("salesPlanDTO")SalesPlanDTO salesPlanDTO);
 
     @Select({"<script>",
             "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
             "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
+            " JOIN area on sales_plan.area = area.code ",
             "<if test='salesPlanDTO.feedbackState != 0'>",//details start
             " JOIN (SELECT plan_id FROM sales_plan_details WHERE plan_id ",
             "<if test='salesPlanDTO.feedbackState == 1'>",
@@ -98,7 +104,16 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
             "GROUP BY plan_id) details ",
             " on sales_plan.id = details.plan_id",
             "</if>",// details end
-            "where job_num = '${salesPlanDTO.jobNum}' ",
+
+            "<if test='salesPlanDTO.isAdmin'>",//管理员
+            " where state = 1 ",
+            "</if>",
+            "<if test='salesPlanDTO.isManager'>",//经理
+            " where state = 1 and area.job_num = '${salesPlanDTO.jobNum}'",
+            "</if>",
+            "<if test='!salesPlanDTO.isAdmin and !salesPlanDTO.isManager'>",//不是管理员也不是经理
+            " where sales_plan.job_num = '${salesPlanDTO.jobNum}' ",
+            "</if>",
             "<if test='salesPlanDTO.shopCodes != null and salesPlanDTO.shopCodes.size() > 0'>",
             " and shop_code in ",
             "<foreach item='item' index='index' collection='salesPlanDTO.shopCodes' open='(' separator=',' close=')'> #{item} </foreach>",

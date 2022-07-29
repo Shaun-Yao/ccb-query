@@ -38,27 +38,35 @@ public class SalesPlanServiceImpl extends ServiceImpl<SalesPlanMapper, SalesPlan
     @Override
     public PageInfo<SalesPlanVO> listForIndex(SalesPlanDTO salesPlanDTO) {
         String jobNum = salesPlanDTO.getJobNum();
-//        List<String> shopCodes = salesPlanDTO.getShopCodes();
-        int offset = salesPlanDTO.getOffset();
-        int limit = salesPlanDTO.getLimit();
-        String result = salesPlanMapper.selectAManager(jobNum);//查询是否大区经理
-        PageHelper.startPage(offset / limit + 1, limit);
-        if ("admin".equals(jobNum)) {//领导查看数据
+
+        if ("admin".equals(salesPlanDTO.getJobNum())) {//领导查看数据
             salesPlanDTO.setAdmin(true);
-            return new PageInfo<>(salesPlanMapper.selectForManager(salesPlanDTO));
+        } else {
+            //这步查询需要在分页之前进行
+            String result = salesPlanMapper.selectAManager(jobNum);//查询是否大区经理
+            if (StringUtils.isNotEmpty(result)) {//大区经理查看数据
+                salesPlanDTO.setManager(true);
+            }
         }
 
-        if (StringUtils.isNotEmpty(result)) {//大区经理查看数据
-            return new PageInfo<>(salesPlanMapper.selectForManager(salesPlanDTO));
-        }
+        int offset = salesPlanDTO.getOffset();
+        int limit = salesPlanDTO.getLimit();
+        PageHelper.startPage(offset / limit + 1, limit);
         return new PageInfo<>(salesPlanMapper.selectForIndex(salesPlanDTO));
     }
 
 
     @Override
     public List<SalesPlanVO> listForExport(SalesPlanDTO salesPlanDTO) {
+        String jobNum = salesPlanDTO.getJobNum();
+
         if ("admin".equals(salesPlanDTO.getJobNum())) {//领导查看数据
             salesPlanDTO.setAdmin(true);
+        } else {
+            String result = salesPlanMapper.selectAManager(jobNum);//查询是否大区经理
+            if (StringUtils.isNotEmpty(result)) {//大区经理查看数据
+                salesPlanDTO.setManager(true);
+            }
         }
         return salesPlanMapper.selectForIndex(salesPlanDTO);
     }

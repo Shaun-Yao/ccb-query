@@ -21,8 +21,10 @@ public class SalesPlanDTO {
      * 门店代码
      * bootstrpa-table 传数组参数没有加上数组index，加上traditional:true 也无效
      */
+    private String area;
     private List<String> shopCodes ;
     private int feedbackState;
+    private String performDate;
     boolean isAdmin = false;
     boolean isManager = false;
 

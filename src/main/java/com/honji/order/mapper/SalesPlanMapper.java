@@ -91,7 +91,8 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
     @Select({"<script>",
             "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
             "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
-            " JOIN area on sales_plan.area = area.code ",
+//            " JOIN area on sales_plan.area = area.code ",
+            " JOIN area on kehu.khsx3 = area.code ",
             "<if test='salesPlanDTO.feedbackState != 0'>",//details start
             " JOIN (SELECT plan_id FROM sales_plan_details WHERE plan_id ",
             "<if test='salesPlanDTO.feedbackState == 1'>",
@@ -114,9 +115,15 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
             "<if test='!salesPlanDTO.isAdmin and !salesPlanDTO.isManager'>",//不是管理员也不是经理
             " where sales_plan.job_num = '${salesPlanDTO.jobNum}' ",
             "</if>",
-            "<if test='salesPlanDTO.shopCodes != null and salesPlanDTO.shopCodes.size() > 0'>",
+            "<if test='salesPlanDTO.area != null and salesPlanDTO.area.length > 0'>",//大区筛选
+            " and area.code = '${salesPlanDTO.area}' ",
+            "</if>",
+            "<if test='salesPlanDTO.shopCodes != null and salesPlanDTO.shopCodes.size() > 0'>",//门店筛选
             " and shop_code in ",
             "<foreach item='item' index='index' collection='salesPlanDTO.shopCodes' open='(' separator=',' close=')'> #{item} </foreach>",
+            "</if>",
+            "<if test='salesPlanDTO.performDate.length > 0'>",//业绩日期筛选
+            " and perform_date = '${salesPlanDTO.performDate}'",
             "</if>",
             " ORDER BY perform_date desc ",
             "</script>"})

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Hello, Bootstrap Table!</title>
+
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-table/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="/webjars/bootstrap-select/1.13.17/css/bootstrap-select.min.css" />
+</head>
+<body>
+
+
+<table id="table" class="modal-body"></table>
+<div id="deposit" >
+    <button type="button" class="btn btn-success" id="add">新增</button>
+    <button type="button" class="btn btn-danger" id="remove">删除</button>
+</div>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title" id="myModalLabel">人员区域权限</h3>
+            </div>
+            <form class="form-horizontal" id="form" role="form" action="/person-area/add" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="id" name="id" >
+
+                    <div class="form-group">
+                        <label for="jobNum" class="col-sm-2 control-label">人员</label>
+                        <div class="col-sm-8">
+                            <select class="form-control" name="jobNum" id="jobNum"
+                                    data-live-search="true" data-actions-box="true" required>
+                                <option></option>
+                                <option th:each="person : ${persons}"
+                                        th:value="${person.jobNum}" th:text="${person.name}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="areaCode" class="col-sm-2 control-label">区域</label>
+                        <div class="col-sm-8">
+                            <select class="form-control" name="areaCode" id="areaCode"
+                                    data-live-search="true" data-actions-box="true" required>
+                                <option></option>
+                                <option th:each="area : ${areas}"
+                                        th:value="${area.code}" th:text="${area.name}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" id="save" class="btn btn-primary">提交更改</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div><!-- 模态框（Modal）end -->
+
+<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery-form/4.2.2/jquery.form.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="/webjars/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/webjars/bootbox.js/5.1.3/dist/bootbox.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
+<script src="/webjars/bootstrap-select/1.13.17/js/i18n/defaults-zh_CN.min.js"></script>
+</body>
+<script th:inline="javascript">
+
+
+    $(function () {
+
+        $('#jobNum, #areaCode').selectpicker();
+
+        $('#type').on('change', function() {
+            if (this.value == 'CASH_SUPPLEMENT') {
+                $('#actualAmount').prop('disabled', true);
+                // $('#actualAmount').val(0);
+            } else {
+                $('#actualAmount').prop('disabled', false);
+                // $('#actualAmount').val('');
+            }
+        });
+
+        $('#myModal').on('show.bs.modal', function () {
+            if ($('#type').val() == 'CASH_SUPPLEMENT') {
+                $('#actualAmount').prop('disabled', true);
+            } else {
+                $('#actualAmount').prop('disabled', false);
+            }
+        })
+    });
+
+
+    $('#table').bootstrapTable({
+        url: '/person-area/list?type=ZERO&shopCode=' + $('#shopCode').val(),
+        pagination: true,
+        sidePagination: "server",
+        locale: 'zh-CN',
+        toolbar: "#deposit",
+        clickToSelect: true,
+        singleSelect: true,
+        sortable: true,
+        smartDisplay: false,
+        pageNumber: 1,     //初始化加载第一页，默认第一页
+        pageSize: 10,      //每页的记录行数（*）
+        queryParams: function (params) {
+
+            return params;
+        },
+        onClickRow: function (row, $element) {
+            //console.log(row.id);
+        },
+        onDblClickRow: function (row, $element) {
+            //暂不允许编辑，删除再添加即可
+            $.ajax({
+                type: "GET",
+                url: "/person-area/get?id=" + row.id,
+                async: false,
+                success: function(data){
+                    $('#form').clearForm();
+                    $('#id').val(data.id);
+                    $('#jobNum').val(data.jobNum);
+                    $('#areaCode').val(data.areaCode);
+                    $('#jobNum, #areaCode').selectpicker('refresh');
+                }
+            });
+            $('#myModal').modal('show');
+        },
+        columns: [ {
+            field: '',
+            checkbox: true, // 显示一个勾选框
+            align: 'center'
+        },{
+            field: 'id',
+            title: 'ID',
+            visible: false
+        }, {
+            field: 'personName',
+            title: '姓名'
+        }, {
+            field: 'areaName',
+            title: '区域'
+        }]
+    });
+
+    $('#save').click(function() {
+        if($('#form')[0].reportValidity()) {
+            $('#save').attr("disabled", true);//屏蔽提交按钮
+            $.ajax({
+                type: "post",
+                url: "/person-area/save",
+                data: $('#form').serialize(),
+                success: function(data){
+                    $('#myModal').modal('hide');
+                    $('#table').bootstrapTable('refresh');
+                    $('#save').attr("disabled", false);//提交成功后激活提交按钮
+                },
+                error: function(data){
+                    $('#save').attr("disabled", false);
+                    bootbox.alert("保存失败，请重试！");
+                }
+            });
+
+        }
+    });
+
+    $('#add').click(function () {
+        $('#form').resetForm();
+        $('#id').val('');
+        $('#jobNum, #areaCode').selectpicker('refresh');
+        $('#myModal').modal('show');
+    });
+
+    $('#remove').click(function () {
+        if($('#table').bootstrapTable('getSelections').length == 0) {
+            return;
+        }
+
+        var id = $('#table').bootstrapTable('getSelections')[0].id;
+        bootbox.confirm("确认删除？",
+            function(result){
+                if(result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/person-area/remove",
+                        traditional: true,
+                        data: {
+                            id: id
+                        },
+                        success: function(data){
+                            $('#table').bootstrapTable('refresh');
+                        },
+                        error:function(xhr,state,errorThrown){
+                            alert("删除失败，请关闭网页重新尝试！");
+                        }
+                    });
+                }
+            })
+    });
+</script>
+</html>

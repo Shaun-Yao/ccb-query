@@ -17,8 +17,8 @@ spring:
       mode: HTML
   servlet:
     multipart:
-      max-file-size: 80MB
-      max-request-size: 80MB
+      max-file-size: 200MB
+      max-request-size: 200MB
 
 mybatis:
   type-aliases-package: com.honji.order
@@ -44,5 +44,5 @@ pagehelper:
 logging:
   file: logs/ccb.log
   level:
-    com.honji.order.mapper: debug
+    com.honji.order.mapper: INFO
     root: INFO

@@ -102,7 +102,7 @@
         var file = $('#' + name)[0].files[0];
         if (file != undefined) {
             if (file.size > 80 * 1024 * 1024) {
-                alert("文件超过15M，不允许上传");
+                alert("文件超过80M，不允许上传");
                 return;
             }
             var formData = new FormData();

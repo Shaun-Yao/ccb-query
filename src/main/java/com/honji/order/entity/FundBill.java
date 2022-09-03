@@ -19,6 +19,18 @@ public class FundBill extends IdEntity {
 
     private static final long serialVersionUID = 1L;
 
+    public FundBill(String createdTime, String serialNumber, String subOrderNumber, String orderTime,
+                    String goodsId, Double totalAmount, Double refundAmount, Double commission) {
+        this.createdTime = createdTime;
+        this.serialNumber = serialNumber;
+        this.subOrderNumber = subOrderNumber;
+        this.orderTime = orderTime;
+        this.goodsId = goodsId;
+        this.totalAmount = totalAmount;
+        this.refundAmount = refundAmount;
+        this.commission = commission;
+    }
+
     public FundBill(String createdTime, String serialNumber, String direction, Double orderAmount,
                     String account, String summary, String billType, String subOrderNumber, String orderNumber,
                     String afterSalesNumber, String orderTime, String goodsId, String orderType,

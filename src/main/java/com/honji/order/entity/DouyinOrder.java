@@ -2,6 +2,7 @@ package com.honji.order.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -13,6 +14,7 @@ import lombok.experimental.Accessors;
  * @since 2022-08-25
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class DouyinOrder extends IdEntity {
@@ -59,6 +61,26 @@ public class DouyinOrder extends IdEntity {
         this.adChannel = adChannel;
     }
 
+
+    public DouyinOrder(String orderNumber, String subOrderNumber, String goodsName, String goodsId, String submitTime,
+                       String finishTime, String status, double totalAmount, double freight, String orderType,
+                       String expressInformation, String darenId, String darenNickName, int quantity, double price) {
+        this.orderNumber = orderNumber;
+        this.subOrderNumber = subOrderNumber;
+        this.goodsName = goodsName;
+        this.goodsId = goodsId;
+        this.submitTime = submitTime;
+        this.finishTime = finishTime;
+        this.status = status;
+        this.totalAmount = totalAmount;
+        this.freight = freight;
+        this.orderType = orderType;
+        this.expressInformation = expressInformation;
+        this.darenId = darenId;
+        this.darenNickName = darenNickName;
+        this.quantity = quantity;
+        this.price = price;
+    }
 
     private String orderNumber;
 

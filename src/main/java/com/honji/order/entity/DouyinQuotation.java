@@ -19,11 +19,12 @@ public class DouyinQuotation extends IdEntity {
 
     private static final long serialVersionUID = 1L;
 
-    public DouyinQuotation(String goodsId, String goodsCategory, String adjustment, String manufacturer, String itemNumber,
+    public DouyinQuotation(String goodsId, String goodsCategory, String adjustment, String inOutside, String manufacturer, String itemNumber,
                            String code, String description, String cost, String accessory, String operatingFee, String freight) {
         this.goodsId = goodsId;
         this.goodsCategory = goodsCategory;
         this.adjustment = adjustment;
+        this.inOutside = inOutside;
         this.manufacturer = manufacturer;
         this.itemNumber = itemNumber;
         this.code = code;
@@ -48,6 +49,11 @@ public class DouyinQuotation extends IdEntity {
      * 件数调整
      */
     private String adjustment;
+
+    /**
+     * 内外部说明
+     */
+    private String inOutside;
 
     /**
      * 厂家

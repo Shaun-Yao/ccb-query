@@ -1,17 +1,14 @@
 package com.honji.order.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.honji.order.entity.Area;
-import com.honji.order.entity.DetailsProposal;
 import com.honji.order.entity.SalesPlan;
 import com.honji.order.entity.SalesPlanDetails;
 import com.honji.order.mapper.SalesPlanMapper;
 import com.honji.order.model.DataGridResult;
 import com.honji.order.model.SalesPlanVO;
 import com.honji.order.service.IAreaService;
-import com.honji.order.service.IDetailsProposalService;
 import com.honji.order.service.ISalesPlanDetailsService;
 import com.honji.order.service.ISalesPlanService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +46,6 @@ public class SalesPlanDetailsController {
     @Autowired
     private IAreaService areaService;
 
-    @Autowired
-    private IDetailsProposalService detailsProposalService;
     @Autowired
     private SalesPlanMapper salesPlanMapper;
 
@@ -148,11 +143,9 @@ public class SalesPlanDetailsController {
     @ResponseBody
     public boolean remove(@RequestParam String id) {
         SalesPlanDetails salesPlanDetails =  salesPlanDetailsService.getById(id);
-        QueryWrapper<DetailsProposal> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("details_id", id);
-        List<DetailsProposal> proposals = detailsProposalService.list(queryWrapper);
+
         //已经有方案或者有反馈不允许删除
-        if (proposals.size() > 0 || salesPlanDetails.getFeedback().length() > 0) {
+        if (salesPlanDetails.getFeedback().length() > 0) {
             return false;
         }
         return salesPlanDetailsService.removeById(id);

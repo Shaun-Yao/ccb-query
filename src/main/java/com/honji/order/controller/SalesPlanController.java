@@ -9,7 +9,6 @@ import com.honji.order.model.DataGridResult;
 import com.honji.order.model.SalesPlanDTO;
 import com.honji.order.model.SalesPlanVO;
 import com.honji.order.service.IAreaService;
-import com.honji.order.service.IDetailsProposalService;
 import com.honji.order.service.ISalesPlanDetailsService;
 import com.honji.order.service.ISalesPlanService;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +50,6 @@ public class SalesPlanController {
 
     @Autowired
     private ISalesPlanDetailsService salesPlanDetailsService;
-
-    @Autowired
-    private IDetailsProposalService detailsProposalService;
     @Autowired
     private IAreaService areaService;
 
@@ -159,7 +155,7 @@ public class SalesPlanController {
             dateCell.setCellValue(plan.getCreateDate());
             dateCell.setCellStyle(cellStyle);
 
-            row.createCell(2).setCellValue(plan.getArea());
+            row.createCell(2).setCellValue(plan.getAreaName());
             row.createCell(3).setCellValue(plan.getShopCode());
             row.createCell(4).setCellValue(plan.getShopName());
             row.createCell(5).setCellValue(plan.getPerformDate());

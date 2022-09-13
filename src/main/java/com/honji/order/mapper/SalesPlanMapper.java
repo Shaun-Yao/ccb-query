@@ -89,7 +89,7 @@ public interface SalesPlanMapper extends BaseMapper<SalesPlan> {
     List<SalesPlanVO> selectForManager(@Param("salesPlanDTO")SalesPlanDTO salesPlanDTO);
 
     @Select({"<script>",
-            "SELECT kehu.khmc as shopName, sales_plan.* FROM sales_plan ",
+            "SELECT kehu.khmc as shopName, area.name as areaName, sales_plan.* FROM sales_plan ",
             "JOIN IP180.SPERP.dbo.kehu on sales_plan.shop_code = kehu.khdm ",
 //            " JOIN area on sales_plan.area = area.code ",
             " JOIN area on kehu.khsx3 = area.code ",

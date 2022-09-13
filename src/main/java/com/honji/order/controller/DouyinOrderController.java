@@ -461,11 +461,11 @@ public class DouyinOrderController {
 
                 String orderNumber = row.getCell(1).getStringCellValue().trim();
                 String goodsId = row.getCell(2).getStringCellValue().trim();
-                String createdTime = row.getCell(5).getStringCellValue().trim();
+                String orderTime = row.getCell(5).getStringCellValue().trim();
                 double totalAmount = row.getCell(9).getNumericCellValue();
                 double refundAmount = row.getCell(10).getNumericCellValue();
                 double commission = row.getCell(13).getNumericCellValue();
-                String orderTime = row.getCell(24).getStringCellValue().trim();
+                String createdTime = row.getCell(24).getStringCellValue().trim();
 
                 FundBill fundBill = new FundBill(createdTime, orderNumber, orderNumber, orderTime,
                         goodsId, totalAmount, refundAmount, commission);
@@ -522,17 +522,18 @@ public class DouyinOrderController {
                 String goodsId = df.formatCellValue(row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 String goodsCategory = df.formatCellValue(row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
                 String adjustment = df.formatCellValue(row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String manufacturer = df.formatCellValue(row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String itemNumber = df.formatCellValue(row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String code = df.formatCellValue(row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String description = df.formatCellValue(row.getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String cost = df.formatCellValue(row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String accessory = df.formatCellValue(row.getCell(9, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String operatingFee = df.formatCellValue(row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-                String freight = df.formatCellValue(row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String inOutside = df.formatCellValue(row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String manufacturer = df.formatCellValue(row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String itemNumber = df.formatCellValue(row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String code = df.formatCellValue(row.getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String description = df.formatCellValue(row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String cost = df.formatCellValue(row.getCell(9, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String accessory = df.formatCellValue(row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String operatingFee = df.formatCellValue(row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+                String freight = df.formatCellValue(row.getCell(12, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
 
-                DouyinQuotation quotation = new DouyinQuotation(goodsId, goodsCategory, adjustment, manufacturer, itemNumber,
-                        code, description, cost, accessory, operatingFee, freight);
+                DouyinQuotation quotation = new DouyinQuotation(goodsId, goodsCategory, adjustment, inOutside,
+                        manufacturer, itemNumber, code, description, cost, accessory, operatingFee, freight);
                 list.add(quotation);
 
             }
@@ -621,6 +622,8 @@ public class DouyinOrderController {
             String columnNames[] = { "主订单编号", "子订单编号", "支付方式", "选购商品", "商品ID", "商品数量", "商品金额", "订单提交时间", "订单完成时间",
                     "买家留言", "旗帜颜色", "商家备注", "app渠道", "订单状态", "取消原因", "售后状态", "订单类型", "应付金额", "运费", "优惠总金额", "平台优惠",
                     "商家优惠", "达人优惠", "商家改价", "支付优惠", "手续费", "红包抵扣", "快递信息", "达人ID", "达人昵称", "广告渠道",
+                    //"商品分类", "厂家分类",
+                    //"厂家用友代码", "供应商做账说明", "物流信息", "件数调整", "整理后_商品数量", "商品单价", "商品销售总额", "商品成本单价", "商品成本总额",
                     "动账时间", "下单时间", "贷款", "佣金"
             };// 列名
             String fields[] = { "orderNumber", "subOrderNumber", "paymentMethod", "goodsName", "goodsId",
@@ -628,6 +631,7 @@ public class DouyinOrderController {
                     "status", "cancelReason", "afterSalesStatus", "orderType", "totalAmount", "freight",
                     "totalDiscount", "platformOffers", "merchantOffers", "darenOffers", "changePrice",
                     "paymentDiscount", "fee", "redEnvelope", "expressInformation", "darenId", "darenNickName", "adChannel",
+                    //"", "", "", "","", "","", "",
                     "createdTime", "orderTime", "loan", "commission"
 
             };// 字段名
@@ -649,7 +653,7 @@ public class DouyinOrderController {
             wb.removeSheetAt(0);
             SXSSFSheet sheet = wb.createSheet();
             //SXSSFSheet sheet = (SXSSFSheet) wb.getSheetAt(0);
-            sheet.setRandomAccessWindowSize(1000);// keep 100 rows in memory, exceeding rows will be flushed to disk
+            sheet.setRandomAccessWindowSize(2000);// keep 100 rows in memory, exceeding rows will be flushed to disk
             Row headRow = sheet.createRow(0);
             for (int i = 0; i < columnNames.length; i++) {
                 headRow.createCell(i).setCellValue(columnNames[i]);

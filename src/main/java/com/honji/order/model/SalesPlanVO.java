@@ -41,9 +41,14 @@ public class SalesPlanVO extends IdEntity {
     private LocalDate createDate;
 
     /**
-     * 销售区域
+     * 销售区域代码
      */
     private String area;
+
+    /**
+     * 销售区域名称
+     */
+    private String areaName;
 
     /**
      * 店铺编码

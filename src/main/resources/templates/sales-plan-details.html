@@ -64,12 +64,12 @@
                 <label class="col-sm-1 control-label">当月业绩</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="amounts" name="amounts"
-                           th:value="${salesPlan?.amounts}" readonly required>
+                           th:value="${salesPlan?.amounts}"  required>
                 </div>
                 <label class="col-sm-1 control-label">同期业绩</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="lastYearMonthAmounts" name="lastYearMonthAmounts"
-                           th:value="${salesPlan?.lastYearMonthAmounts}" readonly required>
+                           th:value="${salesPlan?.lastYearMonthAmounts}"  required>
                 </div>
 
             </div>
@@ -79,12 +79,12 @@
                 <label class="col-sm-1 control-label">同期涨幅金额</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="monthDiff" name="monthDiff"
-                           th:value="${salesPlan?.monthDiff}" readonly required>
+                           th:value="${salesPlan?.monthDiff}"  required>
                 </div>
-                <label class="col-sm-1 control-label">同期涨幅</label>
+                <label class="col-sm-1 control-label">同期涨幅(百分比)</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="monthPercent" name="monthPercent"
-                           th:value="${salesPlan?.monthPercent}" readonly required>
+                           th:value="${salesPlan?.monthPercent}"  required>
                 </div>
             </div>
 
@@ -92,12 +92,12 @@
                 <label class="col-sm-1 control-label">当年累计业绩</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="totalAmounts" name="totalAmounts"
-                           th:value="${salesPlan?.totalAmounts}"  readonly required>
+                           th:value="${salesPlan?.totalAmounts}"   required>
                 </div>
                 <label  class="col-sm-1 control-label">同期累计金额</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="lastYearTotalAmounts" name="lastYearTotalAmounts"
-                           th:value="${salesPlan?.lastYearTotalAmounts}"  readonly required>
+                           th:value="${salesPlan?.lastYearTotalAmounts}"   required>
                 </div>
 
             </div>
@@ -106,12 +106,12 @@
                 <label  class="col-sm-1 control-label">同期累计涨幅金额</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="yearDiff" name="yearDiff"
-                           th:value="${salesPlan?.yearDiff}"  readonly required>
+                           th:value="${salesPlan?.yearDiff}"   required>
                 </div>
-                <label class="col-sm-1 control-label">同期累计涨幅</label>
+                <label class="col-sm-1 control-label">同期累计涨幅(百分比)</label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" id="yearPercent" name="yearPercent"
-                           th:value="${salesPlan?.yearPercent}" readonly required>
+                           th:value="${salesPlan?.yearPercent}"  required>
                 </div>
             </div>
 
@@ -505,7 +505,7 @@
 
 
         $('#shopCode').change(function () {
-            var performDate = $('#performDate').val();
+            /*var performDate = $('#performDate').val();
             var shopCode = $('#shopCode').val();
             if(performDate.length > 0 && shopCode.length > 0) {
                 $.ajax({
@@ -523,7 +523,7 @@
                         $('#yearPercent').val(data.yearPercent);
                     }
                 });
-            }
+            }*/
         });
 
         var subjectSel = document.getElementById("reasonType");
@@ -660,11 +660,11 @@
 
         if($('#form')[0].reportValidity()) {
             if ($('#reason').val() == '其他' && $('#other').val().trim().length < 1) {
-                bootbox.alert("请填写其他原因描述！");
+                alert("请填写其他原因描述！");
                 return;
             }
             if ($('#reason').val() != '其他' && $('#other').val().trim().length > 0) {
-                bootbox.alert("原因非其他，请不要填写其他原因描述！");
+                alert("原因非其他，请不要填写其他原因描述！");
                 return;
             }
             $(this).attr("disabled", true);//屏蔽提交按钮

@@ -129,8 +129,8 @@ public class SalesPlanController {
 
         String columnNames[] = { "制表人", "制表日期", "销售区域", "店铺编码", "店铺名称", "业绩分析时点",
                 "当月业绩", "同期业绩"};// 列名
-        String detailsColumnNames[] = { "原因类型", "主要原因", "原因分析", "方案类型", "方案", "大区经理反馈",
-                "方案确定", "开始日期", "结束日期", "频率", "执行人", "结果"};// 原因列名
+        String detailsColumnNames[] = { "原因类型", "主要原因", "原因分析", "其他原因描述", "方案类型", "方案",
+                "大区经理反馈", "方案确定", "开始日期", "结束日期", "频率", "执行人", "结果"};// 原因列名
 //        String proposalColumnNames[] = { "方案", "日期", "原因分析", "常规方案", "创新方案", "大区经理反馈",
 //                "执行人", "结果"};// 方案列名
         CreationHelper creationHelper = workbook.getCreationHelper();
@@ -177,21 +177,21 @@ public class SalesPlanController {
                 detailsRow.createCell(0).setCellValue(details.getReasonType());
                 detailsRow.createCell(1).setCellValue(details.getPrimaryReason());
                 detailsRow.createCell(2).setCellValue(details.getReason());
-                detailsRow.createCell(3).setCellValue(details.getProposalType());
-                detailsRow.createCell(4).setCellValue(details.getProposal());
-                detailsRow.createCell(5).setCellValue(details.getFeedback());
-                detailsRow.createCell(6).setCellValue(details.getConfirmation());
-//                detailsRow.createCell(5).setCellValue(details.getBeginDate());
-                Cell beginDateCell = detailsRow.createCell(7);
+                detailsRow.createCell(3).setCellValue(details.getOther());
+                detailsRow.createCell(4).setCellValue(details.getProposalType());
+                detailsRow.createCell(5).setCellValue(details.getProposal());
+                detailsRow.createCell(6).setCellValue(details.getFeedback());
+                detailsRow.createCell(7).setCellValue(details.getConfirmation());
+
+                Cell beginDateCell = detailsRow.createCell(8);
                 beginDateCell.setCellValue(details.getBeginDate());
                 beginDateCell.setCellStyle(cellStyle);
-                Cell endDateCell = detailsRow.createCell(8);
+                Cell endDateCell = detailsRow.createCell(9);
                 endDateCell.setCellValue(details.getEndDate());
                 endDateCell.setCellStyle(cellStyle);
-//                detailsRow.createCell(6).setCellValue(details.getEndDate());
-                detailsRow.createCell(9).setCellValue(details.getFrequency());
-                detailsRow.createCell(10).setCellValue(details.getExecutor());
-                detailsRow.createCell(11).setCellValue(details.getResult());
+                detailsRow.createCell(10).setCellValue(details.getFrequency());
+                detailsRow.createCell(11).setCellValue(details.getExecutor());
+                detailsRow.createCell(12).setCellValue(details.getResult());
 
 /*
 

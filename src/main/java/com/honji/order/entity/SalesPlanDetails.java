@@ -42,6 +42,11 @@ public class SalesPlanDetails extends IdEntity {
     private String reason;
 
     /**
+     * 其他原因描述
+     */
+    private String other;
+
+    /**
      * 方案类型：常规、创新
      */
     private String proposalType;
